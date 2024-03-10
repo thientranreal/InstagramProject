@@ -1,0 +1,18 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebRTC Call</title>
+</head>
+<body>
+    <h1>WebRTC Call</h1>
+    <video id="localVideo" autoplay></video>
+    <video id="remoteVideo" autoplay></video>
+    <button id="startButton">Start Call</button>
+    <button id="hangupButton">Hang Up</button>
+
+    <script src="{% static 'webrtc/app.js' %}"></script>
+</body>
+</html>

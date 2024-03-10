@@ -1,0 +1,121 @@
+.box{
+    background: white;
+    height: 600px;
+    width: 350px;
+    border: 2px solid black;
+    position: absolute;
+    transform: translate(-50%,-50%);
+    left: 50%;
+    top: 1500%;
+    border-radius: 15px;
+    box-shadow: 0px 10px 20px -10px rgba(0,0,0,0.8);
+}
+
+.nav{
+    display: flex;
+}
+
+.box .nav img{
+    height: 50px;
+    width: 50px;
+    margin:10px;
+    border-radius: 50%;
+}
+
+.nav h1{
+    margin-top: 18px;
+    font-size: 25px;
+}
+
+.nav .right-bar{
+    text-align: right;
+    margin-left: 90px;
+    margin-top: 10px;
+}
+
+.nav .right-bar i{
+    font-size: 22px;
+    margin: 10px;
+}
+
+.box .bar input{
+    height: 30px;
+    width: 90%;
+    margin-left: 15px;
+    padding: 5px;
+    outline: none;
+    border-radius: 15px;
+}
+
+.box .bar2{
+    display: flex;
+}
+
+.box .online i{
+    margin: 14px;
+    font-size: 30px;
+}
+
+.box .pics img{
+    margin: 10px;
+    height: 50px;
+    width: 50px;
+    border-radius: 50%;
+    border:1px solid black;
+}
+
+.box .pics{
+    text-align: center;
+}
+
+.box .online{
+    text-align: center;
+}
+
+.box .message {
+    margin-top: 10px;
+}
+
+.box .message .member img{
+height: 50px;
+width: 50px;
+margin: 15px;
+border:1px solid black;
+border-radius: 50%;
+}
+.box .message .member{
+    display: flex;
+}
+
+.box .message .member h1{
+    font-size: 20px;
+    margin-top: 15px;
+}
+
+.box .message .member p{
+    font-size: 12px;
+}
+
+.box .foot{
+    display: flex;
+}
+
+.box .foot i{
+    font-size: 30px;
+}
+
+.box .foot .left{
+    text-align: left;
+    margin-left: 40px;
+    margin-top: 10px;
+}
+
+.box .foot .right{
+    margin-left: 55%;
+    margin-top: 10px;
+}
+
+.box .foot p{
+    font-weight: 100px;
+    font-weight: bold;
+}

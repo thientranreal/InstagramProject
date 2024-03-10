@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    {% load static %}
+    <!-- <link
+      rel="stylesheet"
+      type="text/css"
+      href="{% static 'css/style.css' %}"
+    /> -->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{% static 'messenger/css/style.css' %}"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{% static 'messenger/css/normalize.css' %}"
+    />
+
+    <title>Messenger</title>
+  </head>
+
+  <body>
+    <!-- <nav class="navbar">
+      <div class="navbar-wrapper">
+        <img
+          src="{% static 'assets/images/instagram_logo.png' %}"
+          alt="Instagram logo"
+          class="logo"
+        />
+        <input type="text" class="search" placeholder="Search" />
+        <div class="nav-items" style="display: flex">
+          <img
+            src="{% static 'assets/images/nav-items/home.PNG' %}"
+            class="icons"
+            alt="Home Icon"
+          />
+
+          <div id="messenger">
+            <img
+              src="{% static 'assets/images/nav-items/messenger.PNG' %}"
+              class="icons"
+              alt="Messenger Icon"
+            />
+          </div>
+
+          <div class="box" id="box" style="display: none">
+            <div class="nav">
+              <img src="{% static 'assets/images/img.jpg' %}" />
+              <h1 class="logo">Chats</h1>
+              <div class="right-bar">
+                <i class="fas fa-camera"></i>
+                <i class="fas fa-pen"></i>
+              </div>
+            </div>
+            <div class="bar">
+              <input type="text" name="" placeholder="Search" />
+            </div>
+            <div class="bar2">
+              <div class="online">
+                <i class="far fa-plus-square"></i>
+                Create Room
+              </div>
+              <div class="pics">
+                <img src="{% static 'assets/images/img.jpg' %}" />
+                Vishal
+              </div>
+              <div class="pics">
+                <img src="{% static 'assets/images/img.jpg' %}" />
+                coder
+              </div>
+              <div class="pics">
+                <img src="{% static 'assets/images/img.jpg' %}" />
+                lokesh
+              </div>
+              <div class="pics">
+                <img src="{% static 'assets/images/img.jpg' %}" />
+                rohit
+              </div>
+            </div>
+            <div class="message">
+              <div class="member">
+                <img src="{% static 'assets/images/img.jpg' %}" />
+                <h1>
+                  Coder<br />
+                  <p>Hello - Tue</p>
+                </h1>
+              </div>
+              <div class="member">
+                <img src="{% static 'assets/images/img.jpg' %}" />
+                <h1>
+                  Rohit<br />
+                  <p>Like my photo - Mon</p>
+                </h1>
+              </div>
+              <div class="member">
+                <img src="{% static 'assets/images/img.jpg' %}" />
+                <h1>
+                  Vishal Tewtia<br />
+                  <p>Kase Ho - Fri</p>
+                </h1>
+              </div>
+              <div class="member">
+                <img src="{% static 'assets/images/img.jpg' %}" />
+                <h1>
+                  lokesh<br />
+                  <p>jarur video like karna - Tue</p>
+                </h1>
+              </div>
+            </div>
+            <hr />
+            <div class="foot">
+              <div class="left">
+                <i class="fas fa-comment"></i>
+                <p>Chats</p>
+              </div>
+              <div class="right">
+                <i class="fas fa-user-friends"></i>
+                <p>People</p>
+              </div>
+            </div>
+          </div>
+          <img
+            src="{% static 'assets/images/nav-items/add.PNG' %}"
+            class="icons"
+            alt="Add Icon"
+          />
+          <img
+            src="{% static 'assets/images/nav-items/explore.PNG' %}"
+            class="icons"
+            alt="Explore Icon"
+          />
+          <div id="notificationLink">
+            <img
+              src="{% static 'assets/images/nav-items/like.PNG' %}"
+              class="icons"
+              alt="Like Icon"
+              style="height: 24px; position: relative"
+            />
+            <ul id="nav">
+              <li id="notification_li">
+                <span id="notification_count">3</span>
+                <div id="notificationContainer">
+                  <div id="notificationTitle">Notifications</div>
+                  <div id="notificationsBody" class="notifications"></div>
+                  <div id="notificationFooter"><a href="#">See All</a></div>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div>
+            <a href="{% url 'profile' %}">
+              <img
+                src="{% static 'assets/images/nav-items/user.png' %}"
+                class="icons user-account"
+                alt="User Profile"
+              />
+            </a>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <nav class="navbar-mobile-top">
+      <div class="navbar-wrapper">
+        <img
+          src="{% static 'assets/images/instagram_logo.png' %}"
+          alt="Instagram logo"
+          class="logo"
+        />
+        <input type="text" class="search" placeholder="Search" />
+        <div class="nav-items">
+          <img
+            src="{% static 'assets/images/nav-items/add.PNG' %}"
+            class="icons"
+            alt="Add Icon"
+          />
+          <img
+            src="{% static 'assets/images/nav-items/like.PNG' %}"
+            class="icons"
+            alt="Like Icon"
+          />
+          <img
+            src="{% static 'assets/images/nav-items/messenger.PNG' %}"
+            class="icons"
+            alt="Messenger Icon"
+          />
+        </div>
+      </div>
+    </nav>
+    <nav class="navbar-mobile-bottom">
+      <div class="navbar-wrapper">
+        <div class="nav-g">
+          <img
+            src="{% static 'assets/images/nav-items/home.PNG' %}"
+            class="icons"
+            alt="Home Icon"
+          />
+          <img
+            src="{% static 'assets/images/instagram_logo.png' %}"
+            class="icons"
+            alt="Add Icon"
+          />
+          <img
+            src="{% static 'assets/images/nav-items/send.PNG' %}"
+            class="icons"
+            alt="Explore Icon"
+          />
+          <img
+            src="{% static 'assets/images/nav-items/comment.PNG' %}"
+            class="icons"
+            alt="Like Icon"
+          />
+          <img
+            src="{% static 'assets/images/nav-items/user.png' %}"
+            class="icons"
+            alt="Like Icon"
+          />
+        </div>
+      </div>
+    </nav> -->
+
+    <div class="wrapper-mobile">
+      <div class="mobile">
+        <img src="" />Not available on Tablet or Mobile devices.
+      </div>
+    </div>
+
+    <div class="wrapper">
+      <header style="position: fixed; background-color: #ffffff">
+        <div class="container">
+          <div class="left">
+            <img src="{% static 'messenger/img/logo.svg' %}" />
+          </div>
+
+          <div class="middle">
+            <h3>Theresa Hudson</h3>
+            <p>Messenger</p>
+          </div>
+
+          <div class="right">
+            <div class="username">
+              <div class="settings">
+                <img src="{% static 'messenger/img/settings.svg' %}" />
+              </div>
+              Patrcia Fields
+            </div>
+
+            <div class="avatar">
+              <img src="{% static 'messenger/img/avatar.png' %}" />
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main>
+        <div class="col-left">
+          <!-- <div class="col-content"> -->
+            <div class="messages" style="overflow-y: auto;">
+              {% for ll in lienlac %}
+              <li>
+                <div class="avatar">
+                  <div class="avatar-image">
+                    <div class="status online"></div>
+                    <img src="{% static 'messenger/img/avatar-2.png' %}" />
+                  </div>
+                </div>
+                <h3>{{ ll.dich }}</h3>
+                <p>{{ ll.lastmess }}</p>
+              </li>
+              {% endfor %}
+            </div>
+          <!-- </div> -->
+        </div>
+        <div class="col">
+          <div class="col-content">
+            <section class="message">
+              <div class="grid-message">
+                <div class="col-message-received">
+                  <div class="message-received">
+                    <p>Ok.</p>
+                  </div>
+                  <div class="message-received">
+                    <p>Do you play EVE Online?</p>
+                  </div>
+                </div>
+                <div class="col-message-sent">
+                  <div class="message-sent">
+                    <p>Not anymore.</p>
+                  </div>
+                </div>
+                <div class="col-message-received">
+                  <div class="message-received">
+                    <p>But, can you?</p>
+                  </div>
+                </div>
+                <div class="col-message-sent">
+                  <div class="message-sent">
+                    <p>
+                      I guess if I had some practice I could again. It's been
+                      years.
+                    </p>
+                  </div>
+                </div>
+                <div class="col-message-received">
+                  <div class="message-received">
+                    <p>Dat titan though...</p>
+                  </div>
+                </div>
+                <div class="col-message-sent">
+                  <div class="message-sent">
+                    <p>Trombone, guitar, titan?</p>
+                  </div>
+                </div>
+                <div class="col-message-received">
+                  <div class="message-received">
+                    <p>Niiiiice.</p>
+                  </div>
+                </div>
+                <div class="col-message-sent">
+                  <div class="message-sent">
+                    <div class="">
+                      <p>
+                        Do you care if I use the last few minutes of our
+                        conversation as dummy text for this thing I'm coding?
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-message-received">
+                  <div class="message-received">
+                    <p>Sure go ahead.</p>
+                  </div>
+                </div>
+                <div class="col-message-sent">
+                  <div class="message-sent">
+                    <p>Okay.</p>
+                  </div>
+                  <div class="message-sent">
+                    <p>I'll send you some ISK when I'm done.</p>
+                  </div>
+                  <div class="message-sent">
+                    <p>It's cool.</p>
+                  </div>
+                </div>
+                <div class="col-message-received">
+                  <div class="message-received">
+                    <p>Ok.</p>
+                  </div>
+                  <div class="message-received">
+                    <p>Do you play EVE Online?</p>
+                  </div>
+                </div>
+                <div class="col-message-sent">
+                  <div class="message-sent">
+                    <p>Not anymore.</p>
+                  </div>
+                </div>
+                <div class="col-message-received">
+                  <div class="message-received">
+                    <p>But, can you?</p>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <div class="col-foot">
+            <div class="compose">
+              <input placeholder="Type a message" />
+              <div class="compose-dock">
+                <div class="dock">
+                  <img src="{% static 'messenger/img/picture.svg' %}" /><img
+                    src="{% static 'messenger/img/smile.svg' %}"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-right"></div>
+      </main>
+    </div>
+  </body>
+</html>

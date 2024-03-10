@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+    <link rel="icon" type="image/x-icon" href="{% static 'assets/images/insta-favicon.ico' %}" />
+    <script type="module" src="{% static "js/SignupPage.js" %}" defer></script>
+    <title>Instagram Signup</title>
+  </head>
+  <body>
+    <main class="flex align-items-center justify-content-center">
+      <section id="mobile" class="flex"></section>
+      <section id="auth" class="flex direction-column">
+        <div class="panel login flex direction-column">
+          <h1 title="Instagram" class="flex justify-content-center">
+            <img
+              src="{% static 'image/instagram-logo.png' %}"
+              alt="Instagram logo"
+              title="Instagram logo"
+            />
+          </h1>
+          <form>
+            <input name="phone_email" placeholder="Mobile Number or Email" />
+            <input name="firstname" placeholder="First Name" />
+            <input name="lastname" placeholder="Last Name" />
+            <input name="username" placeholder="Username" />
+            <input name="password" type="password" placeholder="Password" />
+
+            <div>
+                <p class="contract-paragraph" style="padding-top: 10px;">
+                    People who use our service may have uploaded your 
+                    contact information to Instagram. <a href="#">Learn More</a>
+                </p>
+                <p class="contract-paragraph">
+                    By signing up, you agree to 
+                    our Terms , <a href="#">Privacy Policy</a> and <a href="#">Cookies Policy</a> .
+                </p>
+              </div>
+
+            <button id="sign-up-btn" type="button">Sign up</button>
+
+            <!-- Hiển thị thông báo lỗi -->
+            <p class="error"></p>
+          </form>
+        </div>
+        <div class="panel register flex justify-content-center">
+          <p>Have an account?</p>  
+          <a href="{% url "login" %}">Log in</a>
+        </div>
+        <div class="app-download flex direction-column align-items-center">
+          <p>Get the app.</p>
+          <div class="flex justify-content-center">
+            <img
+              src="{% static 'image/apple-button.png' %}"
+              alt="Imagem com a logo da Apple Store"
+              title="Imagem com a logo da Apple Store"
+            />
+            <img
+              src="{% static 'image/googleplay-button.png' %}"
+              alt="Imagem com a logo da Google Play"
+              title="Imagem com a logo da Google Play"
+            />
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <ul class="flex flex-wrap justify-content-center">
+        <li><a href="#">ABOUT</a></li>        
+        <li><a href="#">HELP</a></li>
+        <li><a href="#">PRESS</a></li>
+        <li><a href="#">API</a></li>
+        <li><a href="#">CAREERS</a></li>
+        <li><a href="#">PRIVACY</a></li>
+        <li><a href="#">TERMS</a></li>
+        <li><a href="#">LOCATION</a></li>
+        <li><a href="#">MOST RELEVANT ACCOUNTS</a></li>
+        <li><a href="#">HASHTAGS</a></li>
+        <li><a href="#">LANGUAGE</a></li>
+      </ul>
+      <p class="copyright">© 2020 Instagram by Facebook</p>
+    </footer>
+  </body>
+</html>

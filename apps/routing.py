@@ -8,7 +8,8 @@ ws_urlpatterns=[
     path('ws/notification/', NoftificationConsumer.as_asgi()),
     path('ws/commment/', CommentConsumer.as_asgi()),
     path('ws/onlinestatus/', OnlineStatusConsumer.as_asgi()),
-    re_path(r'^ws/video_call/$', VideoCallConsumer.as_asgi()),
+    # re_path(r'ws/videocall/(?P<room_name>\w+)/$', VideoCallConsumer.as_asgi()),
+    re_path(r'ws/call/', CallConsumer.as_asgi()),
 ]
 
 

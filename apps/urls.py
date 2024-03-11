@@ -16,7 +16,8 @@ urlpatterns = [
     path('messenger', views.messenger, name="messenger"),
     path('chat/<str:chat_box_name>/', views.chat_box, name="chat"),
     path('testthu', views.send_offer, name="testthu"),
-    path('api/check_login_status', views.check_login_status)
+    path('api/check_login_status', views.check_login_status),
+    path('messengerajax/<int:id>/', views.your_ajax_view, name='your-ajax-view'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
-from django.contrib.auth import login, get_user_model as auth_login, authenticate
+from django.contrib.auth import login as auth_login, get_user_model, authenticate
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
 from channels.layers import get_channel_layer

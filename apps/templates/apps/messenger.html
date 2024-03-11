@@ -239,18 +239,24 @@
           <div class="middle">
             <h3>Theresa Hudson</h3>
             <p>Messenger</p>
+            
           </div>
 
           <div class="right">
             <div class="username">
+              
               <div class="settings">
                 <img src="{% static 'messenger/img/settings.svg' %}" />
+                <img src="{% static 'messenger/img/video-camera.png' %}"  style="width: 50px; height: 50px;"/>
               </div>
+
               {{current_user.user}}
+
             </div>
 
             <div class="avatar">
-              <img src="{% static 'messenger/img/avatar.png' %}" />
+              <!-- <img src="{% static 'messenger/img/avatar.png' %}" /> -->
+              <img src="media/{{ current_user.avatar }}" alt="">
             </div>
           </div>
         </div>

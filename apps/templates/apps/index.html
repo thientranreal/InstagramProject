@@ -1,6 +1,6 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -10,13 +10,40 @@
   <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}" />
   <link rel="stylesheet" type="text/css" href="{% static 'css/Notification.css' %}" />
   <link rel="stylesheet" href="{% static 'css/Message.css' %}">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ti-icons@0.1.2/css/themify-icons.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="{% static 'css/friend.css' %}">
   <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
   <script src="https://kit.fontawesome.com/83ccd457ed.js" crossorigin="anonymous"></script>
   <title>Instagram</title>
+  <script type="text/javascript">
+    var user ='{{request.user}}'
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+          const cookies = document.cookie.split(';');
+          for (let i = 0; i < cookies.length; i++) {
+              const cookie = cookies[i].trim();
+              // Does this cookie string begin with the name we want?
+              if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                  break;
+              }
+          }
+      }
+      return cookieValue;
+  }
+  const csrftoken = getCookie('csrftoken');
+  </script>
 </head>
 
 <body>
-  <nav class="navbar">
+  <nav class="navbar1">
     <div class="navbar-wrapper">
       <img src="{% static 'assets/images/instagram_logo.png' %}" alt="Instagram logo" class="logo" />
       <input type="text" class="search" placeholder="Search" />
@@ -139,312 +166,8 @@
       </div>
     </div>
   </nav>
-
-  <section class="main">
-    <div class="wrapper">
-      <div class="left-col">
-        <div class="status-wrapper">
-          <button class="story--scroll" id="scroll-left" onclick="scrollHorizontal(1)"><i
-              class="fas fa-chevron-left"></i></button>
-          <button class="story--scroll" id="scroll-right" onclick="scrollHorizontal(-1)"><i
-              class="fas fa-chevron-right"></i></button>
-          <div class="stories">
-            <div class="status-card">
-              <div class="status-pic">
-                <img src="{% static 'assets/images/profile/status-0.png' %}" />
-              </div>
-              <p class="username">that.suman</p>
-            </div>
-            <div class="status-card">
-              <div class="status-pic">
-                <img src="{% static 'assets/images/profile/status-1.jpg' %}" />
-              </div>
-              <p class="username">debajyoti_r...</p>
-            </div>
-            <div class="status-card">
-              <div class="status-pic">
-                <img src="{% static 'assets/images/profile/status-2.jpg' %}" />
-              </div>
-              <p class="username">su1nta</p>
-            </div>
-            <div class="status-card">
-              <div class="status-pic">
-                <img src="{% static 'assets/images/profile/status-3.jpg' %}" />
-              </div>
-              <p class="username">lexfridman</p>
-            </div>
-            <div class="status-card">
-              <div class="status-pic">
-                <img src="{% static 'assets/images/profile/status-4.jpg' %}" />
-              </div>
-              <p class="username">golimitless</p>
-            </div>
-            <div class="status-card">
-              <div class="status-pic">
-                <img src="{% static 'assets/images/profile/status-5.jpg' %}" />
-              </div>
-              <p class="username">markrober</p>
-            </div>
-            <div class="status-card">
-              <div class="status-pic">
-                <img src="{% static 'assets/images/profile/status-6.jpg' %}" />
-              </div>
-              <p class="username">hubermanlab</p>
-            </div>
-            <div class="status-card">
-              <div class="status-pic">
-                <img src="{% static 'assets/images/profile/status-8.jpg' %}" />
-              </div>
-              <p class="username">waitbutwhy</p>
-            </div>
-            <div class="status-card">
-              <div class="status-pic">
-                <img src="{% static 'assets/images/profile/status-7.jpg' %}" />
-              </div>
-              <p class="username">geeks_for_g...</p>
-            </div>
-          </div>
-        </div>
-        <!-- Posts------------------------------------------- ---------------------- -->
-        <div class="post">
-          <div class="info">
-            <div class="user">
-              <div class="status-pic">
-                <img src="{% static 'assets/images/profile/status-7.jpg' %}" alt="Profile Image" />
-              </div>
-              <p class="username">geeks_for_geeks</p>
-            </div>
-            <img src="{% static 'assets/images/nav-items/option.PNG' %}" class="options" alt="Options" />
-          </div>
-          <img src="{% static 'assets/images/post/post-1.jpg' %}" class="post-image" alt="Geeks for Geeks post" />
-          <div class="post-content">
-            <div class="reaction-wrapper">
-              <img src="{% static 'assets/images/nav-items/like.PNG' %}" class="icons" />
-              <img src="{% static 'assets/images/nav-items/comment.PNG' %}" class="icons" />
-              <img src="{% static 'assets/images/nav-items/send.PNG' %}" class="icons" />
-              <img src="{% static 'assets/images/nav-items/save.PNG' %}" class="save icons" />
-            </div>
-            <p>Liked by <b>su1nta</b> and <b>1,032 others</b></p>
-            <p class="description">
-              <span>geeks_for_geeks</span>*glare intensifies* 😯 😯 😯 😯 😯
-            </p>
-            <p class="no-comments">View all 45 comments</p>
-            <p class="post-time">2 DAYS AGO</p>
-          </div>
-          <!-- <hr /> -->
-          <div class="comment-wrapper">
-            <img src="{% static 'assets/images/nav-items/smile.PNG' %}" class="icons" />
-            <input type="text" class="comment-box" placeholder="Add a comment..." />
-            <button class="comment-btn">Post</button>
-          </div>
-        </div>
-        <div class="post">
-          <div class="info">
-            <div class="user">
-              <div class="status-pic">
-                <img src="{% static 'assets/images/profile/status-10.jpg' %}" alt="Profile Image" />
-              </div>
-              <p class="username">kurzgesagt</p>
-            </div>
-            <img src="{% static 'assets/images/nav-items/option.PNG' %}" class="options" alt="Options" />
-          </div>
-          <img src="{% static 'assets/images/post/post-2.jpg' %}" class="post-image" />
-          <div class="post-content">
-            <div class="reaction-wrapper">
-              <img src="{% static 'assets/images/nav-items/like.PNG' %}" class="icons" />
-              <img src="{% static 'assets/images/nav-items/comment.PNG' %}" class="icons" />
-              <img src="{% static 'assets/images/nav-items/send.PNG' %}" class="icons" />
-              <img src="{% static 'assets/images/nav-items/save.PNG' %}" class="save icons" />
-            </div>
-            <p class="likes">4,316 likes</p>
-            <p class="description">
-              <span>kurzgesagt</span>Verified Which of these pins reminds you
-              of your BBFF (best birb friend forever)?<br />
-              Tag them below! <br />Psst: You can get these Friendship Enamel
-              Pins from the official kurzgesagt friend shop. <br />🔗 Link in
-              Bio
-            </p>
-            <p class="no-comments">View all 283 comments</p>
-            <p class="post-time">2 DAYS AGO</p>
-          </div>
-          <div class="comment-wrapper">
-            <img src="{% static 'assets/images/nav-items/smile.PNG' %}" class="icons" />
-            <input type="text" class="comment-box" placeholder="Add a comment..." />
-            <button class="comment-btn">Post</button>
-          </div>
-        </div>
-        <div class="post">
-          <div class="info">
-            <div class="user">
-              <div class="status-pic">
-                <img src="{% static 'assets/images/profile/status-8.jpg' %}" alt="Profile Image" />
-              </div>
-              <p class="username">waitbutwhy</p>
-            </div>
-            <img src="{% static 'assets/images/nav-items/option.PNG' %}" class="options" alt="Options" />
-          </div>
-          <img src="{% static 'assets/images/post/post-3.jpg' %}" class="post-image" />
-          <div class="post-content">
-            <div class="reaction-wrapper">
-              <img src="{% static 'assets/images/nav-items/like.PNG' %}" class="icons" />
-              <img src="{% static 'assets/images/nav-items/comment.PNG' %}" class="icons" />
-              <img src="{% static 'assets/images/nav-items/send.PNG' %}" class="icons" />
-              <img src="{% static 'assets/images/nav-items/save.PNG' %}" class="save icons" />
-            </div>
-            <p class="likes">4,833 likes</p>
-            <p class="description">
-              <span>waitbutwhy</span>At the center of our planet is a solid
-              sphere of iron and nickel the size of India (1,500mi across)
-              that's as hot as the surface of the sun, and its interaction
-              with the molten iron surrounding it generates the magnetic field
-              that keeps our atmosphere from being blown away by the solar
-              wind. It is a very important metal sphere.
-            </p>
-            <p class="no-comments">View all 45 comments</p>
-            <p class="post-time">6 DAYS AGO</p>
-          </div>
-          <div class="comment-wrapper">
-            <img src="{% static 'assets/images/instagram_logo.png' %}/nav-items/smile.PNG" class="icons" />
-            <input type="text" class="comment-box" placeholder="Add a comment..." />
-            <button class="comment-btn">Post</button>
-          </div>
-        </div>
-        <div class="post">
-          <div class="info">
-            <div class="user">
-              <div class="status-pic">
-                <img src="{% static 'assets/images/profile/status-4.jpg' %}" alt="Profile Image" />
-              </div>
-              <p class="username">golimitless</p>
-            </div>
-            <img src="{% static 'assets/images/nav-items/option.PNG' %}" class="options" alt="Options" />
-          </div>
-          <img src="{% static 'assets/images/post/post-4.jpg' %}" class="post-image" alt="post" />
-          <div class="post-content">
-            <div class="reaction-wrapper">
-              <img src="{% static 'assets/images/nav-items/like.PNG' %}" class="icons" />
-              <img src="{% static 'assets/images/nav-items/comment.PNG' %}" class="icons" />
-              <img src="{% static 'assets/images/nav-items/send.PNG' %}" class="icons" />
-              <img src="{% static 'assets/images/nav-items/save.PNG' %}" class="save icons" />
-            </div>
-            <p class="likes">23,666 likes</p>
-            <p class="description">
-              <span>golimitless</span>You don't need more time, you need more
-              focus.
-            </p>
-            <p class="no-comments">View all 342 comments</p>
-            <p class="post-time">SEPTEMBER 5</p>
-          </div>
-          <div class="comment-wrapper">
-            <img src="{% static 'assets/images/nav-items/smile.PNG' %}" class="icons" />
-            <input type="text" class="comment-box" placeholder="Add a comment..." />
-            <button class="comment-btn">Post</button>
-          </div>
-        </div>
-      </div>
-      <div class="right-col">
-        <div class="profile-card">
-          <div class="status-pic">
-            <img src="{% static 'assets/images/nav-items/user.png' %}" />
-          </div>
-          <div>
-            <p class="pro-user">priyanshumaitra</p>
-            <p class="sub-text">Priyanshu Maitra</p>
-          </div>
-          <div class="action-div">
-            <button class="action-btn">Switch</button>
-          </div>
-        </div>
-        <div class="profile-card">
-          <div>
-            <p class="suggestion-text">Suggestions for you</p>
-          </div>
-          <div class="action-div">
-            <button class="seeall-btn">See All</button>
-          </div>
-        </div>
-        <div class="profile-card">
-          <div class="status-pic">
-            <img src="{% static 'assets/images/follow-img/follow-1.jpg' %}" />
-          </div>
-          <div>
-            <p class="pro-user">stoicarmy</p>
-            <p class="sug-text">New to Instagram&nbsp;</p>
-          </div>
-          <div class="action-div">
-            <button class="action-btn">Follow</button>
-          </div>
-        </div>
-
-        <div class="profile-card">
-          <div class="status-pic">
-            <img src="{% static 'assets/images/follow-img/follow-2.jpg' %}" />
-          </div>
-          <div>
-            <p class="pro-user">visuallywise</p>
-            <p class="sug-text">New to Instagram&nbsp;</p>
-          </div>
-          <div class="action-div">
-            <button class="action-btn">Follow</button>
-          </div>
-        </div>
-
-        <div class="profile-card">
-          <div class="status-pic">
-            <img src="{% static 'assets/images/follow-img/follow-3.jpg' %}" />
-          </div>
-          <div>
-            <p class="pro-user">veritasium</p>
-            <p class="sug-text">Suggested for you</p>
-          </div>
-          <div class="action-div">
-            <button class="action-btn">Follow</button>
-          </div>
-        </div>
-        <div class="profile-card">
-          <div class="status-pic">
-            <img src="{% static 'assets/images/follow-img/follow-4.jpg' %}" />
-          </div>
-          <div>
-            <p class="pro-user">wisesages</p>
-            <p class="sug-text">Suggested for you</p>
-          </div>
-          <div class="action-div">
-            <button class="action-btn">Follow</button>
-          </div>
-        </div>
-        <div class="profile-card">
-          <div class="status-pic">
-            <img src="{% static 'assets/images/follow-img/follow-5.jpg' %}" />
-          </div>
-          <div>
-            <p class="pro-user">lifedsn</p>
-            <p class="sug-text">Suggested for you</p>
-          </div>
-          <div class="action-div">
-            <button class="action-btn">Follow</button>
-          </div>
-          
-        </div>
-        <div class="quick-links-wrapper" style="padding-top:15px;">
-          <div class="quick-link">About</div>
-          <div class="quick-link">Help</div>
-          <div class="quick-link">Press</div>
-          <div class="quick-link">API</div>
-          <div class="quick-link">Jobs</div>
-          <div class="quick-link">Privacy</div>
-          <div class="quick-link">Terms</div>
-        </div>
-        <div class="quick-links-wrapper">
-          <div class="quick-link">Locations</div>
-          <div class="quick-link">Language</div>
-        </div>
-        <div class="quick-links-wrapper" style="padding-top:10px;">
-          <div class="quick-link">@ 2022 INSTAGRAM FROM META</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  {% block friend %}{% endblock friend %}
+  {% block homepage %}{% endblock homepage %}
   <script>
     let currentScroll = 0;
     let scrollAmount = 320;
@@ -503,7 +226,7 @@
         });
       });
       
-  </script>
+  </script> 
+  <script src="{% static 'js/addFriend.js'%}"></script>
 </body>
-
 </html>

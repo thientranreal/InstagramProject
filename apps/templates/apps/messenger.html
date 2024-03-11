@@ -279,104 +279,20 @@
         <div class="col">
           <div class="col-content">
             <section class="message">
-              <div class="grid-message">
-                <div class="col-message-received">
-                  <div class="message-received">
-                    <p>Ok.</p>
-                  </div>
-                  <div class="message-received">
-                    <p>Do you play EVE Online?</p>
-                  </div>
-                </div>
-                <div class="col-message-sent">
-                  <div class="message-sent">
-                    <p>Not anymore.</p>
-                  </div>
-                </div>
-                <div class="col-message-received">
-                  <div class="message-received">
-                    <p>But, can you?</p>
-                  </div>
-                </div>
-                <div class="col-message-sent">
-                  <div class="message-sent">
-                    <p>
-                      I guess if I had some practice I could again. It's been
-                      years.
-                    </p>
-                  </div>
-                </div>
-                <div class="col-message-received">
-                  <div class="message-received">
-                    <p>Dat titan though...</p>
-                  </div>
-                </div>
-                <div class="col-message-sent">
-                  <div class="message-sent">
-                    <p>Trombone, guitar, titan?</p>
-                  </div>
-                </div>
-                <div class="col-message-received">
-                  <div class="message-received">
-                    <p>Niiiiice.</p>
-                  </div>
-                </div>
-                <div class="col-message-sent">
-                  <div class="message-sent">
-                    <div class="">
-                      <p>
-                        Do you care if I use the last few minutes of our
-                        conversation as dummy text for this thing I'm coding?
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-message-received">
-                  <div class="message-received">
-                    <p>Sure go ahead.</p>
-                  </div>
-                </div>
-                <div class="col-message-sent">
-                  <div class="message-sent">
-                    <p>Okay.</p>
-                  </div>
-                  <div class="message-sent">
-                    <p>I'll send you some ISK when I'm done.</p>
-                  </div>
-                  <div class="message-sent">
-                    <p>It's cool.</p>
-                  </div>
-                </div>
-                <div class="col-message-received">
-                  <div class="message-received">
-                    <p>Ok.</p>
-                  </div>
-                  <div class="message-received">
-                    <p>Do you play EVE Online?</p>
-                  </div>
-                </div>
-                <div class="col-message-sent">
-                  <div class="message-sent">
-                    <p>Not anymore.</p>
-                  </div>
-                </div>
-                <div class="col-message-received">
-                  <div class="message-received">
-                    <p>But, can you?</p>
-                  </div>
-                </div>
-              </div>
+              <div class="grid-message"></div>
             </section>
           </div>
 
           <div class="col-foot">
             <div class="compose">
-              <input placeholder="Type a message" />
+              <input id="input" placeholder="Type a message" />
               <div class="compose-dock">
+                <input type="boxID" hidden />
+                <button id="send">Gửi</button>
                 <div class="dock">
-                  <img src="{% static 'messenger/img/picture.svg' %}" /><img
+                  <!-- <img src="{% static 'messenger/img/picture.svg' %}" /><img
                     src="{% static 'messenger/img/smile.svg' %}"
-                  />
+                  /> -->
                 </div>
               </div>
             </div>
@@ -388,6 +304,9 @@
     </div>
   </body>
 </html>
+<!-- {% comment %} Get data for username and chatbox name{% endcomment %}
+{{ request.user.username|json_script:"user_username" }} -->
+<!-- {{ chat_box_name|json_script:"room-name" }} -->
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
@@ -399,41 +318,27 @@
         url: "/messengerajax/" + id + "/",
         success: function (response) {
           // console.log(response);
+          $(".message .grid-message ").empty();
           var tinnhan = JSON.parse(response.tinnhan);
           for (var i = 0; i < tinnhan.length; i++) {
-            // var tinNhanItem = tinnhan[i].fields;
-            // var id = tinnhan[i].pk;
-            // var noidung = tinNhanItem.noidung;
-            // var thoigian = tinNhanItem.thoigian;
-            // console.log(
-            //   "ID: " +
-            //     id +
-            //     ", Nội dung: " +
-            //     noidung +
-            //     ", Thời gian: " +
-            //     thoigian
-            // );
-            for (var i = 0; i < tinnhan.length; i++) {
-              var tinNhanItem = tinnhan[i].fields;
-              var noidung = tinNhanItem.noidung;
-              var senter = tinNhanItem.senter;
-              var receiver = tinNhanItem.receiver;
-              // $('.message .grid-message ').remove();
-              if (senter == id) {
-                $(".message .grid-message ").append(
-                  '<div class ="col-message-sent"> <div class="message-sent"><p>' +
-                    noidung +
-                    "</p></div></div>"
-                );
-              } else {
-                $(".message .grid-message ").append(
-                  '<div class ="col-message-received"><div class="message-received"><p>' +
-                    noidung +
-                    "</p></div></div>"
-                );
-              }
+            var tinNhanItem = tinnhan[i].fields;
+            var noidung = tinNhanItem.noidung;
+            var senter = tinNhanItem.senter;
+            var receiver = tinNhanItem.receiver;
+
+            if (senter == id) {
+              $(".message .grid-message ").append(
+                '<div class ="col-message-sent"> <div class="message-sent"><p>' +
+                  noidung +
+                  "</p></div></div>"
+              );
+            } else {
+              $(".message .grid-message ").append(
+                '<div class ="col-message-received"><div class="message-received"><p>' +
+                  noidung +
+                  "</p></div></div>"
+              );
             }
-            // Tiếp tục xử lý các trường khác ở đây nếu cần
           }
         },
         error: function (xhr, status, error) {
@@ -444,19 +349,76 @@
   });
 </script>
 
+<!-- // để lấy thuộc tính id -->
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var listItems = document.querySelectorAll(".messages li");
+    listItems.forEach(function (item) {
+      item.addEventListener("click", function () {
+        var id = this.getAttribute("data-id");
+        console.log("Clicked ID:", id);
 
+        // const boxName = JSON.parse(
+        //   document.getElementById("room-name").textContent
+        // );
 
+        //  Create a WebSocket in JavaScript.
+        const chatSocket = new WebSocket(
+          "ws://" + window.location.host + "/ws/chat/" + id + "/"
+        );
+
+        chatSocket.onmessage = function (e) {
+          const data = JSON.parse(e.data);
+          //dữ liệu trả về
+          // document.querySelector("#chat-text").value +=
+          //   data.message + " sent by " + data.username + "\n";
+        };
+        document.querySelector("#send").onclick = function (e) {
+          const messageInputDom = document.querySelector("#input");
+          const message = messageInputDom.value;
+          chatSocket.send(
+            JSON.stringify({
+              message: message,
+              // username: user_username,
+            })
+          );
+          messageInputDom.value = "";
+          $(".message .grid-message ").append(
+            '<div class ="col-message-sent"> <div class="message-sent"><p>' +
+              message +
+              "</p></div></div>"
+          );
+        };
+      });
+    });
+  });
+</script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
   $(document).ready(function () {
     $(".messages li").click(function () {
-      // Loại bỏ lớp CSS 'bold' từ tất cả các <li> khác
       $(".messages li").removeClass("bold");
       $(".messages li").not(this).removeClass("clicked");
-
-      // Thêm lớp CSS 'bold' cho <li> được nhấp vào
       $(this).addClass("bold");
       $(this).toggleClass("clicked");
     });
   });
+</script>
+
+<script
+  src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+  integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+  crossorigin="anonymous"
+></script>
+<script
+  src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+  integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
+  crossorigin="anonymous"
+></script>
+
+<!-- // code chạy websocket -->
+<script>
+  // const user_username = JSON.parse(
+  //   document.getElementById("user_username").textContent
+  // );
 </script>

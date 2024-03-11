@@ -1,12 +1,11 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
-from .models import *
-from django.contrib.auth import login as auth_login, authenticate
+from django.http import HttpResponse, JsonResponse
+from django.contrib.auth import login, get_user_model as auth_login, authenticate
 from django.contrib import messages
-from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
+from .models import *
 import json
 import re
 
@@ -14,8 +13,9 @@ def home(request):
     # Người dùng chưa đăng nhập
     if request.user.is_authenticated is False:
         return redirect("login")
-
-    return render(request, 'apps/index.html')
+    post = BaiDang.objects.all()
+    context = {'posts': post}
+    return render(request, 'apps/homepage.html',context)
 
 def signup(request):
     if request.method == 'POST':
@@ -149,8 +149,6 @@ def messenger(request,chat_box_name):
     # return render(request, 'apps/messenger.html', {'lienlac': lienlac})
     return render(request, 'apps/messenger.html')
 
-
-
 def chat_box(request, chat_box_name):
     # we will get the chatbox name from the url
     return render(request, 'apps/chatbox.html', {'chat_box_name': chat_box_name})
@@ -177,3 +175,43 @@ def is_email(value):
 def is_phone_number(phone_number):
     phone_regex = r'^(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b'
     return re.match(phone_regex, phone_number) is not None
+
+def friend(request):
+    # Lấy thông tin người dùng hiện tại
+    current_user = request.user.nguoidung
+    # Lấy danh sách id của các người dùng đã kết bạn với người dùng hiện tại
+    friends_ids = BanBe.objects.filter(nguoidung1=current_user).values_list('nguoidung2_id', flat=True)
+    # Lấy thông tin của tất cả người dùng trừ người dùng hiện tại đăng nhập và những người dùng đã kết bạn với người dùng hiện tại
+    other_users = NguoiDung.objects.exclude(user=current_user.user).exclude(id__in=friends_ids)
+    
+    # Truyền combined_users vào context
+    context = {'other_users': other_users}
+    return render(request, 'apps/friend.html', context)
+
+def updatefriend(request):
+    nguoidung1 = request.user.nguoidung  # Lấy đối tượng NguoiDung từ user của request
+    print(nguoidung1)
+    
+    data = json.loads(request.body)
+    nguoidung2_username = data['userId']  # Giả sử nguoidung2_id được truyền dưới dạng tên người dùng (username)
+    print(nguoidung2_username)
+
+    # Tìm nguoidung2 dựa trên tên người dùng
+    try:
+        nguoidung2 = NguoiDung.objects.get(user__username=nguoidung2_username)
+    except NguoiDung.DoesNotExist:
+        return JsonResponse({'error': 'User does not exist'}, status=404)
+
+    action = data['action']  
+    
+    if action == 'add':
+        friendship = BanBe.objects.create(nguoidung1=nguoidung1, nguoidung2=nguoidung2)
+        friendship.save()
+        
+        return JsonResponse({'message': 'Friendship added successfully'}, status=200)
+    
+    elif action == 'remove':
+        return JsonResponse({'message': 'Friendship removed successfully'}, status=200)
+    
+    else:
+        return JsonResponse({'error': 'Invalid action'}, status=400)

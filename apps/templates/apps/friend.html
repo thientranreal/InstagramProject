@@ -1,0 +1,38 @@
+{% extends 'apps/index.html' %} {% load static %} {% block friend %}
+<section class="main">
+  <div class="content">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="people-nearby">
+            {% for user in other_users %}
+            <div class="nearby-user">
+              <div class="row">
+                <div class="col-md-2 col-sm-2">
+                  <img
+                    src="media/{{ user.avatar }}"
+                    alt="user"
+                    class="profile-photo-lg mx-auto d-block"
+                  />
+                </div>
+                <div class="col-md-7 col-sm-7">
+                  <h6><a href="#" class="profile-link">{{ user.user }}</a></h6>
+                  <p class="text-muted name">
+                    {{ user.user.last_name }} {{ user.user.first_name }}
+                  </p>
+                  <p class="text-muted">{{ user.sobanbe }} Friend</p>
+                </div>
+                <div class="col-md-2 col-sm-3 text-center">
+                  {% csrf_token %}
+                  <button data-product={{user.user}} data-action="add" class="btn btn-primary pull-right add-btn updatefriend">Add friend</button>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock friend %}

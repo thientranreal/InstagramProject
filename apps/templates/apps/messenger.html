@@ -256,25 +256,26 @@
         </div>
       </header>
 
-      <main>
+      <main style="height: 100%">
         <div class="col-left">
-          <!-- <div class="col-content"> -->
-            <div class="messages" style="overflow-y: auto;">
+          <div class="col-content">
+            <div class="messages" style="overflow-y: auto">
               {% for ll in lienlac %}
-              <li>
+              <li data-id="{{ ll.id }}">
                 <div class="avatar">
                   <div class="avatar-image">
                     <div class="status online"></div>
                     <img src="{% static 'messenger/img/avatar-2.png' %}" />
                   </div>
                 </div>
-                <h3>{{ ll.dich }}</h3>
+                <h3>{{ ll.dich.user }}</h3>
                 <p>{{ ll.lastmess }}</p>
               </li>
               {% endfor %}
             </div>
-          <!-- </div> -->
+          </div>
         </div>
+
         <div class="col">
           <div class="col-content">
             <section class="message">
@@ -387,3 +388,75 @@
     </div>
   </body>
 </html>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $(document).ready(function () {
+    $(".messages li").click(function () {
+      var id = $(this).data("id");
+      $.ajax({
+        type: "GET",
+        url: "/messengerajax/" + id + "/",
+        success: function (response) {
+          // console.log(response);
+          var tinnhan = JSON.parse(response.tinnhan);
+          for (var i = 0; i < tinnhan.length; i++) {
+            // var tinNhanItem = tinnhan[i].fields;
+            // var id = tinnhan[i].pk;
+            // var noidung = tinNhanItem.noidung;
+            // var thoigian = tinNhanItem.thoigian;
+            // console.log(
+            //   "ID: " +
+            //     id +
+            //     ", Nội dung: " +
+            //     noidung +
+            //     ", Thời gian: " +
+            //     thoigian
+            // );
+            for (var i = 0; i < tinnhan.length; i++) {
+              var tinNhanItem = tinnhan[i].fields;
+              var noidung = tinNhanItem.noidung;
+              var senter = tinNhanItem.senter;
+              var receiver = tinNhanItem.receiver;
+              // $('.message .grid-message ').remove();
+              if (senter == id) {
+                $(".message .grid-message ").append(
+                  '<div class ="col-message-sent"> <div class="message-sent"><p>' +
+                    noidung +
+                    "</p></div></div>"
+                );
+              } else {
+                $(".message .grid-message ").append(
+                  '<div class ="col-message-received"><div class="message-received"><p>' +
+                    noidung +
+                    "</p></div></div>"
+                );
+              }
+            }
+            // Tiếp tục xử lý các trường khác ở đây nếu cần
+          }
+        },
+        error: function (xhr, status, error) {
+          console.error(error);
+        },
+      });
+    });
+  });
+</script>
+
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $(document).ready(function () {
+    $(".messages li").click(function () {
+      // Loại bỏ lớp CSS 'bold' từ tất cả các <li> khác
+      $(".messages li").removeClass("bold");
+      $(".messages li").not(this).removeClass("clicked");
+
+      // Thêm lớp CSS 'bold' cho <li> được nhấp vào
+      $(this).addClass("bold");
+      $(this).toggleClass("clicked");
+    });
+  });
+</script>

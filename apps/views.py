@@ -144,10 +144,39 @@ def login(request):
 def profile(request):
     return render(request, 'apps/profile.html')
 
-def messenger(request,chat_box_name):
+# def messenger(request,chat_box_name):
+#     lienlac = LienLac.objects.all()
+#     # return render(request, 'apps/messenger.html', {'lienlac': lienlac})
+#     return render(request, 'apps/messenger.html')
+
+def messenger(request):
     lienlac = LienLac.objects.all()
-    # return render(request, 'apps/messenger.html', {'lienlac': lienlac})
-    return render(request, 'apps/messenger.html')
+    return render(request, 'apps/messenger.html', {'lienlac': lienlac})
+    # return render(request, 'apps/messenger.html')
+
+def is_ajax(request):
+    return request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
+
+from django.core import serializers
+
+def your_ajax_view(request, id):
+    # if request.method == 'GET' and is_ajax(request=request):
+        try:
+            # item = YourModel.objects.get(id=id)
+
+            tinnhan = TinNhan.objects.all()
+            serialized_tinnhan = serializers.serialize('json', tinnhan)
+            data = {
+                'tinnhan':serialized_tinnhan,
+                'id':id
+            }
+            return JsonResponse(data)
+        except TinNhan.DoesNotExist:
+            return JsonResponse({'error': 'Item not found'}, status=404)
+    # else:
+    #     return JsonResponse({'error': 'Invalid request'}, status=400)
+
+
 
 def chat_box(request, chat_box_name):
     # we will get the chatbox name from the url

@@ -230,7 +230,7 @@
     </div>
 
     <div class="wrapper">
-      <header style="position: fixed; background-color: #ffffff">
+      <header style=" background-color: #ffffff">
         <div class="container">
           <div class="left">
             <img src="{% static 'messenger/img/logo.svg' %}" />
@@ -249,7 +249,7 @@
                 <img src="{% static 'messenger/img/settings.svg' %}" />
                 <img src="{% static 'messenger/img/video-camera.png' %}"  style="width: 50px; height: 50px;"/>
               </div>
-                         
+
               {{current_user.user}}
 
             </div>
@@ -262,28 +262,119 @@
         </div>
       </header>
 
-      <main style="height: 100%">
+      <main style="height: 90%">
         <div class="col-left">
-          <div class="col-content">
-            <div class="messages" style="overflow-y: auto">
+          <div class="col-contents col-item">
+            <div class="messages">
               {% for ll in lienlac %}
               <li data-id="{{ ll.id }}">
                 <div class="avatar">
                   <div class="avatar-image">
                     <div class="status online"></div>
-                    <img src="{% static 'messenger/img/avatar-2.png' %}" />
+                    <img src="media/{{ ll.dich.avatar }}" />
                   </div>
                 </div>
                 <h3>{{ ll.dich.user }}</h3>
                 <p>{{ ll.lastmess }}</p>
               </li>
               {% endfor %}
+              <li data-id="9">
+                <div class="avatar">
+                  <div class="avatar-image">
+                    <div class="status online"></div>
+                    <img src="media/images/user_4/truong.png" />
+                  </div>
+                </div>
+                <h3>duongtruong</h3>
+                <p></p>
+              </li><li data-id="9">
+                <div class="avatar">
+                  <div class="avatar-image">
+                    <div class="status online"></div>
+                    <img src="media/images/user_4/truong.png" />
+                  </div>
+                </div>
+                <h3>duongtruong</h3>
+                <p></p>
+              </li><li data-id="9">
+                <div class="avatar">
+                  <div class="avatar-image">
+                    <div class="status online"></div>
+                    <img src="media/images/user_4/truong.png" />
+                  </div>
+                </div>
+                <h3>duongtruong</h3>
+                <p></p>
+              </li><li data-id="9">
+                <div class="avatar">
+                  <div class="avatar-image">
+                    <div class="status online"></div>
+                    <img src="media/images/user_4/truong.png" />
+                  </div>
+                </div>
+                <h3>duongtruong</h3>
+                <p></p>
+              </li><li data-id="9">
+                <div class="avatar">
+                  <div class="avatar-image">
+                    <div class="status online"></div>
+                    <img src="media/images/user_4/truong.png" />
+                  </div>
+                </div>
+                <h3>duongtruong</h3>
+                <p></p>
+              </li><li data-id="9">
+                <div class="avatar">
+                  <div class="avatar-image">
+                    <div class="status online"></div>
+                    <img src="media/images/user_4/truong.png" />
+                  </div>
+                </div>
+                <h3>duongtruong</h3>
+                <p></p>
+              </li><li data-id="9">
+                <div class="avatar">
+                  <div class="avatar-image">
+                    <div class="status online"></div>
+                    <img src="media/images/user_4/truong.png" />
+                  </div>
+                </div>
+                <h3>duongtruong</h3>
+                <p></p>
+              </li><li data-id="9">
+                <div class="avatar">
+                  <div class="avatar-image">
+                    <div class="status online"></div>
+                    <img src="media/images/user_4/truong.png" />
+                  </div>
+                </div>
+                <h3>duongtruong</h3>
+                <p></p>
+              </li><li data-id="9">
+                <div class="avatar">
+                  <div class="avatar-image">
+                    <div class="status online"></div>
+                    <img src="media/images/user_4/truong.png" />
+                  </div>
+                </div>
+                <h3>duongtruong</h3>
+                <p></p>
+              </li><li data-id="9">
+                <div class="avatar">
+                  <div class="avatar-image">
+                    <div class="status online"></div>
+                    <img src="media/images/user_4/truong.png" />
+                  </div>
+                </div>
+                <h3>duongtruong</h3>
+                <p></p>
+              </li>
             </div>
           </div>
         </div>
 
         <div class="col">
-          <div class="col-content">
+          <div class="col-content col-mess">
             <section class="message">
               <div class="grid-message"></div>
             </section>
@@ -345,6 +436,7 @@
                   "</p></div></div>"
               );
             }
+            $(".col-content").scrollTop($(".col-content")[0].scrollHeight);
           }
         },
         error: function (xhr, status, error) {

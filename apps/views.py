@@ -144,15 +144,11 @@ def login(request):
 def profile(request):
     return render(request, 'apps/profile.html')
 
-# def messenger(request,chat_box_name):
-#     lienlac = LienLac.objects.all()
-#     # return render(request, 'apps/messenger.html', {'lienlac': lienlac})
-#     return render(request, 'apps/messenger.html')
-
 def messenger(request):
-    lienlac = LienLac.objects.all()
-    return render(request, 'apps/messenger.html', {'lienlac': lienlac})
-    # return render(request, 'apps/messenger.html')
+    current_user = request.user.nguoidung
+    lienlac = LienLac.objects.filter(goc=current_user)
+    context = {'lienlac': lienlac,'current_user': current_user}
+    return render(request, 'apps/messenger.html', context)
 
 def is_ajax(request):
     return request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'

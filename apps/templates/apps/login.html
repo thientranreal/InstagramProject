@@ -84,3 +84,20 @@
     </footer>
   </body>
 </html>
+
+
+<script>
+  var socket = new WebSocket('ws://' + window.location.host + '/ws/online-status/');
+
+  socket.onopen = function(event) {
+      console.log('WebSocket connection established.');
+      // Gửi ID của người dùng cho máy chủ khi kết nối được thiết lập
+      socket.send(JSON.stringify({'user_id': USER_ID}));
+  };
+
+  socket.onmessage = function(event) {
+      var data = JSON.parse(event.data);
+      console.log('Received online status:', data);
+      
+  };
+</script>

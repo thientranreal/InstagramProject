@@ -155,7 +155,7 @@ def is_ajax(request):
 
 from django.core import serializers
 
-def your_ajax_view(request, id):
+def load_mess(request, id):
     # if request.method == 'GET' and is_ajax(request=request):
         try:
             # item = YourModel.objects.get(id=id)
@@ -164,6 +164,22 @@ def your_ajax_view(request, id):
             serialized_tinnhan = serializers.serialize('json', tinnhan)
             data = {
                 'tinnhan':serialized_tinnhan,
+                'id':id
+            }
+            return JsonResponse(data)
+        except TinNhan.DoesNotExist:
+            return JsonResponse({'error': 'Item not found'}, status=404)
+    # else:
+    #     return JsonResponse({'error': 'Invalid request'}, status=400)
+def load_comment(request, id):
+    # if request.method == 'GET' and is_ajax(request=request):
+        try:
+            # item = YourModel.objects.get(id=id)
+
+            comment = BinhLuan.objects.all()
+            serialized_binhluan = serializers.serialize('json', comment)
+            data = {
+                'tinnhan':serialized_binhluan,
                 'id':id
             }
             return JsonResponse(data)

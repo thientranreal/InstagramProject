@@ -68,13 +68,16 @@
         </div>
         <!-- Posts -->
         {% for post in  posts  %}
-        <div class="post">
+        <div class="post" data-id="{{ post.id }}">
           <div class="info">
             <div class="user">
               <div class="status-pic">
                 <img src="{% static 'assets/images/profile/status-7.jpg' %}" alt="Profile Image" />
               </div>
-              <p class="username">{{post.nguoidung.user}}<p>{{post.thoigiandang}}</p></p>
+              <p class="username">
+                {{post.nguoidung.user}}
+                <p style="font-size: 0.8em; color: #888; margin-top: 7px; margin-left: 5px;">{{post.thoigiandang}}</p>
+              </p>
             </div>
             <img src="{% static 'assets/images/nav-items/option.PNG' %}" class="options" alt="Options" />
           </div>
@@ -86,12 +89,15 @@
               <img src="{% static 'assets/images/nav-items/send.PNG' %}" class="icons" />
               <img src="{% static 'assets/images/nav-items/save.PNG' %}" class="save icons" />
             </div>
-            <p>Liked by <b>{{post.tongluotthich}}</b></p>
+            <p>Liked by <b>{{post.tongluotthich}} people</b></p>
             <p class="description">
               <span>{{post.nguoidung.user}}</span>{{post.noidung}} 
             </p>
-            <p class="no-comments">View all 45 comments</p>
-            
+            <p class="no-comments" >View all 45 comments</p>
+             <style>p.no-comments:hover {
+              font-weight: bold;
+              cursor: pointer; 
+          }</style> 
           </div>
           <!-- <hr /> -->
           <div class="comment-wrapper">
@@ -104,3 +110,48 @@
     </div>
   </section>
 {% endblock homepage %}
+
+
+<script>
+   $(document).ready(function () {
+    $(".no-comments").click(function () {
+      var id = $(this).data("id");
+    //   alert(id);
+      $.ajax({
+        type: "GET",
+        url: "/commentajax/" + id + "/",
+        success: function (response) {
+          // console.log(response);
+          $(".message .grid-message ").empty();
+          var tinnhan = JSON.parse(response.tinnhan);
+          for (var i = 0; i < tinnhan.length; i++) {
+            var tinNhanItem = tinnhan[i].fields;
+            var noidung = tinNhanItem.noidung;
+            var senter = tinNhanItem.senter;
+            var receiver = tinNhanItem.receiver;
+
+            if (senter == id) {
+              $(".message .grid-message ").append(
+                '<div class ="col-message-sent"> <div class="message-sent"><p>' +
+                  noidung +
+                  "</p></div></div>"
+              );
+            } else {
+              $(".message .grid-message ").append(
+                '<div class ="col-message-received"><div class="message-received"><p>' +
+                  noidung +
+                  "</p></div></div>"
+              );
+            }
+            $(".col-content").scrollTop($(".col-content")[0].scrollHeight);
+          }
+        },
+        error: function (xhr, status, error) {
+          console.error(error);
+        },
+      });
+    });
+  });
+</script>
+
+

@@ -179,7 +179,7 @@ def load_comment(request, id):
             comment = BinhLuan.objects.all()
             serialized_binhluan = serializers.serialize('json', comment)
             data = {
-                'tinnhan':serialized_binhluan,
+                'binhluan':serialized_binhluan,
                 'id':id
             }
             return JsonResponse(data)

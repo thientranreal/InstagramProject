@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
+
 from .models import *
 import json
 import re
@@ -240,3 +241,6 @@ def updatefriend(request):
     
     else:
         return JsonResponse({'error': 'Invalid action'}, status=400)
+
+def createPost(request):
+    return render(request,'apps/createPost.html')

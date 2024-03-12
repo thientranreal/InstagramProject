@@ -18,7 +18,7 @@ urlpatterns = [
     path('testthu', views.send_offer, name="testthu"),
     path('api/check_login_status', views.check_login_status),
     path('messengerajax/<int:id>/', views.your_ajax_view, name='your-ajax-view'),
-
+    path('createPost',views.createPost, name="createPost"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
       

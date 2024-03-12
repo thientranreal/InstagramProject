@@ -118,7 +118,10 @@
               </div>
           </div>
         </div>
-        <img src="{% static 'assets/images/nav-items/add.PNG' %}" class="icons" alt="Add Icon" />
+        <a href="{% url 'createPost' %}">
+          <img src="{% static 'assets/images/nav-items/add.PNG' %}" class="icons add-icon" alt="Add Icon" />
+        </a>
+        
         <img src="{% static 'assets/images/nav-items/explore.PNG' %}" class="icons" alt="Explore Icon" />
         <div id="notificationLink">
         <img src="{% static 'assets/images/nav-items/like.PNG' %}" class="icons" alt="Like Icon" style="height: 24px;
@@ -226,6 +229,16 @@
         });
       });
       
+    //   document.addEventListener('DOMContentLoaded', function() {
+    //     // Lấy thẻ img có class là add-icon
+    //     var addIcon = document.querySelector('.add-icon');
+        
+    //     // Thêm sự kiện click cho thẻ img
+    //     addIcon.addEventListener('click', function() {
+    //         // Chuyển hướng đến trang createPost.html
+    //         window.location.href = 'home/createPost';
+    //     });
+    // });
   </script> 
   <script src="{% static 'js/addFriend.js'%}"></script>
 </body>

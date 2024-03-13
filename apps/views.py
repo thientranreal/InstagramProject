@@ -161,6 +161,8 @@ def load_mess(request, id):
             # item = YourModel.objects.get(id=id)
 
             tinnhan = TinNhan.objects.all()
+            # tinnhan = TinNhan.objects.filter(senter=id)
+
             serialized_tinnhan = serializers.serialize('json', tinnhan)
             data = {
                 'tinnhan':serialized_tinnhan,

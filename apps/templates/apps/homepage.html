@@ -159,24 +159,15 @@
     </div>
 </div>
     <script>
-    //   $(document).ready(function () {
-    //     $(".no-comments").click(function () {
-    //       var id = $(this).data("id");
-    //       alert(id);
-    //       //   alert(id);
-    //     });
-    //   });
-      document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("DOMContentLoaded", function () {
         // Lắng nghe sự kiện click trên phần tử có class là 'no-comments'
-        document
-          .querySelectorAll(".no-comments")
-          .forEach(function (commentElement) {
+        document.querySelectorAll(".no-comments").forEach(function (commentElement) {
             commentElement.addEventListener("click", function () {
               // Lấy ID của bài post từ thuộc tính 'data-id' của phần tử cha
-              var postId = commentElement.closest(".post").dataset.id;
-              var postElement = document.querySelector('.post[data-id="' + postId + '"]');
+            var postId = commentElement.closest(".post").dataset.id;
+            var postElement = document.querySelector('.post[data-id="' + postId + '"]');
             var hienblElement = postElement.querySelector('.hienbl');
-              $.ajax({
+            $.ajax({
                 type: "GET",
                 url: "/commentajax/" + postId + "/",
                 success: function (response) {
@@ -189,11 +180,10 @@
                     // var receiver = binhluanItem.receiver;
                     // console.log(noidung);
                     // if (senter == id) {
-                        hienblElement.appendChild(
+                        hienblElement.innerHTML+=
                         '<p><b> ' +nguoidung+' </b>'+
                           noidung +
-                          "</p>"
-                      );
+                          "</p>";
                     //   $(".hienbl").append(
                     //     '<p><b> ' +nguoidung+' </b>'+
                     //       noidung +
@@ -206,7 +196,7 @@
                     //       "</p></div></div>"
                     //   );
                     // }
-                  }
+                    }
                 },
                 error: function (xhr, status, error) {
                   console.error(error);

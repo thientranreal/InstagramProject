@@ -1,106 +1,211 @@
-{% extends 'apps/index.html' %}
-{% load static %}
-{% block homepage %}
-  <section class="main">
-    <div class="wrapper">
-      <div class="left-col">
-        <div class="status-wrapper">
-          <button class="story--scroll" id="scroll-left" onclick="scrollHorizontal(1)"><i
-              class="fas fa-chevron-left"></i></button>
-          <button class="story--scroll" id="scroll-right" onclick="scrollHorizontal(-1)"><i
-              class="fas fa-chevron-right"></i></button>
-          <div class="stories">
-            <div class="status-card">
-              <div class="status-pic">
-                <img src="{% static 'assets/images/profile/status-0.png' %}" />
-              </div>
-              <p class="username">that.suman</p>
+{% extends 'apps/index.html' %} {% load static %} {% block homepage %}
+<section class="main">
+  <div class="wrapper">
+    <div class="left-col">
+      <div class="status-wrapper">
+        <button
+          class="story--scroll"
+          id="scroll-left"
+          onclick="scrollHorizontal(1)"
+        >
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <button
+          class="story--scroll"
+          id="scroll-right"
+          onclick="scrollHorizontal(-1)"
+        >
+          <i class="fas fa-chevron-right"></i>
+        </button>
+        <div class="stories">
+          <div class="status-card">
+            <div class="status-pic">
+              <img src="{% static 'assets/images/profile/status-0.png' %}" />
             </div>
-            <div class="status-card">
-              <div class="status-pic">
-                <img src="{% static 'assets/images/profile/status-1.jpg' %}" />
-              </div>
-              <p class="username">debajyoti_r...</p>
+            <p class="username">that.suman</p>
+          </div>
+          <div class="status-card">
+            <div class="status-pic">
+              <img src="{% static 'assets/images/profile/status-1.jpg' %}" />
             </div>
-            <div class="status-card">
-              <div class="status-pic">
-                <img src="{% static 'assets/images/profile/status-2.jpg' %}" />
-              </div>
-              <p class="username">su1nta</p>
+            <p class="username">debajyoti_r...</p>
+          </div>
+          <div class="status-card">
+            <div class="status-pic">
+              <img src="{% static 'assets/images/profile/status-2.jpg' %}" />
             </div>
-            <div class="status-card">
-              <div class="status-pic">
-                <img src="{% static 'assets/images/profile/status-3.jpg' %}" />
-              </div>
-              <p class="username">lexfridman</p>
+            <p class="username">su1nta</p>
+          </div>
+          <div class="status-card">
+            <div class="status-pic">
+              <img src="{% static 'assets/images/profile/status-3.jpg' %}" />
             </div>
-            <div class="status-card">
-              <div class="status-pic">
-                <img src="{% static 'assets/images/profile/status-4.jpg' %}" />
-              </div>
-              <p class="username">golimitless</p>
+            <p class="username">lexfridman</p>
+          </div>
+          <div class="status-card">
+            <div class="status-pic">
+              <img src="{% static 'assets/images/profile/status-4.jpg' %}" />
             </div>
-            <div class="status-card">
-              <div class="status-pic">
-                <img src="{% static 'assets/images/profile/status-5.jpg' %}" />
-              </div>
-              <p class="username">markrober</p>
+            <p class="username">golimitless</p>
+          </div>
+          <div class="status-card">
+            <div class="status-pic">
+              <img src="{% static 'assets/images/profile/status-5.jpg' %}" />
             </div>
-            <div class="status-card">
-              <div class="status-pic">
-                <img src="{% static 'assets/images/profile/status-6.jpg' %}" />
-              </div>
-              <p class="username">hubermanlab</p>
+            <p class="username">markrober</p>
+          </div>
+          <div class="status-card">
+            <div class="status-pic">
+              <img src="{% static 'assets/images/profile/status-6.jpg' %}" />
             </div>
-            <div class="status-card">
-              <div class="status-pic">
-                <img src="{% static 'assets/images/profile/status-8.jpg' %}" />
-              </div>
-              <p class="username">waitbutwhy</p>
+            <p class="username">hubermanlab</p>
+          </div>
+          <div class="status-card">
+            <div class="status-pic">
+              <img src="{% static 'assets/images/profile/status-8.jpg' %}" />
             </div>
-            <div class="status-card">
-              <div class="status-pic">
-                <img src="{% static 'assets/images/profile/status-7.jpg' %}" />
-              </div>
-              <p class="username">geeks_for_g...</p>
+            <p class="username">waitbutwhy</p>
+          </div>
+          <div class="status-card">
+            <div class="status-pic">
+              <img src="{% static 'assets/images/profile/status-7.jpg' %}" />
             </div>
+            <p class="username">geeks_for_g...</p>
           </div>
         </div>
-        <!-- Posts -->
-        {% for post in  posts  %}
-        <div class="post">
-          <div class="info">
-            <div class="user">
-              <div class="status-pic">
-                <img src="{% static 'assets/images/profile/status-7.jpg' %}" alt="Profile Image" />
-              </div>
-              <p class="username">{{post.nguoidung.user}}<p>{{post.thoigiandang}}</p></p>
+      </div>
+      <!-- Posts -->
+      {% for post in posts %}
+      <div class="post" data-id="{{ post.id }}">
+        <div class="info">
+          <div class="user">
+            <div class="status-pic">
+              <img
+                src="{% static 'assets/images/profile/status-7.jpg' %}"
+                alt="Profile Image"
+              />
             </div>
-            <img src="{% static 'assets/images/nav-items/option.PNG' %}" class="options" alt="Options" />
-          </div>
-          <img src="{% static 'assets/images/post/post-1.jpg' %}" class="post-image" alt="Geeks for Geeks post" />
-          <div class="post-content">
-            <div class="reaction-wrapper">
-              <img src="{% static 'assets/images/nav-items/like.PNG' %}" class="icons" />
-              <img src="{% static 'assets/images/nav-items/comment.PNG' %}" class="icons" />
-              <img src="{% static 'assets/images/nav-items/send.PNG' %}" class="icons" />
-              <img src="{% static 'assets/images/nav-items/save.PNG' %}" class="save icons" />
-            </div>
-            <p>Liked by <b>{{post.tongluotthich}}</b></p>
-            <p class="description">
-              <span>{{post.nguoidung.user}}</span>{{post.noidung}} 
+            <p class="username">{{post.nguoidung.user}}</p>
+
+            <p
+              style="
+                font-size: 0.8em;
+                color: #888;
+                margin-top: 7px;
+                margin-left: 5px;
+              "
+            >
+              {{post.thoigiandang}}
             </p>
-            <p class="no-comments">View all 45 comments</p>
-            
           </div>
-          <!-- <hr /> -->
-          <div class="comment-wrapper">
-            <img src="{% static 'assets/images/nav-items/smile.PNG' %}" class="icons" />
-            <input type="text" class="comment-box" placeholder="Add a comment..." />
-            <button class="comment-btn">Post</button>
-          </div>
+          <img
+            src="{% static 'assets/images/nav-items/option.PNG' %}"
+            class="options"
+            alt="Options"
+          />
         </div>
-        {% endfor %}
+        <img
+          src="{% static 'assets/images/post/post-1.jpg' %}"
+          class="post-image"
+          alt="Geeks for Geeks post"
+        />
+        <div class="post-content">
+          <div class="reaction-wrapper">
+            <img
+              src="{% static 'assets/images/nav-items/like.PNG' %}"
+              class="icons"
+            />
+            <img
+              src="{% static 'assets/images/nav-items/comment.PNG' %}"
+              class="icons"
+            />
+            <img
+              src="{% static 'assets/images/nav-items/send.PNG' %}"
+              class="icons"
+            />
+            <img
+              src="{% static 'assets/images/nav-items/save.PNG' %}"
+              class="save icons"
+            />
+          </div>
+          <p>Liked by <b>{{post.tongluotthich}} people</b></p>
+          <p class="description">
+            <span>{{post.nguoidung.user}}</span>{{post.noidung}}
+          </p>
+          <p class="no-comments">View all 45 comments</p>
+          <div class="hienbl"></div>
+          <style>
+            p.no-comments:hover {
+              font-weight: bold;
+              cursor: pointer;
+            }
+          </style>
+        </div>
+        <!-- <hr /> -->
+        <div class="comment-wrapper">
+          <img
+            src="{% static 'assets/images/nav-items/smile.PNG' %}"
+            class="icons"
+          />
+          <input
+            type="text"
+            class="comment-box"
+            placeholder="Add a comment..."
+          />
+          <button class="comment-btn">Post</button>
+        </div>
+      </div>
+      {% endfor %}
     </div>
-  </section>
-{% endblock homepage %}
+</div>
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Lắng nghe sự kiện click trên phần tử có class là 'no-comments'
+        document.querySelectorAll(".no-comments").forEach(function (commentElement) {
+            commentElement.addEventListener("click", function () {
+              // Lấy ID của bài post từ thuộc tính 'data-id' của phần tử cha
+            var postId = commentElement.closest(".post").dataset.id;
+            var postElement = document.querySelector('.post[data-id="' + postId + '"]');
+            var hienblElement = postElement.querySelector('.hienbl');
+            $.ajax({
+                type: "GET",
+                url: "/commentajax/" + postId + "/",
+                success: function (response) {
+                  console.log(response);
+                  var binhluan = JSON.parse(response.binhluan);
+                  for (var i = 0; i < binhluan.length; i++) {
+                    var binhluanItem = binhluan[i].fields;
+                    var noidung = binhluanItem.noidungbl;
+                    var nguoidung = binhluanItem.nguoidung;
+                    // var receiver = binhluanItem.receiver;
+                    // console.log(noidung);
+                    // if (senter == id) {
+                        hienblElement.innerHTML+=
+                        '<p><b> ' +nguoidung+' </b>'+
+                          noidung +
+                          "</p>";
+                    //   $(".hienbl").append(
+                    //     '<p><b> ' +nguoidung+' </b>'+
+                    //       noidung +
+                    //       "</p>"
+                    //   );
+                    // } else {
+                    //   $(".message .grid-message ").append(
+                    //     '<div class ="col-message-received"><div class="message-received"><p>' +
+                    //       noidung +
+                    //       "</p></div></div>"
+                    //   );
+                    // }
+                    }
+                },
+                error: function (xhr, status, error) {
+                  console.error(error);
+                },
+              });
+            });
+          });
+      });
+    </script>
+    {% endblock homepage %}
+  </div>
+</section>

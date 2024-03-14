@@ -230,27 +230,32 @@
     </div>
 
     <div class="wrapper">
-      <header style=" background-color: #ffffff">
+      <header style="background-color: #ffffff">
         <div class="container">
           <div class="left">
             <img src="{% static 'messenger/img/logo.svg' %}" />
           </div>
 
           <div class="middle">
-            <h3>Theresa Hudson</h3>
-            <p>Messenger</p>
+            <h3 id="receiverName"></h3>
           </div>
 
           <div class="right">
             <div class="username">
               <div class="settings">
                 <img src="{% static 'messenger/img/settings.svg' %}" />
+                <img
+                  src="{% static 'messenger/img/video-camera.png' %}"
+                  style="width: 50px; height: 50px"
+                />
               </div>
+
               {{current_user.user}}
             </div>
 
             <div class="avatar">
-              <img src="{% static 'messenger/img/avatar.png' %}" />
+              <!-- <img src="{% static 'messenger/img/avatar.png' %}" /> -->
+              <img src="media/{{ current_user.avatar }}" alt="" />
             </div>
           </div>
         </div>
@@ -272,7 +277,7 @@
                 <p>{{ ll.lastmess }}</p>
               </li>
               {% endfor %}
-              <li data-id="9">
+              <!-- <li data-id="9">
                 <div class="avatar">
                   <div class="avatar-image">
                     <div class="status online"></div>
@@ -362,7 +367,7 @@
                 </div>
                 <h3>duongtruong</h3>
                 <p></p>
-              </li>
+              </li> -->
             </div>
           </div>
         </div>
@@ -401,9 +406,25 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
+//   var listItems = document.querySelectorAll("li");
+
+//   // Duyệt qua từng phần tử <li>
+//   listItems.forEach(function (item) {
+//     // Lấy giá trị của thuộc tính data-id
+//     var dataId = item.getAttribute("data-id");
+
+//     // Lấy phần tử con chứa giá trị của dich.user
+//     var userNameElement = item.querySelector("h3");
+
+//     // Lấy giá trị của dich.user từ phần tử con và hiển thị ra console
+//     var userName = userNameElement.innerText;
+//     document.getElementById("receiverName").innerText=userName;
+//   });
   $(document).ready(function () {
     $(".messages li").click(function () {
       var id = $(this).data("id");
+      var dichUser = $(this).find("h3").text();
+      document.getElementById("receiverName").innerText=dichUser;
       $.ajax({
         type: "GET",
         url: "/messengerajax/" + id + "/",
@@ -430,7 +451,7 @@
                   "</p></div></div>"
               );
             }
-            $(".col-content").scrollTop($(".col-content")[0].scrollHeight);
+            // $(".col-content").scrollTop($(".col-content")[0].scrollHeight);
           }
         },
         error: function (xhr, status, error) {
@@ -448,13 +469,7 @@
     listItems.forEach(function (item) {
       item.addEventListener("click", function () {
         var id = this.getAttribute("data-id");
-        console.log("Clicked ID:", id);
-
-        // const boxName = JSON.parse(
-        //   document.getElementById("room-name").textContent
-        // );
-
-        //  Create a WebSocket in JavaScript.
+        // console.log("Clicked ID:", id);
         const chatSocket = new WebSocket(
           "ws://" + window.location.host + "/ws/chat/" + id + "/"
         );

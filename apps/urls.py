@@ -15,11 +15,16 @@ urlpatterns = [
     path('profile', views.profile, name="profile"),
     path('messenger', views.messenger, name="messenger"),
     path('chat/<str:chat_box_name>/', views.chat_box, name="chat"),
-    path('testthu', views.send_offer, name="testthu"),
+    # path('videocall/<str:room_name>/', views.video_call, name='video_call'),
+    path('call/', views.call_view, name='call'),
+    # path('receive_call/', views.receive_call_view, name='receive_call'),
+    # path('send_offer/', views.send_offer, name='send_offer'),
+    # path('send_answer/', views.send_answer, name='send_answer'),
     path('api/check_login_status', views.check_login_status),
     path('messengerajax/<int:id>/', views.your_ajax_view, name='your-ajax-view'),
     path('createPost',views.createPost, name="createPost"),
     path('editProfile',views.editProfile, name="editProfile"),
+    path('commentajax/<int:id>/', views.load_comment, name='load_comment'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
       

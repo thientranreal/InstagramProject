@@ -244,3 +244,6 @@ def updatefriend(request):
 
 def createPost(request):
     return render(request,'apps/createPost.html')
+
+def editProfile(request):
+    return render(request,'apps/editProfile.html')

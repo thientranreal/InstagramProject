@@ -303,3 +303,10 @@ def updatefriend(request):
     
     else:
         return JsonResponse({'error': 'Invalid action'}, status=400)
+
+
+def createPost(request):
+    return render(request, 'apps/createPost.html')
+
+def editProfile(request):
+    return render(request, 'apps/editProfile.html')

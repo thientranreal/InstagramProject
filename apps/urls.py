@@ -23,7 +23,8 @@ urlpatterns = [
     path('api/check_login_status', views.check_login_status),
     path('messengerajax/<int:id>/', views.load_mess, name='load_mess'),
     path('commentajax/<int:id>/', views.load_comment, name='load_comment'),
-
+    path('createPost/<int:id>/', views.createPost, name='load_comment'),
+    path('editProfile/<int:id>/', views.editProfile, name='load_comment'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
       

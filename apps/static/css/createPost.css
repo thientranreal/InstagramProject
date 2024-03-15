@@ -1,0 +1,165 @@
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: rgba(0, 0, 0, 0.5) !important;
+    /* Nền trong suốt */
+}
+
+.main {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100vh;
+}
+
+.main>a {
+    right: 10px;
+    top: 10px;
+    position: absolute;
+    color: black;
+}
+
+.container {
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 550px !important;
+    width: 850px !important;
+    background-color: white;
+    border-radius: 10px;
+}
+
+.header {
+    height: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 0.5px solid #737373;
+    padding: 0 20px;
+}
+
+.header a:first-child {
+    color: black;
+}
+
+.header a:last-child {
+    color: aqua;
+    text-decoration: none;
+}
+
+/* container of second-third section */
+.main-content {
+    display: flex;
+}
+
+/* second section */
+.image {
+    width: 510px;
+    height: 510px;
+    position: absolute;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-right: 0.5px solid #737373;
+    float: left;
+    left: 0;
+}
+
+.image-visibility {
+    width: 512px;
+    height: 512px;
+}
+
+.image-visibility img {
+    width: 90%;
+    height: 90%;
+    transform: translate(5%, 5%);
+}
+.select-icon{
+    padding: 0 43%;
+}
+.select-icon a{
+    font-size: 20px;
+    color: #737373;
+    text-decoration: none;
+    position: absolute;
+    width: 140px;
+}
+.select-icon a:hover{
+    color: aqua;
+}
+.select-icon a i{
+    padding-right: 10px;
+}
+.content {
+    display: block !important;
+    position: absolute;
+    width: 340px;
+    height: 510px;
+    float: right;
+    right: 0;
+}
+
+.user {
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    padding: 15px 15px;
+
+}
+
+.user a {
+    padding-right: 1em;
+}
+
+
+.user h4 {
+    cursor: pointer;
+}
+
+.text {
+    display: flex;
+    padding: 1em 1em;
+    height: 100px;
+    width: 310px;
+    border-bottom: 0.5px solid #d0cece;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 40px;
+}
+
+.custom-input {
+    height: 100px !important;
+}
+
+
+
+.text input::placeholder {
+    position: absolute;
+    /* Đặt vị trí tuyệt đối cho placeholder */
+    
+    /* Đặt vị trí ở phía trái cùng */
+    width: 100%;
+    height: 100%;
+}
+.text input:focus {
+    width: 100%;
+    height: 100%;
+}
+
+
+.tags{
+    padding: 1em 1em;
+}
+.tags a{
+    color: black;
+    cursor: pointer;
+    text-decoration: none;
+}
+.tags i{
+    padding-right: 5px;
+}
+.tags a:hover{
+    color: rgb(1, 95, 95);
+}

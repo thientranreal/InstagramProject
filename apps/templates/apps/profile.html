@@ -24,7 +24,7 @@
           <div class="profile-user-settings">
             <h1 class="profile-user-name">janedoe_</h1>
 
-            <button class="btn profile-edit-btn">Edit Profile</button>
+            <a href="{% url 'editProfile' %}" style="color: black;"><button class="btn profile-edit-btn">Edit Profile</button></a>
 
             <button
               class="btn profile-settings-btn"
@@ -36,9 +36,8 @@
 
           <div class="profile-stats">
             <ul>
-              <li><span class="profile-stat-count">164</span> posts</li>
-              <li><span class="profile-stat-count">188</span> followers</li>
-              <li><span class="profile-stat-count">206</span> following</li>
+              <li><span class="profile-stat-count">164</span> Posts</li>
+              <li><span class="profile-stat-count">188</span> Friends</li>
             </ul>
           </div>
 

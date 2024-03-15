@@ -171,25 +171,11 @@
               </div>
             </div> -->
           </div>
-
-        </div>
-        <a href="{% url 'createPost' %}">
-          <img src="{% static 'assets/images/nav-items/add.PNG' %}" class="icons add-icon" alt="Add Icon" />
-        </a>
-        
-        <img src="{% static 'assets/images/nav-items/explore.PNG' %}" class="icons" alt="Explore Icon" />
-        <div id="notificationLink">
-        <img src="{% static 'assets/images/nav-items/like.PNG' %}" class="icons" alt="Like Icon" style="height: 24px;
-        position: relative;"/>
-          <ul id="nav">
-              <li id="notification_li" >
-                  <span id="notification_count">3</span>
-                  <div id="notificationContainer">
-          <img
+          <a href="{% url 'createPost' %}"><img
             src="{% static 'assets/images/nav-items/add.PNG' %}"
             class="icons"
             alt="Add Icon"
-          />
+          /></a>
           <img
             src="{% static 'assets/images/nav-items/explore.PNG' %}"
             class="icons"
@@ -206,7 +192,6 @@
               <li id="notification_li">
                 <span id="notification_count">3</span>
                 <div id="notificationContainer">
->>>>>>> 729da73cd54f3a79134b2e5b96e51ebd61ef3e6d
                   <div id="notificationTitle">Notifications</div>
                   <div id="notificationsBody" class="notifications"></div>
                   <div id="notificationFooter"><a href="#">See All</a></div>
@@ -341,23 +326,6 @@
           event.stopPropagation();
         });
       });
-<<<<<<< HEAD
-      
-    //   document.addEventListener('DOMContentLoaded', function() {
-    //     // Lấy thẻ img có class là add-icon
-    //     var addIcon = document.querySelector('.add-icon');
-        
-    //     // Thêm sự kiện click cho thẻ img
-    //     addIcon.addEventListener('click', function() {
-    //         // Chuyển hướng đến trang createPost.html
-    //         window.location.href = 'home/createPost';
-    //     });
-    // });
-  </script> 
-  <script src="{% static 'js/addFriend.js'%}"></script>
-</body>
-</html>
-=======
 
       // Bên client viết vậy (thông báo có 3 dạng. 1 nhắn tin, 2 kết bạn, 3 bình luận , 4 lượt thích)
       // const socket = new WebSocket("ws://localhost:8000/ws/notification/");
@@ -380,4 +348,3 @@
     <script src="{% static 'js/addFriend.js'%}"></script>
   </body>
 </html>
->>>>>>> 729da73cd54f3a79134b2e5b96e51ebd61ef3e6d

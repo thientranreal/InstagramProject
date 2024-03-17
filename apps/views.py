@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
+from django.contrib.auth.models import User
 from .models import *
 import json
 import re
@@ -309,4 +310,25 @@ def updatefriend(request):
 def editProfile(request):
     return render(request, 'apps/editProfile.html')
 def createPost(request):
-    return render(request, 'apps/createPost.html')
+    current_user = request.user.nguoidung
+    return render(request, 'apps/createPost.html',{'nguoi_dung': current_user})
+
+
+def get_admin_nguoidung():
+    try:
+        admin_user = User.objects.filter(is_staff=True, is_superuser=True).first()  # Lấy người dùng đầu tiên có is_staff và is_superuser là True
+        if admin_user:
+            nguoidung = NguoiDung.objects.get(user=admin_user)  # Lấy thông tin người dùng tương ứng
+            return nguoidung
+        else:
+            return None  # Trả về None nếu không tìm thấy người dùng admin
+    except NguoiDung.DoesNotExist:
+        return None  # Xử lý trường hợp không tìm thấy thông tin người dùng tương ứng
+    
+def getInfoProfile(request):
+    current_user = request.user.nguoidung
+    # Truyền dữ liệu nguoi_dungs vào template profile.html
+    danh_sach_baidang = BaiDang.objects.filter(nguoidung=current_user)
+    so_luong_baidang = danh_sach_baidang.count()
+    return render(request, 'apps/profile.html', {'nguoi_dung': current_user,'danh_sach_baidang': danh_sach_baidang, 'so_luong_baidang': so_luong_baidang})
+

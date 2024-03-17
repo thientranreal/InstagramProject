@@ -16,6 +16,8 @@ class NguoiDung(models.Model):
     avatar = models.ImageField(blank=True, null=True, upload_to=user_directory_path)
     sobanbe = models.FloatField(blank=True, null=True)
     phone = models.CharField(max_length=15, blank=True, null=True)
+    mota=models.TextField(blank=True, null=True)
+
     # is_online = models.BooleanField(default=False)
 
 class BanBe(models.Model):

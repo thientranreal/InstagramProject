@@ -25,6 +25,7 @@ urlpatterns = [
     path('commentajax/<int:id>/', views.load_comment, name='load_comment'),
     path('editProfile', views.editProfile,name='editProfile'),
     path('createPost', views.createPost,name='createPost'),
+    path('create_post', views.create_post,name='create_post'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

@@ -11,6 +11,8 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
+    <form method="post" action="{% url 'create_post' %}">
+        {% csrf_token %}
     <div class="main">
         <a href="{% url 'home' %}"><i class="fa-solid fa-x"></i></a>
         <div class="container">
@@ -18,7 +20,7 @@
             <section class="header">
                 <a href="{% url 'home' %}" class="header-back"><i class="fa-solid fa-arrow-left"></i></a>
                 <h3>Tạo bài viết mới</h3>
-                <a href="" class="share">Chia sẻ</a>
+                <a href=""><button type="submit" class="btn btn-outline-primary btn-no-outline share">Chia sẻ</button></a>
             </section>
             <div class="main-content">
                 <section class="image">
@@ -30,7 +32,7 @@
                         <a href="" id="selectImage"><i class="fa-regular fa-image"></i>Chọn ảnh</a>
                         
                     </div>
-                    <input type="file" id="imageInput" style="display:none;" accept="image/*"/>
+                    <input type="file" id="imageInput" style="display:none;" accept="image/*" name="hinhanh_url"/>
                     
                     
                 </section>
@@ -41,7 +43,7 @@
                         <h4><span>{{nguoi_dung.user}}</span></h4>
                     </div>
                     <div class="text">
-                        <input type="text" class="form-control custom-input" placeholder="Nhập nội dung...">
+                        <input type="text" class="form-control custom-input" placeholder="Nhập nội dung..." name="noidung">
                     </div>
                     <div class="tags">
                         <a href=""><i class="fa-solid fa-tag"></i>Gắn thẻ</a>
@@ -51,6 +53,7 @@
             {% endif %}
         </div>
     </div>
+</form>
 
 
 

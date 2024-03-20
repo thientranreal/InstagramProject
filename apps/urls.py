@@ -24,7 +24,9 @@ urlpatterns = [
     path('messengerajax/<int:id>/', views.load_mess, name='load_mess'),
     path('commentajax/<int:id>/', views.load_comment, name='load_comment'),
     path('editProfile', views.editProfile,name='editProfile'),
+    path('edit_profile', views.edit_profile,name='edit_profile'),
     path('createPost', views.createPost,name='createPost'),
+    path('create_post', views.create_post,name='create_post'),
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

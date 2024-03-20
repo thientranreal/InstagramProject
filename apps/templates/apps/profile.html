@@ -47,7 +47,7 @@
 
         <div class="profile-bio">
           <p>
-            <!-- <span class="profile-real-name">Jane Doe</span> -->{{nguoi_dung.mota}} 
+            <span class="profile-real-name" style="padding-right: 10px;">{{nguoi_dung.user.last_name}} {{nguoi_dung.user.first_name}}</span>{{nguoi_dung.mota}} 
           </p>
         </div>
       </div>
@@ -62,8 +62,12 @@
       <div class="gallery">
         {%for baidang in danh_sach_baidang%}
         <div class="gallery-item" tabindex="0">
-          <img src="https://images.unsplash.com/photo-1511765224389-37f0e77cf0eb?w=500&h=500&fit=crop"
+          {% if baidang.hinhanh %}
+          <img src="{{baidang.hinhanh.url}}"
             class="gallery-image" alt="" />
+          {% else %}
+          <img src="{% static 'assets/images/profile/status-0.png' %}" class="gallery-image" alt="" />
+          {% endif %}
 
           <div class="gallery-item-info">
             <ul>
@@ -71,7 +75,9 @@
                 <span class="visually-hidden">Likes:</span><i class="fas fa-heart" aria-hidden="true"></i> {{baidang.tongluotthich}}
               </li>
               <li class="gallery-item-comments">
-                <span class="visually-hidden">Comments:</span><i class="fas fa-comment" aria-hidden="true"></i> 2
+                
+                <span class="visually-hidden">Comments:</span><i class="fas fa-comment" aria-hidden="true"></i> {{baidang.tongluotbinhluan}}
+                
               </li>
             </ul>
           </div>

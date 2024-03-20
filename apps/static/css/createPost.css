@@ -47,7 +47,10 @@ body {
     color: aqua;
     text-decoration: none;
 }
-
+.btn-no-outline {
+    border: none !important;
+    box-shadow: none !important;
+}
 /* container of second-third section */
 .main-content {
     display: flex;

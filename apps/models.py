@@ -14,8 +14,9 @@ class NguoiDung(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
     ngaysinh = models.DateField(blank=True, null=True)
     avatar = models.ImageField(blank=True, null=True, upload_to=user_directory_path)
-    sobanbe = models.FloatField(blank=True, null=True)
+    sobanbe = models.IntegerField(blank=True, null=True)
     phone = models.CharField(max_length=15, blank=True, null=True)
+    gioitinh=models.CharField(max_length=15, blank=True, null=True)
     mota=models.TextField(blank=True, null=True)
 
     # is_online = models.BooleanField(default=False)
@@ -40,8 +41,9 @@ class BaiDang(models.Model):
     nguoidung = models.ForeignKey('NguoiDung', on_delete=models.CASCADE)
     noidung = models.TextField(blank=True, null=True)
     thoigiandang = models.DateTimeField(blank=True, null=True)
-    tongluotthich = models.FloatField(blank=True, null=True)
-    hinhanh = models.TextField(blank=True, null=True)
+    tongluotthich = models.IntegerField(blank=True, null=True)
+    tongluotbinhluan = models.IntegerField(blank=True, null=True)
+    hinhanh = models.ImageField(blank=True, null=True)
 
 class ThongBao(models.Model):
     nguoidung = models.ForeignKey('NguoiDung', on_delete=models.CASCADE)

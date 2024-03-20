@@ -23,7 +23,7 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    height: 450px;
+    height: 570px;
     width: 450px !important;
     background-color: white;
     border-radius: 10px;
@@ -63,4 +63,22 @@ body {
     display: block;
     padding: 10px 20px;
 
+}
+.so-dien-thoai{
+    display: block;
+    padding: 10px 20px;
+}
+.ngay-sinh{
+    display: block;
+    padding: 10px 20px;
+}
+
+.ngay-sinh p{
+    font-size: 10px;
+    display: flex;
+    align-items: flex-start;
+    color: gray;
+    font-style: italic;
+    margin: 0;
+    padding: 0;
 }

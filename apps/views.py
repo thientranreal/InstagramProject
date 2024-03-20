@@ -360,3 +360,29 @@ def create_post(request):
         # Xử lý logic khi yêu cầu không phải là POST
         pass
 
+
+def edit_profile(request):
+    if request.method == 'POST':
+        current_user = request.user
+        # Lấy dữ liệu từ request
+        mota = request.POST.get('mota')
+        hinhanh_url = request.POST.get('hinhanh_url')  # Đã cung cấp URL hình ảnh trong template
+        ngaysinh=request.POST.get('ngaysinh')
+        phone=request.POST.get('phone')
+        gioitinh=request.POST.get('gioitinh')
+
+        # Tạo một bài đăng mới
+        nguoidung = NguoiDung.objects.filter(user=current_user).update(
+            ngaysinh=ngaysinh,  
+            avatar=hinhanh_url,     
+            phone=phone,       
+            gioitinh=gioitinh,  
+            mota=mota 
+        )
+
+        # Chuyển hướng người dùng đến trang khác hoặc thông báo thành công
+        return redirect('profile')  # Chuyển hướng về trang chủ sau khi chia sẻ thành công
+    else:
+        # Xử lý logic khi yêu cầu không phải là POST
+        pass
+

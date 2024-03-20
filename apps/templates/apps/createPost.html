@@ -38,8 +38,11 @@
                 </section>
                 <section class="content">
                     <div class="user">
+                        {%if nguoi_dung.avatar%}
                         <a href=""><img src="{{nguoi_dung.avatar.url}}" class="img-fluid" style="width: 30px; height: 30px; border-radius: 100%;" alt="Your Image"></a>
-                        
+                        {%else%}
+                        <a href=""><img src="{% static 'assets/images/profile/status-0.png' %}" class="img-fluid" style="width: 30px; height: 30px; border-radius: 100%;" alt="Your Image"></a>
+                        {%endif%}
                         <h4><span>{{nguoi_dung.user}}</span></h4>
                     </div>
                     <div class="text">

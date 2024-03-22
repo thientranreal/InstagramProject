@@ -146,6 +146,7 @@ def profile(request):
     return render(request, 'apps/profile.html')
 
 def messenger(request):
+    # current_user = request.user.nguoidung
     current_user = request.user.nguoidung
     lienlac = LienLac.objects.filter(goc=current_user)
     context = {'lienlac': lienlac,'current_user': current_user}
@@ -197,63 +198,10 @@ def video_call(request, room_name):
 def call_view(request):
     return render(request, 'apps/call.html')
 
-def receive_call_view(request):
-    return render(request, 'apps/receive_call.html')
-
-@csrf_exempt  # Vô hiệu hóa CSRF cho các API endpoints
-def send_offer(request):
-    if request.method == 'GET':
-        # Xử lý yêu cầu gọi, tạo offer và gửi nó đến người nhận
-        # Truy vấn và xác thực người dùng ở đây (nếu cần)
-        offer_data = generate_offer()  # Phương thức tạo offer từ webrtc module
-        return JsonResponse({'offer': offer_data})
-    else:
-        return JsonResponse({'error': 'Method not allowed'}, status=405)
-
-@csrf_exempt  # Vô hiệu hóa CSRF cho các API endpoints
-def send_answer(request):
-    if request.method == 'POST':
-        # Xử lý phản hồi, tạo answer và gửi nó cho người gọi
-        # Truy vấn và xác thực người dùng ở đây (nếu cần)
-        answer_data = generate_answer()  # Phương thức tạo answer từ webrtc module
-        return JsonResponse({'answer': answer_data})
-    else:
-        return JsonResponse({'error': 'Method not allowed'}, status=405)
-def generate_offer():
-    # Đây là nơi bạn sẽ sử dụng WebRTC API để tạo SDP offer
-    # Ví dụ:
-    offer = {
-        'type': 'offer',
-        'sdp': 'SDP offer data'
-    }
-    return offer
-
-def generate_answer():
-    # Đây là nơi bạn sẽ sử dụng WebRTC API để tạo SDP answer
-    # Ví dụ:
-    answer = {
-        'type': 'answer',
-        'sdp': 'SDP answer data'
-    }
-    return answer
-
 
 def chat_box(request, chat_box_name):
     # we will get the chatbox name from the url
     return render(request, 'apps/chatbox.html', {'chat_box_name': chat_box_name})
-
-# @csrf_exempt
-# def send_offer(request):
-#     if request.method == 'POST':
-#         channel_layer = get_channel_layer()
-#         async_to_sync(channel_layer.group_send)(
-#             'video_call_group', {
-#                 'type': 'send.offer',
-#                 'offer': json.loads(request.body),
-#             }
-#         )
-#         return JsonResponse({'status': 'offer sent'})
-#     return JsonResponse({'status': 'error'}, status=400)
 
 # Hàm kiểm tra email
 def is_email(value):

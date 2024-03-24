@@ -3,20 +3,26 @@ from django.http import HttpResponse, JsonResponse
 from django.contrib.auth import login as auth_login, get_user_model, authenticate
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.models import User
+from django.core import serializers
+from datetime import datetime, timedelta
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
-from django.contrib.auth.models import User
 from .models import *
 import json
 import re
 
 def home(request):
     # Người dùng chưa đăng nhập
-    if request.user.is_authenticated is False:
+    if not request.user.is_authenticated:
         return redirect("login")
-    post = BaiDang.objects.all()
-    context = {'posts': post}
-    return render(request, 'apps/homepage.html',context)
+
+    posts = BaiDang.objects.all()
+    for post in posts:
+        post.formatted_thoigiandang = format_time_ago(post.thoigiandang)
+
+    context = {'posts': posts}
+    return render(request, 'apps/homepage.html', context)
 
 def signup(request):
     if request.method == 'POST':
@@ -155,8 +161,6 @@ def messenger(request):
 def is_ajax(request):
     return request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
 
-from django.core import serializers
-
 def load_mess(request, id):
     # if request.method == 'GET' and is_ajax(request=request):
         try:
@@ -175,22 +179,51 @@ def load_mess(request, id):
             return JsonResponse({'error': 'Item not found'}, status=404)
     # else:
     #     return JsonResponse({'error': 'Invalid request'}, status=400)
-def load_comment(request, id):
-    # if request.method == 'GET' and is_ajax(request=request):
-        try:
-            # item = YourModel.objects.get(id=id)
 
-            comment = BinhLuan.objects.all()
-            serialized_binhluan = serializers.serialize('json', comment)
-            data = {
-                'binhluan':serialized_binhluan,
-                'id':id
+def format_time_ago(timestamp):
+    now = datetime.now()
+    time_difference = now - timestamp.replace(tzinfo=None)
+
+    if time_difference < timedelta(minutes=1):
+        return "Just now"
+    elif time_difference < timedelta(hours=1):
+        return f"{int(time_difference.total_seconds() // 60)} minutes ago"
+    elif time_difference < timedelta(days=1):
+        return f"{int(time_difference.total_seconds() // 3600)} hours ago"
+    elif time_difference < timedelta(weeks=1):
+        return f"{int(time_difference.total_seconds() // 86400)} days ago"
+    else:
+        return timestamp.strftime("%Y-%m-%d %H:%M")
+
+def load_comment(request, id):
+    try:
+        # Lấy tất cả các bình luận cho bài đăng có id tương ứng
+        comments = BinhLuan.objects.filter(baidang_id=id)
+        # Tạo một danh sách chứa thông tin bình luận và avatar
+        serialized_comments = []
+        for comment in comments:
+            serialized_comment = {
+                'comment': {
+                    'id': comment.id,
+                    'noidungbl': comment.noidungbl,
+                    'timestamp': format_time_ago(comment.timestamp)
+                },
+                'user_info':{
+                    'id': comment.nguoidung_id,
+                    'avatar': comment.nguoidung.avatar.url if comment.nguoidung.avatar else 'media/download.png',  # Khởi tạo avatar là None, nếu người dùng không tồn tại hoặc không có avatar
+                    'username': comment.nguoidung.user.username
+                }
             }
-            return JsonResponse(data)
-        except TinNhan.DoesNotExist:
-            return JsonResponse({'error': 'Item not found'}, status=404)
-    # else:
-    #     return JsonResponse({'error': 'Invalid request'}, status=400)
+            serialized_comments.append(serialized_comment)
+
+        # Chuyển đổi danh sách serialized_comments thành JSON
+        data = {
+            'binhluan': serialized_comments,
+            'id': id
+        }
+        return JsonResponse(data)
+    except BinhLuan.DoesNotExist:
+        return JsonResponse({'error': 'Comments not found'}, status=404)
 
 def video_call(request, room_name):
     return render(request, 'apps/testthu.html', {'room_name': room_name})

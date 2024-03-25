@@ -3,10 +3,18 @@
   <div class="wrapper">
     <div class="left-col">
       <div class="status-wrapper">
-        <button class="story--scroll" id="scroll-left" onclick="scrollHorizontal(1)">
+        <button
+          class="story--scroll"
+          id="scroll-left"
+          onclick="scrollHorizontal(1)"
+        >
           <i class="fas fa-chevron-left"></i>
         </button>
-        <button class="story--scroll" id="scroll-right" onclick="scrollHorizontal(-1)">
+        <button
+          class="story--scroll"
+          id="scroll-right"
+          onclick="scrollHorizontal(-1)"
+        >
           <i class="fas fa-chevron-right"></i>
         </button>
         <div class="stories">
@@ -72,34 +80,76 @@
         <div class="info">
           <div class="user">
             <div class="status-pic">
-              <img src="{{post.nguoidung.avatar.url}}" alt="Profile Image" />
+              {%if post.nguoidung.avatar%}
+              <img
+                src="{{post.nguoidung.avatar.url}}"
+                alt="Profile Image"
+              />
+              {%else%}
+              <img
+                src="{% static 'assets/images/profile/status-7.jpg' %}"
+                alt="Profile Image"
+              />
+              {%endif%}
             </div>
             <p class="username">{{post.nguoidung.user}}</p>
 
-            <p style="
+            <p
+              style="
                 font-size: 0.8em;
                 color: #888;
                 margin-top: 7px;
                 margin-left: 5px;
-              ">
-              {{post.formatted_thoigiandang}}
+              "
+            >
+              {{post.thoigiandang}}
             </p>
           </div>
+          <img
+            src="{% static 'assets/images/nav-items/option.PNG' %}"
+            class="options"
+            alt="Options"
+          />
         </div>
-        <img src="{% static 'post.hinhanh' %}" class="post-image" alt="Geeks for Geeks post" />
+        {%if post.hinhanh%}
+        <img
+          src="{{post.hinhanh.url}}"
+          class="post-image"
+          alt="Geeks for Geeks post"
+        />
+        {%else%}
+        <img
+          src="{% static 'assets/images/post/post-1.jpg' %}"
+          class="post-image"
+          alt="Geeks for Geeks post"
+        />
+        {%endif%}
+        
         <div class="post-content">
           <div class="reaction-wrapper">
-            <img src="{% static 'assets/images/nav-items/like.PNG' %}" class="icons" />
-            <img src="{% static 'assets/images/nav-items/comment.PNG' %}" class="icons" />
-            <img src="{% static 'assets/images/nav-items/send.PNG' %}" class="icons" />
+            <img
+              src="{% static 'assets/images/nav-items/like.PNG' %}"
+              class="icons"
+            />
+            <img
+              src="{% static 'assets/images/nav-items/comment.PNG' %}"
+              class="icons"
+            />
+            <img
+              src="{% static 'assets/images/nav-items/send.PNG' %}"
+              class="icons"
+            />
+            <img
+              src="{% static 'assets/images/nav-items/save.PNG' %}"
+              class="save icons"
+            />
           </div>
           <p>Liked by <b>{{post.tongluotthich}} people</b></p>
           <p class="description">
             <span>{{post.nguoidung.user}}</span>{{post.noidung}}
           </p>
-          <p class="no-comments" data="View all 45 comments">View all 45 comments</p>
-          <div class="hienbl">
-          </div>
+          <p class="no-comments">View all 45 comments</p>
+          <div class="hienbl"></div>
           <style>
             p.no-comments:hover {
               font-weight: bold;
@@ -109,60 +159,69 @@
         </div>
         <!-- <hr /> -->
         <div class="comment-wrapper">
-          <input type="text" class="comment-box" placeholder="Add a comment..." />
+          <img
+            src="{% static 'assets/images/nav-items/smile.PNG' %}"
+            class="icons"
+          />
+          <input
+            type="text"
+            class="comment-box"
+            placeholder="Add a comment..."
+          />
           <button class="comment-btn">Post</button>
         </div>
       </div>
       {% endfor %}
     </div>
-  </div>
-  <script>
+</div>
+    <script>
     document.addEventListener("DOMContentLoaded", function () {
-      // Lắng nghe sự kiện click trên phần tử có class là 'no-comments'
-      document.querySelectorAll(".no-comments").forEach(function (commentElement) {
-        commentElement.addEventListener("click", function () {
-          // Lấy ID của bài post từ thuộc tính 'data-id' của phần tử cha
-          var postId = commentElement.closest(".post").dataset.id;
-          var postElement = document.querySelector('.post[data-id="' + postId + '"]');
-          var hienblElement = postElement.querySelector('.hienbl');
-          if (commentElement.innerHTML.trim() !== 'Hide all comments') {
+        // Lắng nghe sự kiện click trên phần tử có class là 'no-comments'
+        document.querySelectorAll(".no-comments").forEach(function (commentElement) {
+            commentElement.addEventListener("click", function () {
+              // Lấy ID của bài post từ thuộc tính 'data-id' của phần tử cha
+            var postId = commentElement.closest(".post").dataset.id;
+            var postElement = document.querySelector('.post[data-id="' + postId + '"]');
+            var hienblElement = postElement.querySelector('.hienbl');
             $.ajax({
-              type: "GET",
-              url: "/commentajax/" + postId + "/",
-              success: function (response) {
-                var binhluan = response.binhluan;
-                hienblElement.innerHTML = '';
-                commentElement.innerHTML = 'Hide all comments';
-                for (var i = 0; i < binhluan.length; i++) {
-                  hienblElement.innerHTML += `<div class="d-flex mt-3">
-                        <img class="rounded-circle shadow-1-strong me-3"
-                          src="`+ binhluan[i].user_info.avatar + `" alt="avatar" width="65"
-                          height="65" />
-                        <div class="flex-grow-1 flex-shrink-1">
-                          <div>
-                            <div class="d-flex justify-content-between align-items-center">
-                              <p class="mb-1">`
-                    + binhluan[i].user_info.username + `<span class="small"> - ` + binhluan[i].comment.timestamp + `</span>
-                              </p>
-                            </div>
-                            <p class="small mb-0">
-                            `+ binhluan[i].comment.noidungbl + `
-                            </p>
-                          </div>`;
-                }
-              },
-              error: function (xhr, status, error) {
-                console.error(error);
-              },
+                type: "GET",
+                url: "/commentajax/" + postId + "/",
+                success: function (response) {
+                  console.log(response);
+                  var binhluan = JSON.parse(response.binhluan);
+                  for (var i = 0; i < binhluan.length; i++) {
+                    var binhluanItem = binhluan[i].fields;
+                    var noidung = binhluanItem.noidungbl;
+                    var nguoidung = binhluanItem.nguoidung;
+                    // var receiver = binhluanItem.receiver;
+                    // console.log(noidung);
+                    // if (senter == id) {
+                        hienblElement.innerHTML+=
+                        '<p><b> ' +nguoidung+' </b>'+
+                          noidung +
+                          "</p>";
+                    //   $(".hienbl").append(
+                    //     '<p><b> ' +nguoidung+' </b>'+
+                    //       noidung +
+                    //       "</p>"
+                    //   );
+                    // } else {
+                    //   $(".message .grid-message ").append(
+                    //     '<div class ="col-message-received"><div class="message-received"><p>' +
+                    //       noidung +
+                    //       "</p></div></div>"
+                    //   );
+                    // }
+                    }
+                },
+                error: function (xhr, status, error) {
+                  console.error(error);
+                },
+              });
             });
-          } else {
-            hienblElement.innerHTML = '';
-            commentElement.innerHTML = commentElement.getAttribute("data");
-          }
-        });
+          });
       });
-    });
-  </script>
-  {% endblock homepage %}
+    </script>
+    {% endblock homepage %}
   </div>
 </section>

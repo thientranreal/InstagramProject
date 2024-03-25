@@ -6,6 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from django.contrib.auth.models import User
+from django.core.files import File
 from .models import *
 import json
 import re
@@ -342,8 +343,7 @@ def create_post(request):
     if request.method == 'POST':
         # Lấy dữ liệu từ request
         noidung = request.POST.get('noidung')
-        hinhanh_url = request.POST.get('hinhanh_url')  # Đã cung cấp URL hình ảnh trong template
-
+        hinhanh_url = request.FILES['hinhanh_url']  # Đã cung cấp URL hình ảnh trong template
         # Tạo một bài đăng mới
         baidang = BaiDang.objects.create(
             nguoidung=request.user.nguoidung,  # Sử dụng người dùng hiện tại đang đăng nhập
@@ -351,8 +351,9 @@ def create_post(request):
             thoigiandang=datetime.now(),
             tongluotthich=0,
             tongluotbinhluan=0,
-            hinhanh=hinhanh_url
         )
+        baidang.hinhanh=hinhanh_url
+        baidang.save()
 
         # Chuyển hướng người dùng đến trang khác hoặc thông báo thành công
         return redirect('home')  # Chuyển hướng về trang chủ sau khi chia sẻ thành công
@@ -363,25 +364,30 @@ def create_post(request):
 
 def edit_profile(request):
     if request.method == 'POST':
-        current_user = request.user
-        # Lấy dữ liệu từ request
-        mota = request.POST.get('mota')
-        hinhanh_url = request.POST.get('hinhanh_url')  # Đã cung cấp URL hình ảnh trong template
-        ngaysinh=request.POST.get('ngaysinh')
-        phone=request.POST.get('phone')
-        gioitinh=request.POST.get('gioitinh')
+        if 'action' in request.POST:
+            if request.POST['action']== 'submit':
+                current_user = request.user
+                # Lấy dữ liệu từ request
+                mota = request.POST.get('mota')
+                hinhanh_url = request.FILES['hinhanh_url']  # Đã cung cấp URL hình ảnh trong template
+                ngaysinh=request.POST.get('ngaysinh')
+                phone=request.POST.get('phone')
+                gioitinh=request.POST.get('gioitinh')
 
-        # Tạo một bài đăng mới
-        nguoidung = NguoiDung.objects.filter(user=current_user).update(
-            ngaysinh=ngaysinh,  
-            avatar=hinhanh_url,     
-            phone=phone,       
-            gioitinh=gioitinh,  
-            mota=mota 
-        )
 
-        # Chuyển hướng người dùng đến trang khác hoặc thông báo thành công
-        return redirect('profile')  # Chuyển hướng về trang chủ sau khi chia sẻ thành công
+                nguoidung1=NguoiDung.objects.get(user=current_user)
+                nguoidung1.avatar=hinhanh_url
+                nguoidung1.save()
+                # Tạo một bài đăng mới
+                nguoidung = NguoiDung.objects.filter(user=current_user).update(
+                    ngaysinh=ngaysinh,      
+                    phone=phone,       
+                    gioitinh=gioitinh,  
+                    mota=mota 
+                )
+
+                # Chuyển hướng người dùng đến trang khác hoặc thông báo thành công
+                return redirect('profile')  # Chuyển hướng về trang chủ sau khi chia sẻ thành công
     else:
         # Xử lý logic khi yêu cầu không phải là POST
         pass

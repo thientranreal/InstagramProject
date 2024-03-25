@@ -8,6 +8,7 @@ def user_directory_path(instance, filename):
     # file sẽ được lưu vào MEDIA_ROOT / hinh_anh/user_<id>/<filename>
     return 'images/user_{0}/{1}'.format(instance.user.id, filename)
 
+
 # Trong User đã có trường email, first name, last name, password
 # Nên NguoiDung k cần những trường trên
 class NguoiDung(models.Model):
@@ -43,7 +44,7 @@ class BaiDang(models.Model):
     thoigiandang = models.DateTimeField(blank=True, null=True)
     tongluotthich = models.IntegerField(blank=True, null=True)
     tongluotbinhluan = models.IntegerField(blank=True, null=True)
-    hinhanh = models.ImageField(blank=True, null=True)
+    hinhanh = models.ImageField(blank=True, null=True, upload_to='images/')
 
 class ThongBao(models.Model):
     nguoidung = models.ForeignKey('NguoiDung', on_delete=models.CASCADE)

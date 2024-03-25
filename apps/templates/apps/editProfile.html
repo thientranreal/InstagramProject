@@ -14,7 +14,7 @@
 </head>
 
 <body>
-    <form method="post" action="{% url 'edit_profile' %}">
+    <form method="post" action="{% url 'edit_profile' %}" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="main">
             <a href="{% url 'profile' %}"><i class="fa-solid fa-x"></i></a>
@@ -34,7 +34,7 @@
                         <h3><span>{{nguoi_dung.user.username}}</span></h3>
                         <p><span>{{nguoi_dung.user.last_name}} {{nguoi_dung.user.first_name}} </span></p>
                     </div>
-                    <button id="changeImg" class="btn btn-primary">Đổi ảnh</button>
+                    <button id="changeImg" class="btn btn-primary" name="action" value="doianh">Đổi ảnh</button>
                     <input type="file" id="imageInput" style="display:none;" accept="image/*" name="hinhanh_url"/>
                 </div>
 
@@ -63,7 +63,7 @@
                     <input type="text" class="form-control datepicker" value="{{nguoi_dung.ngaysinh}}" name="ngaysinh">
                 </div>
 
-                <button type="submit" class="btn btn-primary">Submit</button>
+                <button type="submit" class="btn btn-primary" name="action" value="submit">Submit</button>
             </div>
             {%endif%}
         </div>

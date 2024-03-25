@@ -3,6 +3,9 @@ from django.http import HttpResponse, JsonResponse
 from django.contrib.auth import login as auth_login, get_user_model, authenticate
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.models import User
+from django.core import serializers
+from datetime import datetime, timedelta
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from django.contrib.auth.models import User
@@ -13,11 +16,15 @@ import re
 
 def home(request):
     # Người dùng chưa đăng nhập
-    if request.user.is_authenticated is False:
+    if not request.user.is_authenticated:
         return redirect("login")
-    post = BaiDang.objects.all()
-    context = {'posts': post}
-    return render(request, 'apps/homepage.html',context)
+
+    posts = BaiDang.objects.all()
+    for post in posts:
+        post.formatted_thoigiandang = format_time_ago(post.thoigiandang)
+
+    context = {'posts': posts}
+    return render(request, 'apps/homepage.html', context)
 
 def signup(request):
     if request.method == 'POST':
@@ -147,6 +154,7 @@ def profile(request):
     return render(request, 'apps/profile.html')
 
 def messenger(request):
+    # current_user = request.user.nguoidung
     current_user = request.user.nguoidung
     lienlac = LienLac.objects.filter(goc=current_user)
     context = {'lienlac': lienlac,'current_user': current_user}
@@ -154,8 +162,6 @@ def messenger(request):
 
 def is_ajax(request):
     return request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
-
-from django.core import serializers
 
 def load_mess(request, id):
     # if request.method == 'GET' and is_ajax(request=request):
@@ -175,22 +181,51 @@ def load_mess(request, id):
             return JsonResponse({'error': 'Item not found'}, status=404)
     # else:
     #     return JsonResponse({'error': 'Invalid request'}, status=400)
-def load_comment(request, id):
-    # if request.method == 'GET' and is_ajax(request=request):
-        try:
-            # item = YourModel.objects.get(id=id)
 
-            comment = BinhLuan.objects.all()
-            serialized_binhluan = serializers.serialize('json', comment)
-            data = {
-                'binhluan':serialized_binhluan,
-                'id':id
+def format_time_ago(timestamp):
+    now = datetime.now()
+    time_difference = now - timestamp.replace(tzinfo=None)
+
+    if time_difference < timedelta(minutes=1):
+        return "Just now"
+    elif time_difference < timedelta(hours=1):
+        return f"{int(time_difference.total_seconds() // 60)} minutes ago"
+    elif time_difference < timedelta(days=1):
+        return f"{int(time_difference.total_seconds() // 3600)} hours ago"
+    elif time_difference < timedelta(weeks=1):
+        return f"{int(time_difference.total_seconds() // 86400)} days ago"
+    else:
+        return timestamp.strftime("%Y-%m-%d %H:%M")
+
+def load_comment(request, id):
+    try:
+        # Lấy tất cả các bình luận cho bài đăng có id tương ứng
+        comments = BinhLuan.objects.filter(baidang_id=id)
+        # Tạo một danh sách chứa thông tin bình luận và avatar
+        serialized_comments = []
+        for comment in comments:
+            serialized_comment = {
+                'comment': {
+                    'id': comment.id,
+                    'noidungbl': comment.noidungbl,
+                    'timestamp': format_time_ago(comment.timestamp)
+                },
+                'user_info':{
+                    'id': comment.nguoidung_id,
+                    'avatar': comment.nguoidung.avatar.url if comment.nguoidung.avatar else 'media/download.png',  # Khởi tạo avatar là None, nếu người dùng không tồn tại hoặc không có avatar
+                    'username': comment.nguoidung.user.username
+                }
             }
-            return JsonResponse(data)
-        except TinNhan.DoesNotExist:
-            return JsonResponse({'error': 'Item not found'}, status=404)
-    # else:
-    #     return JsonResponse({'error': 'Invalid request'}, status=400)
+            serialized_comments.append(serialized_comment)
+
+        # Chuyển đổi danh sách serialized_comments thành JSON
+        data = {
+            'binhluan': serialized_comments,
+            'id': id
+        }
+        return JsonResponse(data)
+    except BinhLuan.DoesNotExist:
+        return JsonResponse({'error': 'Comments not found'}, status=404)
 
 def video_call(request, room_name):
     return render(request, 'apps/testthu.html', {'room_name': room_name})
@@ -198,63 +233,10 @@ def video_call(request, room_name):
 def call_view(request):
     return render(request, 'apps/call.html')
 
-def receive_call_view(request):
-    return render(request, 'apps/receive_call.html')
-
-@csrf_exempt  # Vô hiệu hóa CSRF cho các API endpoints
-def send_offer(request):
-    if request.method == 'GET':
-        # Xử lý yêu cầu gọi, tạo offer và gửi nó đến người nhận
-        # Truy vấn và xác thực người dùng ở đây (nếu cần)
-        offer_data = generate_offer()  # Phương thức tạo offer từ webrtc module
-        return JsonResponse({'offer': offer_data})
-    else:
-        return JsonResponse({'error': 'Method not allowed'}, status=405)
-
-@csrf_exempt  # Vô hiệu hóa CSRF cho các API endpoints
-def send_answer(request):
-    if request.method == 'POST':
-        # Xử lý phản hồi, tạo answer và gửi nó cho người gọi
-        # Truy vấn và xác thực người dùng ở đây (nếu cần)
-        answer_data = generate_answer()  # Phương thức tạo answer từ webrtc module
-        return JsonResponse({'answer': answer_data})
-    else:
-        return JsonResponse({'error': 'Method not allowed'}, status=405)
-def generate_offer():
-    # Đây là nơi bạn sẽ sử dụng WebRTC API để tạo SDP offer
-    # Ví dụ:
-    offer = {
-        'type': 'offer',
-        'sdp': 'SDP offer data'
-    }
-    return offer
-
-def generate_answer():
-    # Đây là nơi bạn sẽ sử dụng WebRTC API để tạo SDP answer
-    # Ví dụ:
-    answer = {
-        'type': 'answer',
-        'sdp': 'SDP answer data'
-    }
-    return answer
-
 
 def chat_box(request, chat_box_name):
     # we will get the chatbox name from the url
     return render(request, 'apps/chatbox.html', {'chat_box_name': chat_box_name})
-
-# @csrf_exempt
-# def send_offer(request):
-#     if request.method == 'POST':
-#         channel_layer = get_channel_layer()
-#         async_to_sync(channel_layer.group_send)(
-#             'video_call_group', {
-#                 'type': 'send.offer',
-#                 'offer': json.loads(request.body),
-#             }
-#         )
-#         return JsonResponse({'status': 'offer sent'})
-#     return JsonResponse({'status': 'error'}, status=400)
 
 # Hàm kiểm tra email
 def is_email(value):

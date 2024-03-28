@@ -155,7 +155,11 @@
           </div>
           <div>
             <a href="{% url 'profile' %}">
+              {% if user.nguoidung.avatar and user.nguoidung.avatar.url %}
               <img src="{{user.nguoidung.avatar.url}}" class="icons user-account rounded-circle" alt="User Profile" style="width: 27px; height: 27px;" />
+              {% else %}
+              <img src="{% static "assets/images/profile/status-0.png" %}" class="icons user-account rounded-circle" alt="User Profile" style="width: 27px; height: 27px;" />
+              {% endif %}
             </a>
           </div>
         </div>

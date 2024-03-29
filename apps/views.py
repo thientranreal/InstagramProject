@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 from django.core import serializers
+from django.db.models import Max, Q
 from datetime import datetime, timedelta
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
@@ -23,7 +24,33 @@ def home(request):
     for post in posts:
         post.formatted_thoigiandang = format_time_ago(post.thoigiandang)
 
-    context = {'posts': posts}
+    # Hiển thị tin nhắn
+    if hasattr(request.user, 'nguoidung'):
+        # Lấy các tin nhắn có liên quan tới người dùng hiện tại và tin nhắn mới nhất
+        messages_current_user = TinNhan.objects.filter(Q(receiver=request.user.nguoidung) | Q(senter=request.user.nguoidung)).values('senter', 'receiver').annotate(thoigian_moi_nhat=Max('thoigian'))
+
+        # Lấy username và nội dung tin nhắn mới nhất từ mỗi người gửi
+        messages = []
+        for message in messages_current_user:
+            senter_id = message['senter']
+            receiver_id = message['receiver']
+
+            # Lấy người dùng dựa theo id
+            senter = NguoiDung.objects.get(id=senter_id)
+            receiver = NguoiDung.objects.get(id=receiver_id)
+
+            # Nếu người gửi là người dùng hiện tại thì sẽ hiển thị người nhận
+            if senter.user.username == request.user.username:
+                newestTime = message['thoigian_moi_nhat']
+                newestMessage = TinNhan.objects.filter(receiver__id=receiver_id, thoigian=newestTime).first()
+                messages.append({'nguoidung': receiver, 'noidung': newestMessage.noidung})
+            # Nếu người nhận là người dùng hiện tại thì sẽ hiển thị người gửi
+            elif receiver.user.username == request.user.username:
+                newestTime = message['thoigian_moi_nhat']
+                newestMessage = TinNhan.objects.filter(senter__id=senter_id, thoigian=newestTime).first()
+                messages.append({'nguoidung': senter, 'noidung': newestMessage.noidung})
+
+    context = {'posts': posts, 'messages': messages}
     return render(request, 'apps/homepage.html', context)
 
 def signup(request):

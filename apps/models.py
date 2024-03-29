@@ -6,7 +6,12 @@ from datetime import datetime
 # Hàm tạo đường dẫn hình ảnh cho người dùng
 def user_directory_path(instance, filename):
     # file sẽ được lưu vào MEDIA_ROOT / hinh_anh/user_<id>/<filename>
-    return 'images/user_{0}/{1}'.format(instance.user.id, filename)
+    return f'images/user_{instance.user.username}/avatars/{filename}'
+
+# Hàm tạo đường dẫn hình ảnh cho bài đăng
+def user_directory_post_path(instance, filename):
+    # file sẽ được lưu vào MEDIA_ROOT / hinh_anh/user_<id>/<filename>
+    return f'images/user_{instance.nguoidung.user.username}/posts/{filename}'
 
 
 # Trong User đã có trường email, first name, last name, password
@@ -45,7 +50,7 @@ class BaiDang(models.Model):
     thoigiandang = models.DateTimeField(blank=True, null=True)
     tongluotthich = models.IntegerField(blank=True, null=True)
     tongluotbinhluan = models.IntegerField(blank=True, null=True)
-    hinhanh = models.ImageField(blank=True, null=True, upload_to='images/')
+    hinhanh = models.ImageField(blank=True, null=True, upload_to=user_directory_post_path)
 
 class ThongBao(models.Model):
     nguoidung = models.ForeignKey('NguoiDung', on_delete=models.CASCADE)

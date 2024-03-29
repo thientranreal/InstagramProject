@@ -95,32 +95,19 @@
 
             <div class="message">
               <div class="member">
-                <img src="{% static 'assets/images/img.jpg' %}" />
-                <h1>
-                  Coder<br />
-                  <p>Hello - Tue</p>
-                </h1>
-              </div>
-              <div class="member">
-                <img src="{% static 'assets/images/img.jpg' %}" />
-                <h1>
-                  Rohit<br />
-                  <p>Like my photo - Mon</p>
-                </h1>
-              </div>
-              <div class="member">
-                <img src="{% static 'assets/images/img.jpg' %}" />
-                <h1>
-                  Vishal Tewtia<br />
-                  <p>Kase Ho - Fri</p>
-                </h1>
-              </div>
-              <div class="member">
-                <img src="{% static 'assets/images/img.jpg' %}" />
-                <h1>
-                  lokesh<br />
-                  <p>jarur video like karna - Tue</p>
-                </h1>
+                {% for message in messages %}
+                  {% if message.nguoidung.avatar %}
+                      <!-- Nếu người dùng có avatar, hiển thị avatar -->
+                      <img src="{{ message.nguoidung.avatar.url }}" alt="Avatar của người dùng">
+                  {% else %}
+                      <!-- Nếu người dùng không có avatar, hiển thị hình ảnh mặc định -->
+                      <img src="{% static "assets/images/profile/status-0.png" %}" alt="Avatar mặc định">
+                  {% endif %}
+                  <h1>
+                    {{message.nguoidung.user.username}}<br />
+                    <p>{{message.noidung}}</p>
+                  </h1>
+                {% endfor %}
               </div>
             </div>
             <!-- <hr /> -->
@@ -155,7 +142,11 @@
           </div>
           <div>
             <a href="{% url 'profile' %}">
-              <img src="{{user.nguoidung.avatar.url}}" class="icons user-account rounded-circle" alt="User Profile" style="width: 27px; height: 27px;" />
+              {% if user.nguoidung.avatar %}
+                <img src="{{user.nguoidung.avatar.url}}" class="icons user-account rounded-circle" alt="User Profile" style="width: 27px; height: 27px;" />
+              {% else %}
+                <img src="{% static "assets/images/profile/status-0.png" %}" class="icons user-account rounded-circle" alt="User Profile" style="width: 27px; height: 27px;" />
+              {% endif %}
             </a>
           </div>
         </div>

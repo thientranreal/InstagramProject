@@ -1,4 +1,3 @@
-
 import json
 from random import randint
 from asyncio import sleep
@@ -68,6 +67,13 @@ class NoftificationConsumer(AsyncWebsocketConsumer):
 
 class CommentConsumer(AsyncWebsocketConsumer):
     async def connect(self):
+        self.group_name = "comment"
+
+        await self.channel_layer.group_add(
+            self.group_name, 
+            self.channel_name
+        )
+
         await self.accept()
 
     async def disconnect(self, close_code):
@@ -76,12 +82,45 @@ class CommentConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         # Xử lý dữ liệu nhận được nếu cần thiết
         text_data_json = json.loads(text_data)
-        message = text_data_json['message']
+        comment = text_data_json['comment']
+        post_id = text_data_json['post_id']
+        username = text_data_json['username']
+        avatar = text_data_json['avatar']
+        timestamp = text_data_json['timestamp']
 
         # Gửi lại thông báo cho client
-        await self.send(text_data=json.dumps({
-            'message': message
-        }))
+        await self.channel_layer.group_send(
+            self.group_name,
+            {
+                "type": "comment_message",
+                "comment": comment,
+                "post_id": post_id,
+                "username": username,
+                "avatar": avatar,
+                "timestamp": timestamp,
+            },
+        )
+
+    # Receive message from room group.
+    async def comment_message(self, event):
+        comment = event["comment"]
+        post_id = event["post_id"]
+        username = event["username"]
+        avatar = event["avatar"]
+        timestamp = event["timestamp"]
+        #send message and username of sender to websocket
+        await self.send(
+            text_data=json.dumps(
+                {
+                    "type": "comment",
+                    "comment": comment,
+                    "post_id": post_id,
+                    "username": username,
+                    "avatar": avatar,
+                    "timestamp": timestamp,
+                }
+            )
+        )
 # code phần client tương tự trên
 
 

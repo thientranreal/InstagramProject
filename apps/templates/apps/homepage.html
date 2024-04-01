@@ -150,8 +150,8 @@
           </p>
           <p class="no-comments">View all comments</p>
           {% comment %} Hiển thị bình luận {% endcomment %}
-          <div class="hienbl">
-            {% for binhluan in post.latest_comments %}
+          <div class="hienbl" style="overflow-y: auto; max-height: 300px;">
+            {% for binhluan in post.latest_comments reversed %}
               <div>
                 {% if binhluan.nguoidung.avatar %}
                   <img 

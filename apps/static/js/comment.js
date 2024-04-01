@@ -13,11 +13,11 @@ commentSocket.onmessage = function(e) {
 
         // Hiển thị 2 comment mới nhất
         if (no_comment.innerText === "View all comments"){
-            let allDivs = Array.from(hienblElement.querySelectorAll('div'));
+            let allDivs = Array.from(hienblElement.querySelectorAll('div')).slice(0,2);
             hienblElement.innerHTML = "";
-
-            for (let i = 1; i < 3; i++) {
-                hienblElement.innerHTML += allDivs[i].outerHTML;
+            hienblElement.innerHTML = "";
+            for (let div of allDivs) {
+                hienblElement.innerHTML += div.outerHTML;
             }
         }
         // Thêm bình luận với vào bài đăng
@@ -115,7 +115,8 @@ document.querySelectorAll(".no-comments").forEach(function (commentElement) {
             .then(data => {
                 let binhluans = data.binhluan;
                 hienblElement.innerHTML = '';
-                for (const binhluan of binhluans) {
+                for (let i = binhluans.length - 1; i >= 0; i--) {
+                    const binhluan = binhluans[i];
                     if (binhluan.avatar === null) {
                         binhluan.avatar = defaultAvatarUrl;
                     }
@@ -134,6 +135,20 @@ document.querySelectorAll(".no-comments").forEach(function (commentElement) {
                                                             <i>${binhluan.timestamp}</i>
                                                         </p>
                                                 </div>`;
+                    console.log(`<div>
+                    <img 
+                        src="${binhluan.avatar}" 
+                        class="icons user-account rounded-circle" 
+                        alt="User Profile" 
+                        style="width: 27px; height: 27px;" />
+                        <p>
+                            <b>${binhluan.username}</b>
+                            <br />
+                            ${binhluan.noidungbl}
+                            <br />
+                            <i>${binhluan.timestamp}</i>
+                        </p>
+                </div>`)
                 }
             })
             .catch((error) => {
@@ -143,7 +158,7 @@ document.querySelectorAll(".no-comments").forEach(function (commentElement) {
         else {
             commentElement.innerText = "View all comments";
 
-            let allDivs = Array.from(hienblElement.querySelectorAll('div')).slice(-3);
+            let allDivs = Array.from(hienblElement.querySelectorAll('div')).slice(0,3);
 
             hienblElement.innerHTML = "";
             for (let div of allDivs) {

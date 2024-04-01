@@ -109,6 +109,7 @@
                   </h1>
                 {% endfor %}
               </div>
+              <div id="notificationFooter"><a href="{% url 'messenger' %}">See All Messenger</a></div>
             </div>
             <!-- <hr /> -->
             <!-- <div class="foot">
@@ -143,9 +144,9 @@
           <div>
             <a href="{% url 'profile' %}">
               {% if user.nguoidung.avatar %}
-                <img src="{{user.nguoidung.avatar.url}}" class="icons user-account rounded-circle" alt="User Profile" style="width: 27px; height: 27px;" />
+                <img id="avatar" src="{{user.nguoidung.avatar.url}}" class="icons user-account rounded-circle" alt="User Profile" style="width: 27px; height: 27px;" />
               {% else %}
-                <img src="{% static "assets/images/profile/status-0.png" %}" class="icons user-account rounded-circle" alt="User Profile" style="width: 27px; height: 27px;" />
+                <img id="avatar" src="{% static "assets/images/profile/status-0.png" %}" class="icons user-account rounded-circle" alt="User Profile" style="width: 27px; height: 27px;" />
               {% endif %}
             </a>
           </div>
@@ -253,6 +254,7 @@
       };
     </script>
     <script src="{% static 'js/addFriend.js'%}"></script>
+    <script type="module" src="{% static 'js/comment.js' %}"></script>
   </body>
 
 </html>

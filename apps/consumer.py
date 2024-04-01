@@ -1,9 +1,12 @@
-
 import json
 from random import randint
 from asyncio import sleep
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .models import *
+from django.utils import timezone
+# from django.utils.functional import sync_to_async
+from channels.db import database_sync_to_async
+
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
@@ -21,26 +24,40 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
         message = text_data_json["message"]
-        username = text_data_json["username"]
+        id_user = text_data_json["id_user"]
+        id_receiver = text_data_json["id_receiver"]
+        # Lưu vô đatabase
+        # sender = await NguoiDung.objects.get(id=id_user)
+        
+        # receiver = NguoiDung.objects.get(id=id_receiver)
+        # print(sender.user.username)
+        # print(receiver.user.username)
+        # tinnhan = TinNhan.objects.create(
+        #     senter=sender,
+        #     receiver=receiver,
+        #     noidung=message,
+        #     thoigian=timezone.now()
+        # )
+        # tinnhan.save()
 
         await self.channel_layer.group_send(
             self.group_name,
             {
                 "type": "chatbox_message",
                 "message": message,
-                "username": username,
+                "id_user": id_user,
             },
         )
     # Receive message from room group.
     async def chatbox_message(self, event):
         message = event["message"]
-        username = event["username"]
+        id_user = event["id_user"]
         #send message and username of sender to websocket
         await self.send(
             text_data=json.dumps(
                 {
                     "message": message,
-                    "username": username,
+                    "id_user": id_user,
                 }
             )
         )
@@ -68,6 +85,13 @@ class NoftificationConsumer(AsyncWebsocketConsumer):
 
 class CommentConsumer(AsyncWebsocketConsumer):
     async def connect(self):
+        self.group_name = "comment"
+
+        await self.channel_layer.group_add(
+            self.group_name, 
+            self.channel_name
+        )
+
         await self.accept()
 
     async def disconnect(self, close_code):
@@ -76,12 +100,45 @@ class CommentConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         # Xử lý dữ liệu nhận được nếu cần thiết
         text_data_json = json.loads(text_data)
-        message = text_data_json['message']
+        comment = text_data_json['comment']
+        post_id = text_data_json['post_id']
+        username = text_data_json['username']
+        avatar = text_data_json['avatar']
+        timestamp = text_data_json['timestamp']
 
         # Gửi lại thông báo cho client
-        await self.send(text_data=json.dumps({
-            'message': message
-        }))
+        await self.channel_layer.group_send(
+            self.group_name,
+            {
+                "type": "comment_message",
+                "comment": comment,
+                "post_id": post_id,
+                "username": username,
+                "avatar": avatar,
+                "timestamp": timestamp,
+            },
+        )
+
+    # Receive message from room group.
+    async def comment_message(self, event):
+        comment = event["comment"]
+        post_id = event["post_id"]
+        username = event["username"]
+        avatar = event["avatar"]
+        timestamp = event["timestamp"]
+        #send message and username of sender to websocket
+        await self.send(
+            text_data=json.dumps(
+                {
+                    "type": "comment",
+                    "comment": comment,
+                    "post_id": post_id,
+                    "username": username,
+                    "avatar": avatar,
+                    "timestamp": timestamp,
+                }
+            )
+        )
 # code phần client tương tự trên
 
 
@@ -106,22 +163,7 @@ class OnlineStatusConsumer(WebsocketConsumer):
         # Xác định người dùng có ID user_id là trực tuyến và gửi tin nhắn thông báo
         # Trong thực tế, bạn cần xử lý việc lưu trạng thái trực tuyến của người dùng và thông báo trạng thái tương ứng
         await self.send(text_data=json.dumps({'status': 'online', 'user_id': user_id}))
-#  bên client
 
-# const socket = new WebSocket('ws://localhost:8000/ws/notification/');
-
-# socket.onopen = function() {
-#     console.log('Connected to the server.');
-# };
-
-# socket.onmessage = function(e) {
-#     const data = JSON.parse(e.data);
-#     console.log('Received message:', data.message);
-# };
-
-# socket.onclose = function() {
-#     console.log('Disconnected from the server.');
-# };
 from asgiref.sync import async_to_sync
 class CallConsumer(WebsocketConsumer):
         def connect(self):
@@ -163,7 +205,7 @@ class CallConsumer(WebsocketConsumer):
             
             if eventType == 'call':
                 name = text_data_json['data']['name']
-                print(self.my_name, "is calling", name);
+                print(self.my_name, "is calling", name)
                 # print(text_data_json)
 
 

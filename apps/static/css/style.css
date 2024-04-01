@@ -267,6 +267,15 @@ body {
   padding-bottom: 10px;
 }
 
+.hienbl > div {
+  display: flex;
+}
+
+.hienbl i {
+  opacity: 70%;
+  font-size: 0.85rem;
+}
+
 .comment-wrapper .icons {
   height: 25px;
   margin: 10px;
@@ -292,6 +301,14 @@ body {
   font-weight: 400;
   color: #bde3fc;
   font-weight: bold;
+}
+
+.comment-btn.active{
+  color: #0077c7;
+}
+
+.comment-btn.active:hover{
+  opacity: 80%;
 }
 
 .comment-btn {

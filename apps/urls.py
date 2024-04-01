@@ -27,7 +27,7 @@ urlpatterns = [
     path('edit_profile', views.edit_profile,name='edit_profile'),
     path('createPost', views.createPost,name='createPost'),
     path('create_post', views.create_post,name='create_post'),
-
+    path('api/comment_post', views.comment_post),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
       

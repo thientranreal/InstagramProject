@@ -102,7 +102,7 @@
                 margin-left: 5px;
               "
             >
-              {{post.thoigiandang}}
+              {{post.formatted_thoigiandang}}
             </p>
           </div>
           <img
@@ -149,7 +149,33 @@
             <span>{{post.nguoidung.user}}</span>{{post.noidung}}
           </p>
           <p class="no-comments">View all 45 comments</p>
-          <div class="hienbl"></div>
+          {% comment %} Hiển thị bình luận {% endcomment %}
+          <div class="hienbl">
+            {% for binhluan in post.latest_comments %}
+              <div>
+                {% if binhluan.nguoidung.avatar %}
+                  <img 
+                    src="{{binhluan.nguoidung.avatar.url}}" 
+                    alt="avatar" 
+                    class="icons user-account rounded-circle" 
+                    style="width: 27px; height: 27px;">
+                {% else %}
+                  <img 
+                    src="{% static "assets/images/profile/status-0.png" %}" 
+                    alt="avatar" 
+                    class="icons user-account rounded-circle" 
+                    style="width: 27px; height: 27px;">
+                {% endif %}
+                <p>
+                  <b>{{binhluan.nguoidung.user.username}}</b>
+                  <br />
+                  {{binhluan.noidungbl}}
+                  <br />
+                  <i>{{binhluan.timestamp}}</i>
+                </p>
+              </div>
+            {% endfor %}
+          </div>
           <style>
             p.no-comments:hover {
               font-weight: bold;
@@ -174,7 +200,7 @@
       {% endfor %}
     </div>
 </div>
-    <script>
+    <!-- <script>
     document.addEventListener("DOMContentLoaded", function () {
         // Lắng nghe sự kiện click trên phần tử có class là 'no-comments'
         document.querySelectorAll(".no-comments").forEach(function (commentElement) {
@@ -221,6 +247,10 @@
             });
           });
       });
+    </script> -->
+    <script type="text/javascript">
+      let defaultAvatarUrl = "{% static 'assets/images/profile/status-0.png' %}";
+      let username = "{{user.username}}";
     </script>
     {% endblock homepage %}
   </div>

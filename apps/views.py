@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 from django.core import serializers
-from django.db.models import Max, Q
+from django.db.models import Max, Q, Prefetch
 from datetime import datetime, timedelta
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
@@ -20,8 +20,19 @@ def home(request):
     if not request.user.is_authenticated:
         return redirect("login")
 
-    posts = BaiDang.objects.all()
+    # Sắp xếp các BinhLuan theo thời gian tạo
+    latest_comments = Prefetch(
+        'binhluan_set', 
+        queryset=BinhLuan.objects.order_by('-timestamp')
+    )
+
+    # Lấy tất cả BaiDang và prefetch 3 BinhLuan mới nhất
+    posts = BaiDang.objects.prefetch_related(latest_comments)
+
     for post in posts:
+        post.latest_comments = post.binhluan_set.all()[:3]
+        for comment in post.latest_comments:
+            comment.timestamp = format_time_ago(comment.timestamp)
         post.formatted_thoigiandang = format_time_ago(post.thoigiandang)
 
     # Hiển thị tin nhắn
@@ -400,4 +411,61 @@ def edit_profile(request):
     else:
         # Xử lý logic khi yêu cầu không phải là POST
         pass
+
+def comment_post(request):
+    # Thêm comment vào bài đăng
+    if request.method == 'POST':
+        # Lấy giá trị gửi từ client
+        data = json.loads(request.body)
+        post_id = data.get('post_id')
+        noidungbl = data.get('comment')
+        
+        # Lấy bài đăng và người dùng
+        baidang = BaiDang.objects.get(id=post_id)
+        nguoidung = request.user.nguoidung
+
+        # Tạo một BinhLuan mới
+        binhluan_moi = BinhLuan.objects.create(
+            baidang=baidang,
+            nguoidung=nguoidung,
+            noidungbl=noidungbl
+        )
+
+        # Lưu BinhLuan mới
+        binhluan_moi.save()
+        # Format lại thời gian
+        formatted_timestamp = format_time_ago(binhluan_moi.timestamp)
+
+        return JsonResponse({
+                                'status': 'ok',
+                                'timestamp': formatted_timestamp
+                            })
+
+    # Lấy comment từ bài đăng
+    elif request.method == 'GET':
+        postId = request.GET.get('postId', '')
+
+        # Lấy đối tượng BaiDang dựa trên postId
+        baidang = BaiDang.objects.get(id=postId)
+        # Kết quả bình luận
+        binhluan_data = []
+
+        # Lấy tất cả BinhLuan của BaiDang
+        binhluan_list = BinhLuan.objects.filter(baidang=baidang).order_by('-timestamp')
+
+        # Chuyển đổi binhluan_list thành danh sách các dictionary
+        for binhluan in binhluan_list:
+            # Format lại thời gian
+            formatted_timestamp = format_time_ago(binhluan.timestamp)
+
+            binhluan_data.append({
+                'noidungbl': binhluan.noidungbl,
+                'username': binhluan.nguoidung.user.username,
+                'avatar': binhluan.nguoidung.avatar.url if binhluan.nguoidung.avatar else None,
+                'timestamp': formatted_timestamp
+            })
+            
+        return JsonResponse({'binhluan': binhluan_data})
+
+
 

@@ -31,6 +31,7 @@ def home(request):
 
     for post in posts:
         post.latest_comments = post.binhluan_set.all()[:3]
+        post.latest_comments.reverse()
         for comment in post.latest_comments:
             comment.timestamp = format_time_ago(comment.timestamp)
         post.formatted_thoigiandang = format_time_ago(post.thoigiandang)
@@ -451,7 +452,7 @@ def comment_post(request):
         binhluan_data = []
 
         # Lấy tất cả BinhLuan của BaiDang
-        binhluan_list = BinhLuan.objects.filter(baidang=baidang).order_by('-timestamp')
+        binhluan_list = BinhLuan.objects.filter(baidang=baidang).order_by('timestamp')
 
         # Chuyển đổi binhluan_list thành danh sách các dictionary
         for binhluan in binhluan_list:

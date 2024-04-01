@@ -10,7 +10,7 @@ commentSocket.onmessage = function(e) {
     let postElement = document.querySelector('.post[data-id="' + data.post_id + '"]');
     let hienblElement = postElement.querySelector('.hienbl');
 
-    hienblElement.insertAdjacentHTML('afterbegin', `<div>
+    hienblElement.insertAdjacentHTML('beforeend', `<div>
                                                         <img 
                                                             src="${data.avatar}" 
                                                             class="icons user-account rounded-circle" 
@@ -89,41 +89,55 @@ document.querySelectorAll(".no-comments").forEach(function (commentElement) {
         let postId = commentElement.closest(".post").dataset.id;
         let postElement = document.querySelector('.post[data-id="' + postId + '"]');
         let hienblElement = postElement.querySelector('.hienbl');
-        
-        // Hiển thị comment
-        fetch(`/api/comment_post?postId=${postId}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        })
-        .then(response => response.json())
-        .then(data => {
-            let binhluans = data.binhluan;
-            hienblElement.innerHTML = '';
-            for (const binhluan of binhluans) {
-                if (binhluan.avatar === null) {
-                    binhluan.avatar = defaultAvatarUrl;
-                }
 
-                hienblElement.innerHTML += `<div>
-                                                <img 
-                                                    src="${binhluan.avatar}" 
-                                                    class="icons user-account rounded-circle" 
-                                                    alt="User Profile" 
-                                                    style="width: 27px; height: 27px;" />
-                                                    <p>
-                                                        <b>${binhluan.username}</b>
-                                                        <br />
-                                                        ${binhluan.noidungbl}
-                                                        <br />
-                                                        <i>${binhluan.timestamp}</i>
-                                                    </p>
-                                            </div>`;
+        if (commentElement.innerText === "View all comments") {
+            commentElement.innerText = "Hide comments";
+
+            // Hiển thị comment
+            fetch(`/api/comment_post?postId=${postId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                let binhluans = data.binhluan;
+                hienblElement.innerHTML = '';
+                for (const binhluan of binhluans) {
+                    if (binhluan.avatar === null) {
+                        binhluan.avatar = defaultAvatarUrl;
+                    }
+
+                    hienblElement.innerHTML += `<div>
+                                                    <img 
+                                                        src="${binhluan.avatar}" 
+                                                        class="icons user-account rounded-circle" 
+                                                        alt="User Profile" 
+                                                        style="width: 27px; height: 27px;" />
+                                                        <p>
+                                                            <b>${binhluan.username}</b>
+                                                            <br />
+                                                            ${binhluan.noidungbl}
+                                                            <br />
+                                                            <i>${binhluan.timestamp}</i>
+                                                        </p>
+                                                </div>`;
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        }
+        else {
+            commentElement.innerText = "View all comments";
+
+            let allDivs = Array.from(hienblElement.querySelectorAll('div')).slice(-3);
+
+            hienblElement.innerHTML = "";
+            for (let div of allDivs) {
+                hienblElement.innerHTML += div.outerHTML;
             }
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-        });
+        }
     });
 });

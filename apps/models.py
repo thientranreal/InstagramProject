@@ -1,7 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
 from datetime import datetime
-
 # Create your models here.
 # Hàm tạo đường dẫn hình ảnh cho người dùng
 def user_directory_path(instance, filename):
@@ -25,8 +24,6 @@ class NguoiDung(models.Model):
     is_online = models.BooleanField(default=False, blank=True, null=True)
     gioitinh=models.CharField(max_length=15, blank=True, null=True)
     mota=models.TextField(blank=True, null=True)
-
-
 
 class BanBe(models.Model):
     nguoidung1 = models.ForeignKey('NguoiDung', on_delete=models.CASCADE, related_name='ban_be_1')

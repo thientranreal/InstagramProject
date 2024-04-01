@@ -194,7 +194,7 @@ def profile(request):
 def messenger(request):
     # current_user = request.user.nguoidung
     current_user = request.user.nguoidung
-    lienlac = LienLac.objects.filter(goc=current_user)
+    lienlac = LienLac.objects.filter(Q(goc=current_user) | Q(dich=current_user))
     context = {'lienlac': lienlac,'current_user': current_user}
     return render(request, 'apps/messenger.html', context)
 

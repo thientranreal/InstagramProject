@@ -5,26 +5,37 @@ let urlComment = `ws://${window.location.host}/ws/commment/`;
 const commentSocket = new WebSocket(urlComment);
 
 commentSocket.onmessage = function(e) {
-  let data = JSON.parse(e.data);
-  if (data.type === "comment") {
-    let postElement = document.querySelector('.post[data-id="' + data.post_id + '"]');
-    let hienblElement = postElement.querySelector('.hienbl');
+    let data = JSON.parse(e.data);
+    if (data.type === "comment") {
+        let postElement = document.querySelector('.post[data-id="' + data.post_id + '"]');
+        let hienblElement = postElement.querySelector('.hienbl');
+        let no_comment = document.querySelector('.no-comments');
 
-    hienblElement.insertAdjacentHTML('beforeend', `<div>
-                                                        <img 
-                                                            src="${data.avatar}" 
-                                                            class="icons user-account rounded-circle" 
-                                                            alt="User Profile" 
-                                                            style="width: 27px; height: 27px;" />
-                                                        <p>
-                                                            <b>${data.username}</b>
-                                                            <br />
-                                                            ${data.comment}
-                                                            <br />
-                                                            <i>${data.timestamp}</i>
-                                                        </p>
-                                                    </div>`);
-  }
+        // Hiển thị 2 comment mới nhất
+        if (no_comment.innerText === "View all comments"){
+            let allDivs = Array.from(hienblElement.querySelectorAll('div'));
+            hienblElement.innerHTML = "";
+
+            for (let i = 1; i < 3; i++) {
+                hienblElement.innerHTML += allDivs[i].outerHTML;
+            }
+        }
+        // Thêm bình luận với vào bài đăng
+        hienblElement.insertAdjacentHTML('beforeend', `<div>
+                                                            <img 
+                                                                src="${data.avatar}" 
+                                                                class="icons user-account rounded-circle" 
+                                                                alt="User Profile" 
+                                                                style="width: 27px; height: 27px;" />
+                                                            <p>
+                                                                <b>${data.username}</b>
+                                                                <br />
+                                                                ${data.comment}
+                                                                <br />
+                                                                <i>${data.timestamp}</i>
+                                                            </p>
+                                                        </div>`);
+    }
 };
 
 document.querySelectorAll(".comment-box").forEach(function(element) {

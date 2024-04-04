@@ -50,7 +50,7 @@
         <img src="{% static 'assets/images/instagram_logo.png' %}" alt="Instagram logo" class="logo" />
         </a>
         {% if request.path == '/friend' %}
-            <input type="text" class="search" placeholder="Search" />
+            <input type="text" class="search" data-action="search" placeholder="Search" />
         {% endif %}
         <div class="nav-items" style="display: flex">
           <a href="{% url 'home' %}">
@@ -71,7 +71,9 @@
               </div> -->
             </div>
             <!-- <div class="bar">
-              <input type="text" name="" placeholder="Search" />
+              {% if request.path == '/friend' %}
+                  <input type="text" class="search" data-action="search" placeholder="Search" />
+              {% endif %}
             </div>
             <div class="bar2">
               <div class="online">
@@ -162,7 +164,9 @@
     <nav class="navbar-mobile-top">
       <div class="navbar-wrapper">
         <img src="{% static 'assets/images/instagram_logo.png' %}" alt="Instagram logo" class="logo" />
-        <input type="text" class="search" placeholder="Search" />
+        {% if request.path == '/friend' %}
+            <input type="text" class="search" data-action="search" placeholder="Search" />
+        {% endif %}
         <div class="nav-items">
 
           <img src="{% static 'assets/images/nav-items/add.PNG' %}" class="icons" alt="Add Icon" />

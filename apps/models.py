@@ -28,6 +28,8 @@ class NguoiDung(models.Model):
 class BanBe(models.Model):
     nguoidung1 = models.ForeignKey('NguoiDung', on_delete=models.CASCADE, related_name='ban_be_1')
     nguoidung2 = models.ForeignKey('NguoiDung', on_delete=models.CASCADE, related_name='ban_be_2')
+    is_banbe = models.BooleanField(default=False, blank=True, null=True)
+    thoigian = models.DateTimeField(blank=True, null=True)
 
 class TinNhan(models.Model):
     senter = models.ForeignKey('NguoiDung', on_delete=models.CASCADE,related_name='nguoi_dung_1')

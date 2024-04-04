@@ -11,6 +11,7 @@ from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from django.contrib.auth.models import User
 from django.core.files import File
+from django.utils import timezone
 from .models import *
 import json
 import re
@@ -290,44 +291,69 @@ def is_phone_number(phone_number):
 def friend(request):
     # Lấy thông tin người dùng hiện tại
     current_user = request.user.nguoidung
-    # Lấy danh sách id của các người dùng đã kết bạn với người dùng hiện tại
-    friends_ids = BanBe.objects.filter(nguoidung1=current_user).values_list('nguoidung2_id', flat=True)
-    # Lấy thông tin của tất cả người dùng trừ người dùng hiện tại đăng nhập và những người dùng đã kết bạn với người dùng hiện tại
-    other_users = NguoiDung.objects.exclude(user=current_user.user).exclude(id__in=friends_ids)
     
-    # Truyền combined_users vào context
-    context = {'other_users': other_users}
+    # Lấy thông tin của tất cả người dùng trừ người dùng hiện tại đăng nhập và những người dùng đã kết bạn với người dùng hiện tại
+    other_users = NguoiDung.objects.exclude(id=current_user.id).exclude(
+        Q(id__in=BanBe.objects.filter(nguoidung1_id=current_user.id).values_list('nguoidung2_id', flat=True)) | Q(id__in=BanBe.objects.filter(nguoidung2_id=current_user.id).values_list('nguoidung1_id', flat=True))
+    )
+    
+    # Lấy tất cả bạn của người dùng hiện tại (người gửi lời mời kết bạn)
+    sender_friend_ids = BanBe.objects.filter(nguoidung1_id=current_user.id, is_banbe=False)
+
+    # Lấy tất cả bạn của người dùng hiện tại (người nhận lời mời kết bạn) 
+    receiver_friend_ids = BanBe.objects.filter(nguoidung2_id=current_user.id, is_banbe=False)
+    
+    # Lấy tất cả bạn của người dùng hiện tại
+    friend_ids = BanBe.objects.filter(Q(nguoidung1_id=current_user.id) | Q(nguoidung2_id=current_user.id), is_banbe=True)
+    all_friend_ids = []
+
+    for friend in friend_ids:
+        if friend.nguoidung1_id == current_user.id:
+            all_friend_ids.append(friend.nguoidung2_id)
+        else:
+            all_friend_ids.append(friend.nguoidung1_id)
+    
+    friends = [NguoiDung.objects.get(id=user_id) for user_id in all_friend_ids]
+    
+    context = {'other_users': other_users, 'sender_friend_ids': sender_friend_ids, 'receiver_friend_ids': receiver_friend_ids, 'friends': friends}
     return render(request, 'apps/friend.html', context)
 
 def updatefriend(request):
-    nguoidung1 = request.user.nguoidung  # Lấy đối tượng NguoiDung từ user của request
-    print(nguoidung1)
-    
+    nguoidung1 = request.user.nguoidung  
     data = json.loads(request.body)
-    nguoidung2_username = data['userId']  # Giả sử nguoidung2_id được truyền dưới dạng tên người dùng (username)
-    print(nguoidung2_username)
+    nguoidung2_username = data['userId']  
+    action = data['action']  
 
-    # Tìm nguoidung2 dựa trên tên người dùng
     try:
         nguoidung2 = NguoiDung.objects.get(user__username=nguoidung2_username)
     except NguoiDung.DoesNotExist:
         return JsonResponse({'error': 'User does not exist'}, status=404)
-
-    action = data['action']  
     
     if action == 'add':
         friendship = BanBe.objects.create(nguoidung1=nguoidung1, nguoidung2=nguoidung2)
+        friendship.thoigian = timezone.now()  # Update time
         friendship.save()
-        
         return JsonResponse({'message': 'Friendship added successfully'}, status=200)
-    
     elif action == 'remove':
+        friendship = BanBe.objects.get(Q(nguoidung1=nguoidung2, nguoidung2=nguoidung1) | Q(nguoidung1=nguoidung1, nguoidung2=nguoidung2))
+        friendship.delete()
         return JsonResponse({'message': 'Friendship removed successfully'}, status=200)
-    
+    elif action == 'cancel':
+        friendship = BanBe.objects.get(nguoidung1=nguoidung1, nguoidung2=nguoidung2)
+        friendship.delete()
+        return JsonResponse({'message': 'Friendship removed successfully'}, status=200)
+    elif action == 'accept':
+        friendship = BanBe.objects.get(nguoidung1=nguoidung2, nguoidung2=nguoidung1)
+        friendship.is_banbe = True
+        friendship.thoigian = timezone.now()  # Update time
+        friendship.save()
+        return JsonResponse({'message': 'Friendship accepted successfully'}, status=200)
+    elif action == 'refuse':
+        friendship = BanBe.objects.get(nguoidung1=nguoidung2, nguoidung2=nguoidung1)
+        friendship.delete()
+        return JsonResponse({'message': 'Friendship removed successfully'}, status=200)
     else:
         return JsonResponse({'error': 'Invalid action'}, status=400)
-
-
 
 def editProfile(request):
     current_user = request.user.nguoidung

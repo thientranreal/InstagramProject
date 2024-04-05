@@ -6,17 +6,14 @@ from .models import *
 from django.utils import timezone
 # from django.utils.functional import sync_to_async
 from channels.db import database_sync_to_async
-
+from asgiref.sync import async_to_sync
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        self.chat_box_name = self.scope["url_route"]["kwargs"]["chat_box_name"]
-        self.group_name = "chat_%s" % self.chat_box_name
-
+        # self.chat_box_name = self.scope["url_route"]["kwargs"]["chat_box_name"]
+        self.group_name = "chat"
         await self.channel_layer.group_add(self.group_name, self.channel_name)
-
         await self.accept()
-    
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(self.group_name, self.channel_name)
@@ -26,19 +23,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = text_data_json["message"]
         id_user = text_data_json["id_user"]
         id_receiver = text_data_json["id_receiver"]
-        # Lưu vô đatabase
-        # sender = await NguoiDung.objects.get(id=id_user)
-        
-        # receiver = NguoiDung.objects.get(id=id_receiver)
-        # print(sender.user.username)
-        # print(receiver.user.username)
-        # tinnhan = TinNhan.objects.create(
-        #     senter=sender,
-        #     receiver=receiver,
-        #     noidung=message,
-        #     thoigian=timezone.now()
-        # )
-        # tinnhan.save()
+        senter = await self.get_user(id_user)
+        receiver = await self.get_user(id_receiver)
+
+        # Save message asynchronously
+        await self.save_message(message, senter, receiver)
 
         await self.channel_layer.group_send(
             self.group_name,
@@ -46,18 +35,39 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 "type": "chatbox_message",
                 "message": message,
                 "id_user": id_user,
+                "id_receiver": id_receiver,
             },
         )
+         
+    @database_sync_to_async
+    def get_user(self, id):
+        return NguoiDung.objects.get(id=id)
+
+    @database_sync_to_async
+    def save_message(self, message, senter, receiver):
+        # Use database_sync_to_async to wrap synchronous ORM calls
+        save_message_async = database_sync_to_async(TinNhan.objects.create)
+
+        # Create message asynchronously
+        return save_message_async(
+            senter=senter,
+            receiver=receiver,
+            noidung=message,
+            thoigian=timezone.now()
+        )
+        
     # Receive message from room group.
     async def chatbox_message(self, event):
         message = event["message"]
         id_user = event["id_user"]
-        #send message and username of sender to websocket
+        id_receiver = event["id_receiver"]
+        #send message and username of senter to websocket
         await self.send(
             text_data=json.dumps(
                 {
                     "message": message,
                     "id_user": id_user,
+                    "id_receiver": id_receiver,
                 }
             )
         )
@@ -126,7 +136,7 @@ class CommentConsumer(AsyncWebsocketConsumer):
         username = event["username"]
         avatar = event["avatar"]
         timestamp = event["timestamp"]
-        #send message and username of sender to websocket
+        #send message and username of senter to websocket
         await self.send(
             text_data=json.dumps(
                 {
@@ -164,7 +174,7 @@ class OnlineStatusConsumer(WebsocketConsumer):
         # Trong thực tế, bạn cần xử lý việc lưu trạng thái trực tuyến của người dùng và thông báo trạng thái tương ứng
         await self.send(text_data=json.dumps({'status': 'online', 'user_id': user_id}))
 
-from asgiref.sync import async_to_sync
+
 class CallConsumer(WebsocketConsumer):
         def connect(self):
             self.accept()

@@ -274,6 +274,8 @@ def video_call(request, room_name):
 def call_view(request):
     return render(request, 'apps/call.html')
 
+def rendercall(request,id):
+    return render(request, 'apps/call.html',{'id':id})
 
 def chat_box(request, chat_box_name):
     # we will get the chatbox name from the url

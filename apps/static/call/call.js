@@ -15,9 +15,16 @@ let localStream;
 
 let callInProgress = false;
 
+const id_user = JSON.parse(
+    document.getElementById("id_user").textContent
+);
+const id_receiver = JSON.parse(
+    document.getElementById("id_receiver").value
+);
+
 //event from html
-function call() {
-    let userToCall = document.getElementById("callName").value;
+function call() {  
+    let userToCall = id_receiver;
     otherUser = userToCall;
 
     beReady()
@@ -76,7 +83,7 @@ function connectSocket() {
         callSocket.send(JSON.stringify({
             type: 'login',
             data: {
-                name: myName
+                name: id_user
             }
         }));
     }
@@ -158,7 +165,7 @@ function connectSocket() {
 /**
  * 
  * @param {Object} data 
- * @param {number} data.name - the name of the user to call
+ * @param {number} data.id_receiver - the name of the user to call
  * @param {Object} data.rtcMessage - the rtc create offer object
  */
 function sendCall(data) {
@@ -182,7 +189,7 @@ function sendCall(data) {
 /**
  * 
  * @param {Object} data 
- * @param {number} data.caller - the caller name
+ * @param {number} data.id_user - the caller name
  * @param {Object} data.rtcMessage - answer rtc sessionDescription object
  */
 function answerCall(data) {
@@ -198,7 +205,7 @@ function answerCall(data) {
 /**
  * 
  * @param {Object} data 
- * @param {number} data.user - the other user //either callee or caller 
+ * @param {number} data.id_receiver - the other user //either callee or caller 
  * @param {Object} data.rtcMessage - iceCandidate data 
  */
 function sendICEcandidate(data) {

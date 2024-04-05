@@ -5,12 +5,14 @@ from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 from django.core import serializers
+from django.core.serializers import serialize
 from django.db.models import Max, Q, Prefetch
 from datetime import datetime, timedelta
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from django.contrib.auth.models import User
 from django.core.files import File
+from django.utils import timezone
 from .models import *
 import json
 import re
@@ -288,46 +290,102 @@ def is_phone_number(phone_number):
     return re.match(phone_regex, phone_number) is not None
 
 def friend(request):
-    # Lấy thông tin người dùng hiện tại
     current_user = request.user.nguoidung
-    # Lấy danh sách id của các người dùng đã kết bạn với người dùng hiện tại
-    friends_ids = BanBe.objects.filter(nguoidung1=current_user).values_list('nguoidung2_id', flat=True)
-    # Lấy thông tin của tất cả người dùng trừ người dùng hiện tại đăng nhập và những người dùng đã kết bạn với người dùng hiện tại
-    other_users = NguoiDung.objects.exclude(user=current_user.user).exclude(id__in=friends_ids)
-    
-    # Truyền combined_users vào context
-    context = {'other_users': other_users}
-    return render(request, 'apps/friend.html', context)
+
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        search_users = User.objects.filter(username__icontains=data['searchData'])
+        if search_users.exists():
+            search_user_ids = [user.id for user in search_users] 
+            
+            other_users = NguoiDung.objects.filter(id__in=search_user_ids).exclude(
+                Q(id=current_user.id) | 
+                Q(id__in=BanBe.objects.filter(nguoidung1_id=current_user.id).values_list('nguoidung2_id', flat=True)) | 
+                Q(id__in=BanBe.objects.filter(nguoidung2_id=current_user.id).values_list('nguoidung1_id', flat=True)) 
+            ).values('avatar', 'user__username', 'user__first_name', 'user__last_name', 'sobanbe')
+            
+            sender_friend_ids = BanBe.objects.filter(nguoidung1_id=current_user.id, nguoidung2_id__in=search_user_ids, is_banbe=False).values('nguoidung2__avatar', 'nguoidung2__user__username', 'nguoidung2__user__first_name', 'nguoidung2__user__last_name', 'nguoidung2__sobanbe')
+            
+            receiver_friend_ids = BanBe.objects.filter(nguoidung2_id=current_user.id, nguoidung1_id__in=search_user_ids, is_banbe=False).values('nguoidung1__avatar', 'nguoidung1__user__username', 'nguoidung1__user__first_name', 'nguoidung1__user__last_name', 'nguoidung1__sobanbe')
+            
+            friend_ids = BanBe.objects.filter(Q(nguoidung1_id=current_user.id, nguoidung2_id__in=search_user_ids) | Q(nguoidung2_id=current_user.id, nguoidung1_id__in=search_user_ids), is_banbe=True).values_list('nguoidung1_id', 'nguoidung2_id')
+            all_friend_ids = set()
+            for friend in friend_ids:
+                all_friend_ids.add(friend[0])
+                all_friend_ids.add(friend[1])
+            all_friend_ids.discard(current_user.id)
+            
+            friends = NguoiDung.objects.filter(id__in=all_friend_ids).values('avatar', 'user__username', 'user__first_name', 'user__last_name', 'sobanbe')
+            
+            other_users_data = list(other_users)
+            sender_friend_ids_data = list(sender_friend_ids)
+            receiver_friend_ids_data = list(receiver_friend_ids)
+            friends_data = list(friends)
+
+            return JsonResponse({'other_users': other_users_data, 
+                                'sender_friend_ids': sender_friend_ids_data, 
+                                'receiver_friend_ids': receiver_friend_ids_data, 
+                                'friends': friends_data})
+    else:
+        # Sử dụng truy vấn mặc định khi không có yêu cầu POST
+        other_users = NguoiDung.objects.exclude(
+            Q(id=current_user.id) | 
+            Q(id__in=BanBe.objects.filter(nguoidung1_id=current_user.id).values_list('nguoidung2_id', flat=True)) | 
+            Q(id__in=BanBe.objects.filter(nguoidung2_id=current_user.id).values_list('nguoidung1_id', flat=True))
+        )
+        # Lấy tất cả bạn của người dùng hiện tại (người gửi lời mời kết bạn)
+        sender_friend_ids = BanBe.objects.filter(nguoidung1_id=current_user.id, is_banbe=False)
+        # Lấy tất cả bạn của người dùng hiện tại (người nhận lời mời kết bạn) 
+        receiver_friend_ids = BanBe.objects.filter(nguoidung2_id=current_user.id, is_banbe=False)
+        # Lấy tất cả bạn của người dùng hiện tại
+        friend_ids = BanBe.objects.filter(Q(nguoidung1_id=current_user.id) | Q(nguoidung2_id=current_user.id), is_banbe=True)
+        all_friend_ids = []
+        for friend in friend_ids:
+            if friend.nguoidung1_id == current_user.id:
+                all_friend_ids.append(friend.nguoidung2_id)
+            else:
+                all_friend_ids.append(friend.nguoidung1_id)
+        friends = [NguoiDung.objects.get(id=user_id) for user_id in all_friend_ids]
+        context = {'other_users': other_users, 'sender_friend_ids': sender_friend_ids, 'receiver_friend_ids': receiver_friend_ids, 'friends': friends}
+        return render(request, 'apps/friend.html', context)
 
 def updatefriend(request):
-    nguoidung1 = request.user.nguoidung  # Lấy đối tượng NguoiDung từ user của request
-    print(nguoidung1)
-    
-    data = json.loads(request.body)
-    nguoidung2_username = data['userId']  # Giả sử nguoidung2_id được truyền dưới dạng tên người dùng (username)
-    print(nguoidung2_username)
+    nguoidung1 = request.user.nguoidung  
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        nguoidung2_username = data['userId']  
+        action = data['action']  
 
-    # Tìm nguoidung2 dựa trên tên người dùng
-    try:
-        nguoidung2 = NguoiDung.objects.get(user__username=nguoidung2_username)
-    except NguoiDung.DoesNotExist:
-        return JsonResponse({'error': 'User does not exist'}, status=404)
-
-    action = data['action']  
-    
-    if action == 'add':
-        friendship = BanBe.objects.create(nguoidung1=nguoidung1, nguoidung2=nguoidung2)
-        friendship.save()
+        try:
+            nguoidung2 = NguoiDung.objects.get(user__username=nguoidung2_username)
+        except NguoiDung.DoesNotExist:
+            return JsonResponse({'error': 'User does not exist'}, status=404)
         
-        return JsonResponse({'message': 'Friendship added successfully'}, status=200)
-    
-    elif action == 'remove':
-        return JsonResponse({'message': 'Friendship removed successfully'}, status=200)
-    
-    else:
-        return JsonResponse({'error': 'Invalid action'}, status=400)
-
-
+        if action == 'add':
+            friendship = BanBe.objects.create(nguoidung1=nguoidung1, nguoidung2=nguoidung2)
+            friendship.thoigian = timezone.now()  # Update time
+            friendship.save()
+            return JsonResponse({'message': 'Friendship added successfully'}, status=200)
+        elif action == 'remove':
+            friendship = BanBe.objects.get(Q(nguoidung1=nguoidung2, nguoidung2=nguoidung1) | Q(nguoidung1=nguoidung1, nguoidung2=nguoidung2))
+            friendship.delete()
+            return JsonResponse({'message': 'Friendship removed successfully'}, status=200)
+        elif action == 'cancel':
+            friendship = BanBe.objects.get(nguoidung1=nguoidung1, nguoidung2=nguoidung2)
+            friendship.delete()
+            return JsonResponse({'message': 'Friendship removed successfully'}, status=200)
+        elif action == 'accept':
+            friendship = BanBe.objects.get(nguoidung1=nguoidung2, nguoidung2=nguoidung1)
+            friendship.is_banbe = True
+            friendship.thoigian = timezone.now()  # Update time
+            friendship.save()
+            return JsonResponse({'message': 'Friendship accepted successfully'}, status=200)
+        elif action == 'refuse':
+            friendship = BanBe.objects.get(nguoidung1=nguoidung2, nguoidung2=nguoidung1)
+            friendship.delete()
+            return JsonResponse({'message': 'Friendship removed successfully'}, status=200)
+        else:
+            return JsonResponse({'error': 'Invalid action'}, status=400)
 
 def editProfile(request):
     current_user = request.user.nguoidung

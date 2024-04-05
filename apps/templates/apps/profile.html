@@ -1,109 +1,100 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title></title>
-  <meta name="description" content="" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <!-- Link đến CSS của Bootstrap -->
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-  <!-- Link đến CSS của FontAwesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+{% extends 'apps/index.html' %} {% load static %} {% block profile %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
   {% load static %}
   <link rel="stylesheet" href="{% static 'css/PersonalPage.css' %}" />
-</head>
+<div class="container" style="margin-top: 60px">
+  {% if nguoi_dung %}
+  <div class="profile">
+    <div class="profile-image">
+      {% if nguoi_dung.avatar %}
+      <img src="{{nguoi_dung.avatar.url}}" alt="Avatar" />
+      {% else %}
+      <img src="{% static 'assets/images/profile/status-0.png' %}" />
+      {% endif %}
+    </div>
 
-<body>
-  <div class="return">
-    <a href="/" class="btn btn-primary">
-      <i class="fas fa-home"></i> Quay về trang chủ
-    </a>
-  </div>
-  <header>
-    <div class="container">
-      {% if nguoi_dung %}
-      <div class="profile">
-        <div class="profile-image">
-          {% if nguoi_dung.avatar %}
-          <img src="{{nguoi_dung.avatar.url}}" alt="Avatar">
-          {% else %}
-          <img src="{% static 'assets/images/profile/status-0.png' %}" />
-          {% endif %}
-        </div>
+    <div class="profile-user-settings">
+      <h1 class="profile-user-name">{{ nguoi_dung.user}}</h1>
 
-        <div class="profile-user-settings">
-          <h1 class="profile-user-name">{{ nguoi_dung.user}}</h1>
+      <a href="{% url 'editProfile' %}" style="color: black"
+        ><button class="btn profile-edit-btn">Edit Profile</button></a
+      >
 
-          <a href="{% url 'editProfile' %}" style="color: black;"><button class="btn profile-edit-btn">Edit
-              Profile</button></a>
-
-          <!-- <button class="btn profile-settings-btn" aria-label="profile settings">
+      <!-- <button class="btn profile-settings-btn" aria-label="profile settings">
             <i class="fas fa-cog" aria-hidden="true"></i>
           </button> -->
-        </div>
+    </div>
 
-        <div class="profile-stats">
+    <div class="profile-stats">
+      <ul>
+        {%if so_luong_baidang%}
+        <li>
+          <span class="profile-stat-count">{{ so_luong_baidang }}</span> Posts
+        </li>
+        {%endif%}
+        <li>
+          <span class="profile-stat-count">{{ nguoi_dung.sobanbe }}</span>
+          Friends
+        </li>
+      </ul>
+    </div>
+
+    <div class="profile-bio">
+      <p>
+        <span class="profile-real-name" style="padding-right: 10px"
+          >{{nguoi_dung.user.last_name}} {{nguoi_dung.user.first_name}}</span
+        >{{nguoi_dung.mota}}
+      </p>
+    </div>
+  </div>
+  {% endif %}
+  <!-- End of profile section -->
+</div>
+<!-- End of container -->
+
+<main>
+  <div class="container">
+    <div class="gallery">
+      {%for baidang in danh_sach_baidang%}
+      <div class="gallery-item" tabindex="0">
+        {% if baidang.hinhanh %}
+        <img src="{{baidang.hinhanh.url}}" class="gallery-image" alt="" />
+        {% else %}
+        <img
+          src="{% static 'assets/images/profile/status-0.png' %}"
+          class="gallery-image"
+          alt=""
+        />
+        {% endif %}
+
+        <div class="gallery-item-info">
           <ul>
-            {%if so_luong_baidang%}
-            <li><span class="profile-stat-count">{{ so_luong_baidang }}</span> Posts</li>
-            {%endif%}
-            <li><span class="profile-stat-count">{{ nguoi_dung.sobanbe }}</span> Friends</li>
+            <li class="gallery-item-likes">
+              <span class="visually-hidden">Likes:</span
+              ><i class="fas fa-heart" aria-hidden="true"></i>
+              {{baidang.tongluotthich}}
+            </li>
+            <li class="gallery-item-comments">
+              <span class="visually-hidden">Comments:</span
+              ><i class="fas fa-comment" aria-hidden="true"></i>
+              {{baidang.tongluotbinhluan}}
+            </li>
           </ul>
         </div>
-
-        <div class="profile-bio">
-          <p>
-            <span class="profile-real-name" style="padding-right: 10px;">{{nguoi_dung.user.last_name}} {{nguoi_dung.user.first_name}}</span>{{nguoi_dung.mota}} 
-          </p>
-        </div>
       </div>
-      {% endif %}
-      <!-- End of profile section -->
+
+      {%endfor%}
     </div>
-    <!-- End of container -->
-  </header>
+    <!-- End of gallery -->
 
-  <main>
-    <div class="container">
-      <div class="gallery">
-        {%for baidang in danh_sach_baidang%}
-        <div class="gallery-item" tabindex="0">
-          {% if baidang.hinhanh %}
-          <img src="{{baidang.hinhanh.url}}"
-            class="gallery-image" alt="" />
-          {% else %}
-          <img src="{% static 'assets/images/profile/status-0.png' %}" class="gallery-image" alt="" />
-          {% endif %}
-
-          <div class="gallery-item-info">
-            <ul>
-              <li class="gallery-item-likes">
-                <span class="visually-hidden">Likes:</span><i class="fas fa-heart" aria-hidden="true"></i> {{baidang.tongluotthich}}
-              </li>
-              <li class="gallery-item-comments">
-                
-                <span class="visually-hidden">Comments:</span><i class="fas fa-comment" aria-hidden="true"></i> {{baidang.tongluotbinhluan}}
-                
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        
-        {%endfor%}
-      </div>
-      <!-- End of gallery -->
-
-      <div class="loader"></div>
-      
-    </div>
-    <!-- End of container -->
-  </main>
-  <script src="" async defer></script>
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
-
-</html>
+    <div class="loader"></div>
+  </div>
+  <!-- End of container -->
+</main>
+<script src="" async defer></script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+{% endblock profile %}

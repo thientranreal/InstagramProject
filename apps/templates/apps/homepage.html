@@ -87,7 +87,7 @@
               />
               {%else%}
               <img
-                src="{% static 'assets/images/profile/status-7.jpg' %}"
+                src="{% static '/images/download.png' %}"
                 alt="Profile Image"
               />
               {%endif%}
@@ -105,11 +105,6 @@
               {{post.formatted_thoigiandang}}
             </p>
           </div>
-          <img
-            src="{% static 'assets/images/nav-items/option.PNG' %}"
-            class="options"
-            alt="Options"
-          />
         </div>
         {%if post.hinhanh%}
         <img
@@ -139,19 +134,15 @@
               src="{% static 'assets/images/nav-items/send.PNG' %}"
               class="icons"
             />
-            <img
-              src="{% static 'assets/images/nav-items/save.PNG' %}"
-              class="save icons"
-            />
           </div>
           <p>Liked by <b>{{post.tongluotthich}} people</b></p>
           <p class="description">
             <span>{{post.nguoidung.user}}</span>{{post.noidung}}
           </p>
-          <p class="no-comments">View all 45 comments</p>
+          <p class="no-comments">View all comments</p>
           {% comment %} Hiển thị bình luận {% endcomment %}
-          <div class="hienbl">
-            {% for binhluan in post.latest_comments %}
+          <div class="hienbl" style="overflow-y: auto; max-height: 300px;">
+            {% for binhluan in post.latest_comments reversed %}
               <div>
                 {% if binhluan.nguoidung.avatar %}
                   <img 
@@ -185,10 +176,6 @@
         </div>
         <!-- <hr /> -->
         <div class="comment-wrapper">
-          <img
-            src="{% static 'assets/images/nav-items/smile.PNG' %}"
-            class="icons"
-          />
           <input
             type="text"
             class="comment-box"

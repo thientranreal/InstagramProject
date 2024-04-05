@@ -22,207 +22,14 @@
     />
 
     <title>Messenger</title>
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="{% static 'image/logomess.png' %}"
+    />
   </head>
 
   <body>
-    <!-- <nav class="navbar">
-      <div class="navbar-wrapper">
-        <img
-          src="{% static 'assets/images/instagram_logo.png' %}"
-          alt="Instagram logo"
-          class="logo"
-        />
-        <input type="text" class="search" placeholder="Search" />
-        <div class="nav-items" style="display: flex">
-          <img
-            src="{% static 'assets/images/nav-items/home.PNG' %}"
-            class="icons"
-            alt="Home Icon"
-          />
-
-          <div id="messenger">
-            <img
-              src="{% static 'assets/images/nav-items/messenger.PNG' %}"
-              class="icons"
-              alt="Messenger Icon"
-            />
-          </div>
-
-          <div class="box" id="box" style="display: none">
-            <div class="nav">
-              <img src="{% static 'assets/images/img.jpg' %}" />
-              <h1 class="logo">Chats</h1>
-              <div class="right-bar">
-                <i class="fas fa-camera"></i>
-                <i class="fas fa-pen"></i>
-              </div>
-            </div>
-            <div class="bar">
-              <input type="text" name="" placeholder="Search" />
-            </div>
-            <div class="bar2">
-              <div class="online">
-                <i class="far fa-plus-square"></i>
-                Create Room
-              </div>
-              <div class="pics">
-                <img src="{% static 'assets/images/img.jpg' %}" />
-                Vishal
-              </div>
-              <div class="pics">
-                <img src="{% static 'assets/images/img.jpg' %}" />
-                coder
-              </div>
-              <div class="pics">
-                <img src="{% static 'assets/images/img.jpg' %}" />
-                lokesh
-              </div>
-              <div class="pics">
-                <img src="{% static 'assets/images/img.jpg' %}" />
-                rohit
-              </div>
-            </div>
-            <div class="message">
-              <div class="member">
-                <img src="{% static 'assets/images/img.jpg' %}" />
-                <h1>
-                  Coder<br />
-                  <p>Hello - Tue</p>
-                </h1>
-              </div>
-              <div class="member">
-                <img src="{% static 'assets/images/img.jpg' %}" />
-                <h1>
-                  Rohit<br />
-                  <p>Like my photo - Mon</p>
-                </h1>
-              </div>
-              <div class="member">
-                <img src="{% static 'assets/images/img.jpg' %}" />
-                <h1>
-                  Vishal Tewtia<br />
-                  <p>Kase Ho - Fri</p>
-                </h1>
-              </div>
-              <div class="member">
-                <img src="{% static 'assets/images/img.jpg' %}" />
-                <h1>
-                  lokesh<br />
-                  <p>jarur video like karna - Tue</p>
-                </h1>
-              </div>
-            </div>
-            <hr />
-            <div class="foot">
-              <div class="left">
-                <i class="fas fa-comment"></i>
-                <p>Chats</p>
-              </div>
-              <div class="right">
-                <i class="fas fa-user-friends"></i>
-                <p>People</p>
-              </div>
-            </div>
-          </div>
-          <img
-            src="{% static 'assets/images/nav-items/add.PNG' %}"
-            class="icons"
-            alt="Add Icon"
-          />
-          <img
-            src="{% static 'assets/images/nav-items/explore.PNG' %}"
-            class="icons"
-            alt="Explore Icon"
-          />
-          <div id="notificationLink">
-            <img
-              src="{% static 'assets/images/nav-items/like.PNG' %}"
-              class="icons"
-              alt="Like Icon"
-              style="height: 24px; position: relative"
-            />
-            <ul id="nav">
-              <li id="notification_li">
-                <span id="notification_count">3</span>
-                <div id="notificationContainer">
-                  <div id="notificationTitle">Notifications</div>
-                  <div id="notificationsBody" class="notifications"></div>
-                  <div id="notificationFooter"><a href="#">See All</a></div>
-                </div>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <a href="{% url 'profile' %}">
-              <img
-                src="{% static 'assets/images/nav-items/user.png' %}"
-                class="icons user-account"
-                alt="User Profile"
-              />
-            </a>
-          </div>
-        </div>
-      </div>
-    </nav>
-    <nav class="navbar-mobile-top">
-      <div class="navbar-wrapper">
-        <img
-          src="{% static 'assets/images/instagram_logo.png' %}"
-          alt="Instagram logo"
-          class="logo"
-        />
-        <input type="text" class="search" placeholder="Search" />
-        <div class="nav-items">
-          <img
-            src="{% static 'assets/images/nav-items/add.PNG' %}"
-            class="icons"
-            alt="Add Icon"
-          />
-          <img
-            src="{% static 'assets/images/nav-items/like.PNG' %}"
-            class="icons"
-            alt="Like Icon"
-          />
-          <img
-            src="{% static 'assets/images/nav-items/messenger.PNG' %}"
-            class="icons"
-            alt="Messenger Icon"
-          />
-        </div>
-      </div>
-    </nav>
-    <nav class="navbar-mobile-bottom">
-      <div class="navbar-wrapper">
-        <div class="nav-g">
-          <img
-            src="{% static 'assets/images/nav-items/home.PNG' %}"
-            class="icons"
-            alt="Home Icon"
-          />
-          <img
-            src="{% static 'assets/images/instagram_logo.png' %}"
-            class="icons"
-            alt="Add Icon"
-          />
-          <img
-            src="{% static 'assets/images/nav-items/send.PNG' %}"
-            class="icons"
-            alt="Explore Icon"
-          />
-          <img
-            src="{% static 'assets/images/nav-items/comment.PNG' %}"
-            class="icons"
-            alt="Like Icon"
-          />
-          <img
-            src="{% static 'assets/images/nav-items/user.png' %}"
-            class="icons"
-            alt="Like Icon"
-          />
-        </div>
-      </div>
-    </nav> -->
-
     <div class="wrapper-mobile">
       <div class="mobile">
         <img src="" />Not available on Tablet or Mobile devices.
@@ -242,12 +49,27 @@
 
           <div class="right">
             <div class="username">
+              <img
+                class="img-video"
+                src="{% static 'messenger/img/video-camera.png' %}"
+                style="
+                  width: 30px;
+                  height: 30px;
+                  margin-top: 20px;
+                  margin-right: 20px;
+                "
+              />
+              <style>
+                .img-video:hover {
+                  background-color: aqua; /* Đổi màu nền khi hover */
+                }
+              </style>
               <div class="settings">
                 <img src="{% static 'messenger/img/settings.svg' %}" />
-                <img
+                <!-- <img
                   src="{% static 'messenger/img/video-camera.png' %}"
-                  style="width: 50px; height: 50px"
-                />
+                  style="width: 10px; height: 10px"
+                /> -->
               </div>
 
               {{current_user.user}}
@@ -280,60 +102,194 @@
             </div>
           </div>
         </div>
-
-        <div class="col">
+        <div class="col" style="width: 900px;">
           <div class="col-content col-mess">
             <section class="message">
               <div class="grid-message"></div>
             </section>
           </div>
-
           <div class="col-foot">
             <div class="compose">
               <input id="input" placeholder="Type a message" />
               <div class="compose-dock">
                 <input type="boxID" hidden />
                 <button id="send">Gửi</button>
-                <div class="dock">
-                  <!-- <img src="{% static 'messenger/img/picture.svg' %}" /><img
-                    src="{% static 'messenger/img/smile.svg' %}"
-                  /> -->
-                </div>
+                <div class="dock"></div>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="col-right"></div>
-      </main>
+        <div class="col-right" >
+          <!-- <div id="userName">
+            <div
+              style="
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                width: 300px;
+              "
+            >
+              <input
+                placeholder="What should we call you?"
+                style="text-align: center; height: 50px; font-size: xx-large"
+                type="text"
+                name=""
+                id="userNameInput"
+              />
+              <div style="height: 5px"></div>
+              <button onclick="login()" class="actionButton">Login</button>
+            </div>
+          </div> -->
+  
+          <!-- to display current login user information  -->
+          <div id="userInfo">
+            <div
+              style="
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                width: 300px;
+              "
+            >
+              <h1>Hello, <span id="nameHere"></span></h1>
+            </div>
+          </div>
+
+          <!-- <div id="call">
+            <div class="dialWrapper">
+              <input
+                placeholder="Whom to call?"
+                style="text-align: center; height: 50px; font-size: xx-large"
+                type="text"
+                name="callName"
+                id="callName"
+              />
+              <div class="dialNumpadHWrapper">
+                <div class="dialNumber"></div>
+                <div class="dialNumber">
+                  <button class="dialActionButton" onclick="call()">Call</button>
+                </div>
+                <div class="dialNumber"></div>
+              </div>
+            </div>
+          </div> -->
+  
+          <!-- to show incommming call and accept -->
+          <div id="answer">
+            <div class="incomingWrapper">
+              <div class="itemWrapper">
+                <h2>Incomming Call</h2>
+              </div>
+              <div class="itemWrapper">
+                <img
+                  id="profileImageA"
+                  style="padding: 30px; width: 140px; height: 140px"
+                  src="/static/call/profile.png"
+                  alt=""
+                />
+              </div>
+              <div class="itemWrapper">
+                <h2 style="line-height: 0px"><span id="callerName"></span></h2>
+              </div>
+              <div
+                class="itemWrapper"
+                style="display: flex; flex-direction: row; margin-bottom: 20px"
+              >
+                <button class="actionButton" onclick="answer()">Answer</button>
+              </div>
+            </div>
+          </div>
+  
+          <!-- to show outgoing call -->
+          <div id="calling">
+            <div class="incomingWrapper">
+              <div class="itemWrapper">
+                <h2>Calling</h2>
+              </div>
+              <div class="itemWrapper">
+                <img
+                  id="profileImageCA"
+                  style="padding: 30px; width: 140px; height: 140px"
+                  src="/static/call/profile.png"
+                  alt=""
+                />
+              </div>
+              <div class="itemWrapper">
+                <h3 style="line-height: 0px">
+                  <span id="otherUserNameCA"></span>
+                </h3>
+              </div>
+            </div>
+          </div>
+  
+          <!-- to show call in progress call -->
+          <div id="inCall">
+            <div class="incomingWrapper">
+              <div class="itemWrapper">
+                <h3>On Call With</h3>
+                <h2 style="line-height: 0px">
+                  <span id="otherUserNameC"></span>
+                </h2>
+              </div>
+            </div>
+          
+          </div>
+
+          <br />
+  
+          <!-- to show local and remote video -->
+          <div id="videos">
+            <div
+              style="
+                position: absolute;
+                top: 0;
+                right: 0;
+                padding-right: 20px;
+                padding-top: 20px;
+              "
+            >
+              <video
+                width="100px"
+                id="localVideo"
+                autoplay
+                muted
+                playsinline
+              ></video>
+            </div>
+            <div id="remoteVideoDiv">
+              <video
+                style="width: 500px"
+                id="remoteVideo"
+                autoplay
+                playsinline
+              ></video>
+            </div>
+          </div>
+          <div style="flex-grow: 1"></div>
+
+        </div>
+        
+      <div style="flex-grow: 1"></div>
     </div>
+        <!-- nơi chứa id người nhận -->
+        <input type="text" hidden id="id_receiver" />
+    </div>
+    
   </body>
 </html>
-<!-- {% comment %} Get data for username and chatbox name{% endcomment %}
-{{ request.user.username|json_script:"user_username" }} -->
+
+<!-- {% comment %} Get data for username and chatbox name{% endcomment %}-->
+{{ request.user.id|json_script:"id_user" }}
 <!-- {{ chat_box_name|json_script:"room-name" }} -->
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-//   var listItems = document.querySelectorAll("li");
-
-//   // Duyệt qua từng phần tử <li>
-//   listItems.forEach(function (item) {
-//     // Lấy giá trị của thuộc tính data-id
-//     var dataId = item.getAttribute("data-id");
-
-//     // Lấy phần tử con chứa giá trị của dich.user
-//     var userNameElement = item.querySelector("h3");
-
-//     // Lấy giá trị của dich.user từ phần tử con và hiển thị ra console
-//     var userName = userNameElement.innerText;
-//     document.getElementById("receiverName").innerText=userName;
-//   });
   $(document).ready(function () {
     $(".messages li").click(function () {
       var id = $(this).data("id");
       var dichUser = $(this).find("h3").text();
-      document.getElementById("receiverName").innerText=dichUser;
+      document.getElementById("receiverName").innerText = dichUser;
       $.ajax({
         type: "GET",
         url: "/messengerajax/" + id + "/",
@@ -354,6 +310,7 @@
                   "</p></div></div>"
               );
             } else {
+              document.getElementById("id_receiver").value = receiver;
               $(".message .grid-message ").append(
                 '<div class ="col-message-received"><div class="message-received"><p>' +
                   noidung +
@@ -379,8 +336,14 @@
       item.addEventListener("click", function () {
         var id = this.getAttribute("data-id");
         // console.log("Clicked ID:", id);
+        // const id_user = JSON.parse(
+        //     document.getElementById("id_user").textContent
+        //   );
+        //   const id_receiver = JSON.parse(
+        //     document.getElementById("id_receiver").value
+        //   );
         const chatSocket = new WebSocket(
-          "ws://" + window.location.host + "/ws/chat/" + id + "/"
+          "ws://" + window.location.host + "/ws/chat/"
         );
 
         chatSocket.onmessage = function (e) {
@@ -388,14 +351,29 @@
           //dữ liệu trả về
           // document.querySelector("#chat-text").value +=
           //   data.message + " sent by " + data.username + "\n";
+          if (data.id_receiver == id) {
+            $(".message .grid-message ").append(
+              '<div class ="col-message-received"><div class="message-received"><p>' +
+                data.message +
+                "</p></div></div>"
+            );
+          }
         };
         document.querySelector("#send").onclick = function (e) {
           const messageInputDom = document.querySelector("#input");
           const message = messageInputDom.value;
+          const id_user = JSON.parse(
+            document.getElementById("id_user").textContent
+          );
+          const id_receiver = JSON.parse(
+            document.getElementById("id_receiver").value
+          );
+
           chatSocket.send(
             JSON.stringify({
               message: message,
-              // username: user_username,
+              id_user: id_user,
+              id_receiver: id_receiver,
             })
           );
           messageInputDom.value = "";
@@ -409,6 +387,7 @@
     });
   });
 </script>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
   $(document).ready(function () {
@@ -421,6 +400,8 @@
   });
 </script>
 
+<script src="{% static 'call/call.js' %}"></script>
+
 <script
   src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
   integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
@@ -432,9 +413,50 @@
   crossorigin="anonymous"
 ></script>
 
-<!-- // code chạy websocket -->
 <script>
-  // const user_username = JSON.parse(
-  //   document.getElementById("user_username").textContent
-  // );
+  document.getElementById("call").style.display = "none";
+  document.getElementById("userInfo").style.display = "none";
+  document.getElementById("answer").style.display = "none";
+  document.getElementById("inCall").style.display = "none";
+  document.getElementById("calling").style.display = "none";
+  document.getElementById("videos").style.display = "none";
+
+
+  //  thay hàm login vô
+  const id_user = JSON.parse(
+  document.getElementById("id_user").textContent
+  );
+
+  myName = id_user;
+  document.getElementById("userName").style.display = "none";
+  document.getElementById("call").style.display = "block";
+
+  document.getElementById("nameHere").innerHTML = id_user;
+  document.getElementById("userInfo").style.display = "block";
+  connectSocket();
+
 </script>
+
+<!-- Script của cái call -->
+
+<!-- <script>
+  function login() {
+    // let userName = document.getElementById("userNameInput").value;
+    const id_user = JSON.parse(
+      document.getElementById("id_user").textContent
+    );
+
+    myName = userName;
+    document.getElementById("userName").style.display = "none";
+    document.getElementById("call").style.display = "block";
+
+    document.getElementById("nameHere").innerHTML = id_user;
+    document.getElementById("userInfo").style.display = "block";
+
+    connectSocket();
+  }
+</script> -->
+
+
+
+

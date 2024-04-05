@@ -18,7 +18,6 @@
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/friend.css' %}" />
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    <script src="https://kit.fontawesome.com/83ccd457ed.js" crossorigin="anonymous"></script>
     <title>Instagram</title>
     <script type="text/javascript">
       var user = "{{request.user}}";
@@ -190,6 +189,9 @@
     {% block friend %}{% endblock friend %} 
     {% block profile %}{% endblock profile %} 
     {% block homepage %}{% endblock homepage %}
+
+
+
     <script>
       let currentScroll = 0;
       let scrollAmount = 320;

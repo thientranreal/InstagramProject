@@ -121,7 +121,7 @@
         </div>
 
         <div class="col-right" >
-          <div id="userName">
+          <!-- <div id="userName">
             <div
               style="
                 display: flex;
@@ -140,7 +140,7 @@
               <div style="height: 5px"></div>
               <button onclick="login()" class="actionButton">Login</button>
             </div>
-          </div>
+          </div> -->
   
           <!-- to display current login user information  -->
           <div id="userInfo">
@@ -155,7 +155,8 @@
               <h1>Hello, <span id="nameHere"></span></h1>
             </div>
           </div>
-          <div id="call">
+
+          <!-- <div id="call">
             <div class="dialWrapper">
               <input
                 placeholder="Whom to call?"
@@ -172,7 +173,7 @@
                 <div class="dialNumber"></div>
               </div>
             </div>
-          </div>
+          </div> -->
   
           <!-- to show incommming call and accept -->
           <div id="answer">
@@ -271,11 +272,10 @@
         
       <div style="flex-grow: 1"></div>
     </div>
-
         <!-- nơi chứa id người nhận -->
         <input type="text" hidden id="id_receiver" />
-      </main>
     </div>
+    
   </body>
 </html>
 
@@ -413,9 +413,6 @@
   crossorigin="anonymous"
 ></script>
 
-
-
-<!-- Script của cái call -->
 <script>
   document.getElementById("call").style.display = "none";
   document.getElementById("userInfo").style.display = "none";
@@ -438,10 +435,11 @@
   document.getElementById("userInfo").style.display = "block";
   connectSocket();
 
-
 </script>
 
-<script>
+<!-- Script của cái call -->
+
+<!-- <script>
   function login() {
     // let userName = document.getElementById("userNameInput").value;
     const id_user = JSON.parse(
@@ -457,7 +455,7 @@
 
     connectSocket();
   }
-</script>
+</script> -->
 
 
 

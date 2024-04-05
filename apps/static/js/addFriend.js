@@ -158,7 +158,7 @@ function updateUserOrder(userId, action) {
         })
         .then((data) => {
             console.log('Data:', data);
-            location.reload(); 
+            // location.reload(); 
         })
         .catch((error) => {
             console.error('Error:', error);

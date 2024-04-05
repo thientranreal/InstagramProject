@@ -28,6 +28,7 @@ urlpatterns = [
     path('createPost', views.createPost,name='createPost'),
     path('create_post', views.create_post,name='create_post'),
     path('api/comment_post', views.comment_post),
+    path('call/<int:id>/', views.rendercall, name='rendercall'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
       

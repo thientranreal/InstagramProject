@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 from django.core import serializers
 from django.core.serializers import serialize
 from django.db.models import Max, Q, Prefetch
-from datetime import datetime, timedelta
+from datetime import *
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from django.contrib.auth.models import User
@@ -391,7 +391,8 @@ def updatefriend(request):
 
 def editProfile(request):
     current_user = request.user.nguoidung
-    return render(request, 'apps/editProfile.html',{'nguoi_dung': current_user})
+    ngay_sinh_formatted = current_user.ngaysinh.strftime('%Y-%m-%d') if current_user.ngaysinh else None
+    return render(request, 'apps/editProfile.html',{'nguoi_dung': current_user, 'ngay_sinh_formatted': ngay_sinh_formatted})
 
 def createPost(request):
     current_user = request.user.nguoidung
@@ -414,9 +415,10 @@ def getInfoProfile(request):
     # Truyền dữ liệu nguoi_dungs vào template profile.html
     danh_sach_baidang = BaiDang.objects.filter(nguoidung=current_user)
     so_luong_baidang = danh_sach_baidang.count()
-    context ={'nguoi_dung': current_user,'danh_sach_baidang': danh_sach_baidang, 'so_luong_baidang': so_luong_baidang, 'edit':1}
+    ngay_sinh_formatted = current_user.ngaysinh.strftime('%Y-%m-%d') if current_user.ngaysinh else None
+    context ={'nguoi_dung': current_user,'danh_sach_baidang': danh_sach_baidang, 'so_luong_baidang': so_luong_baidang, 'edit':1, 'ngay_sinh_formatted': ngay_sinh_formatted}
     if so_luong_baidang <=0:
-        context ={'nguoi_dung': current_user,'danh_sach_baidang': danh_sach_baidang, 'so_luong_baidang': 0, 'edit':1}
+        context ={'nguoi_dung': current_user,'danh_sach_baidang': danh_sach_baidang, 'so_luong_baidang': 0, 'edit':1, 'ngay_sinh_formatted': ngay_sinh_formatted}
     return render(request, 'apps/profile.html', context)
 
 def profile_friend(request, user_id):
@@ -466,15 +468,16 @@ def edit_profile(request):
                 current_user = request.user
                 # Lấy dữ liệu từ request
                 mota = request.POST.get('mota')
-                hinhanh_url = request.FILES['hinhanh_url']  # Đã cung cấp URL hình ảnh trong template
                 ngaysinh=request.POST.get('ngaysinh')
                 phone=request.POST.get('phone')
                 gioitinh=request.POST.get('gioitinh')
 
-
                 nguoidung1=NguoiDung.objects.get(user=current_user)
-                nguoidung1.avatar=hinhanh_url
-                nguoidung1.save()
+                if 'hinhanh_url' in request.FILES:
+                    hinhanh_url = request.FILES['hinhanh_url']
+                    nguoidung1.avatar = hinhanh_url
+                    nguoidung1.save()
+
                 # Tạo một bài đăng mới
                 nguoidung = NguoiDung.objects.filter(user=current_user).update(
                     ngaysinh=ngaysinh,      

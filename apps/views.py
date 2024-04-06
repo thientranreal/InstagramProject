@@ -437,7 +437,10 @@ def create_post(request):
     if request.method == 'POST':
         # Lấy dữ liệu từ request
         noidung = request.POST.get('noidung')
-        hinhanh_url = request.FILES['hinhanh_url']  # Đã cung cấp URL hình ảnh trong template
+        if 'hinhanh_url' in request.FILES:
+            hinhanh_url = request.FILES['hinhanh_url']
+        else:
+            hinhanh_url = None
         # Tạo một bài đăng mới
         baidang = BaiDang.objects.create(
             nguoidung=request.user.nguoidung,  # Sử dụng người dùng hiện tại đang đăng nhập

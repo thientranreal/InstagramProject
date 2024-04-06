@@ -92,7 +92,7 @@
               />
               {%endif%}
             </div>
-            <p class="username">{{post.nguoidung.user}}</p>
+            <p class="username"><a href="{% url 'profile_friend' user_id=post.nguoidung.id %}" style="text-decoration: none; color: black;">{{post.nguoidung.user}}</a></p>
 
             <p
               style="

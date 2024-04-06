@@ -414,10 +414,23 @@ def getInfoProfile(request):
     # Truyền dữ liệu nguoi_dungs vào template profile.html
     danh_sach_baidang = BaiDang.objects.filter(nguoidung=current_user)
     so_luong_baidang = danh_sach_baidang.count()
-    context ={'nguoi_dung': current_user,'danh_sach_baidang': danh_sach_baidang, 'so_luong_baidang': so_luong_baidang}
+    context ={'nguoi_dung': current_user,'danh_sach_baidang': danh_sach_baidang, 'so_luong_baidang': so_luong_baidang, 'edit':1}
     if so_luong_baidang <=0:
-        context ={'nguoi_dung': current_user,'danh_sach_baidang': danh_sach_baidang, 'so_luong_baidang': 0}
+        context ={'nguoi_dung': current_user,'danh_sach_baidang': danh_sach_baidang, 'so_luong_baidang': 0, 'edit':1}
     return render(request, 'apps/profile.html', context)
+
+def profile_friend(request, user_id):
+    current_user = request.user.nguoidung
+    nguoi_dung = NguoiDung.objects.get(pk=user_id)
+    if current_user.id == nguoi_dung.id:
+        return getInfoProfile(request)
+    else: 
+        danh_sach_baidang = BaiDang.objects.filter(nguoidung=nguoi_dung)
+        so_luong_baidang = danh_sach_baidang.count()
+        context = {'nguoi_dung': nguoi_dung, 'danh_sach_baidang': danh_sach_baidang, 'so_luong_baidang': so_luong_baidang}
+        if so_luong_baidang <= 0:
+            context = {'nguoi_dung': nguoi_dung, 'danh_sach_baidang': danh_sach_baidang, 'so_luong_baidang': 0}
+        return render(request, 'apps/profile.html', context)
 
 
 def create_post(request):

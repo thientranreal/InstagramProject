@@ -30,6 +30,7 @@ urlpatterns = [
     path('api/comment_post', views.comment_post),
     path('call/<int:id>/', views.rendercall, name='rendercall'),
     path('profile_friend/<int:user_id>/', views.profile_friend, name='profile_friend'),
+    path('xoa_baidang/<int:baidang_id>/', views.xoa_baidang, name='xoa_baidang'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
       

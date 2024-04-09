@@ -27,9 +27,12 @@ urlpatterns = [
     path('edit_profile', views.edit_profile,name='edit_profile'),
     path('createPost', views.createPost,name='createPost'),
     path('create_post', views.create_post,name='create_post'),
+    path('editPost/<int:baidang_id>/', views.editPost,name='editPost'),
+    path('edit_post/<int:baidang_id>/', views.edit_post,name='edit_post'),
     path('api/comment_post', views.comment_post),
     path('call/<int:id>/', views.rendercall, name='rendercall'),
     path('profile_friend/<int:user_id>/', views.profile_friend, name='profile_friend'),
+    path('xoa_baidang/<int:baidang_id>/', views.xoa_baidang, name='xoa_baidang'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
       

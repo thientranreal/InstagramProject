@@ -182,6 +182,8 @@ img {
     top: 0;
     width: 100%;
     height: 100%;
+    max-width: 300px;
+    max-height: 300px;
     background-color: rgba(0, 0, 0, 0.3);
 }
 
@@ -197,6 +199,17 @@ img {
 
 .gallery-item-likes {
     margin-right: 2.2rem;
+}
+.dropdown {
+    position: relative;
+    display: inline-block;
+  }
+  
+.dropdown-menu {
+position: absolute;
+top: 0;
+right: 0;
+display: none;
 }
 
 .gallery-item-type {
@@ -215,6 +228,8 @@ img {
 .gallery-image {
     width: 100%;
     height: 100%;
+    max-width: 300px;
+    max-height: 300px;
     object-fit: cover;
 }
 

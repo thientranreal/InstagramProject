@@ -8,6 +8,8 @@ from django.core import serializers
 from django.core.serializers import serialize
 from django.db.models import Max, Q, Prefetch
 from datetime import *
+from django.shortcuts import redirect, get_object_or_404
+from django.http import *
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from django.contrib.auth.models import User
@@ -398,7 +400,35 @@ def createPost(request):
     current_user = request.user.nguoidung
     return render(request, 'apps/createPost.html',{'nguoi_dung': current_user})
 
+def editPost(request, baidang_id):
+    current_user = request.user.nguoidung
+    baidang = get_object_or_404(BaiDang, pk=baidang_id)
+    return render(request, 'apps/editPost.html',{'nguoi_dung': current_user,'baidang':baidang})
 
+def edit_post(request, baidang_id):
+    # Lấy bài đăng từ cơ sở dữ liệu hoặc trả về 404 nếu không tìm thấy
+    baidang = get_object_or_404(BaiDang, pk=baidang_id)
+
+    if request.method == 'POST':
+        # Lấy dữ liệu từ request
+        noidung = request.POST.get('noidung')
+        baidang.noidung = noidung
+        
+        # Kiểm tra và cập nhật hình ảnh nếu có
+        if 'hinhanh_url' in request.FILES:
+            hinhanh_url = request.FILES['hinhanh_url']
+            baidang.hinhanh = hinhanh_url
+
+        # Lưu các thay đổi vào cơ sở dữ liệu
+        baidang.save()
+
+        # Chuyển hướng người dùng đến trang khác hoặc thông báo thành công
+        return redirect('profile')  # Chuyển hướng về trang chủ sau khi sửa bài đăng
+
+    else:
+        # Xử lý logic khi yêu cầu không phải là POST
+        pass
+    
 def get_admin_nguoidung():
     try:
         admin_user = User.objects.filter(is_staff=True, is_superuser=True).first()  # Lấy người dùng đầu tiên có is_staff và is_superuser là True
@@ -460,6 +490,27 @@ def create_post(request):
         # Xử lý logic khi yêu cầu không phải là POST
         pass
 
+def xoa_baidang(request, baidang_id):
+    try:
+        # Lấy bài đăng từ cơ sở dữ liệu
+        baidang = BaiDang.objects.get(id=baidang_id)
+    except BaiDang.DoesNotExist:
+        # Trả về 404 nếu không tìm thấy bài đăng
+        return HttpResponseNotFound()
+
+    if request.method == 'POST':
+        if 'action' in request.POST and request.POST['action'] == 'xoa':
+            # Xóa bài đăng
+            baidang.delete()
+            
+            # Chuyển hướng người dùng đến một trang nào đó sau khi xóa thành công
+            return redirect('profile')
+        else:
+            # Trả về lỗi 400 Bad Request nếu action không hợp lệ
+            return HttpResponseBadRequest("Yêu cầu không hợp lệ")
+    else:
+        # Nếu yêu cầu không phải từ phương thức POST, trả về 405 Method Not Allowed
+        return HttpResponseNotAllowed(['POST'])
 
 def edit_profile(request):
     if request.method == 'POST':

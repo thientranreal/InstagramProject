@@ -423,8 +423,7 @@ def edit_post(request, baidang_id):
         baidang.save()
 
         # Chuyển hướng người dùng đến trang khác hoặc thông báo thành công
-        return redirect('profile')  # Chuyển hướng về trang chủ sau khi sửa bài đăng
-
+        return redirect('profile')
     else:
         # Xử lý logic khi yêu cầu không phải là POST
         pass
@@ -504,7 +503,7 @@ def xoa_baidang(request, baidang_id):
             baidang.delete()
             
             # Chuyển hướng người dùng đến một trang nào đó sau khi xóa thành công
-            return redirect('profile')
+            return redirect(request.META.get('HTTP_REFERER'))
         else:
             # Trả về lỗi 400 Bad Request nếu action không hợp lệ
             return HttpResponseBadRequest("Yêu cầu không hợp lệ")

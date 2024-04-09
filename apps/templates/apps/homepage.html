@@ -1,4 +1,8 @@
 {% extends 'apps/index.html' %} {% load static %} {% block homepage %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/PersonalPage.css' %}" />
 <section class="main">
   <div class="wrapper">
     <div class="left-col">
@@ -105,6 +109,18 @@
               {{post.formatted_thoigiandang}}
             </p>
           </div>
+          {% if post.nguoidung.user == request.user %}
+          <div class="dropdown" onmouseenter="showDropdown()" onmouseleave="hideDropdown()">
+            <i class="fas fa-ellipsis-h" aria-hidden="true"></i>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <form action="{% url 'xoa_baidang' post.id %}" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn xóa bài đăng này không?')">
+                {% csrf_token %}
+                <a class="dropdown-item" href="#" onmouseenter="cancelHideTimer()" onmouseleave="hideDropdown()"><button type="submit" class="btn btn-danger" name="action" value="xoa">Xóa</button></a>
+                <a class="dropdown-item" href="{% url 'editPost' baidang_id=post.id %}" onmouseenter="cancelHideTimer()" onmouseleave="hideDropdown()"><button type="button" class="btn btn-primary" name="action" value="sua">Chỉnh sửa</button></a>
+              </form>
+            </div>
+        </div>
+          {% endif %}
         </div>
         {%if post.hinhanh%}
         <img
@@ -234,6 +250,11 @@
       let defaultAvatarUrl = "{% static 'assets/images/profile/status-0.png' %}";
       let username = "{{user.username}}";
     </script>
+    <script src="{% static 'js/PersonalPage.js' %}"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     {% endblock homepage %}
   </div>
 </section>

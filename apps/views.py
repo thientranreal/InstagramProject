@@ -547,5 +547,45 @@ def comment_post(request):
             
         return JsonResponse({'binhluan': binhluan_data})
 
+def save_messenger(request):
+    # Thêm comment vào bài đăng
+    if request.method == 'POST':
+        # Lấy giá trị gửi từ client
+        data = json.loads(request.body)
+        message = data.get('message') 
+        id_user = data.get('id_user') 
+        id_receiver = data.get('id_receiver') 
+        
+        user = NguoiDung.objects.get(id=id_user)
+        receiver = NguoiDung.objects.get(id=id_receiver)
+
+        tinnhan = TinNhan.objects.create(
+            senter=user,
+            receiver=receiver,
+            noidung=message,
+            thoigian=timezone.now()  # Sử dụng now() để lấy thời gian hiện tại
+        )
+        tinnhan.save()
+
+        # Cập nhật hoặc tạo LienLac tương ứng
+        lienlac, created = LienLac.objects.get_or_create(goc=user, dich=receiver)
+        lienlac.lastmess = message
+        lienlac.thoigiancuoi = timezone.now()
+        lienlac.save()
+
+        return JsonResponse({'status': 'ok'})
 
 
+def delete_contact(request):
+
+    data = json.loads(request.body)
+    id_user = data.get('id_user') 
+    id_receiver = data.get('id_receiver') 
+    
+    user = NguoiDung.objects.get(id=id_user)
+    receiver = NguoiDung.objects.get(id=id_receiver)
+
+    lienlac = LienLac.objects.get_or_create(goc=user, dich=receiver)
+    lienlac.delete()
+
+    return JsonResponse({'status': 'ok'})

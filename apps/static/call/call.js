@@ -15,9 +15,9 @@ let localStream;
 
 let callInProgress = false;
 
-const id_user = JSON.parse(
-    document.getElementById("id_user").textContent
-);
+// const id_user = JSON.parse(
+//     document.getElementById("id_user").textContent
+// );
 const id_receiver = JSON.parse(
     document.getElementById("id_receiver").value
 );

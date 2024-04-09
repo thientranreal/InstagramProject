@@ -14,6 +14,7 @@ urlpatterns = [
     path('updatefriend/', views.updatefriend, name="updatefriend"),
     path('profile', views.getInfoProfile, name="profile"),
     path('messenger', views.messenger, name="messenger"),
+    path('delete-contact/', views.delete_contact, name='delete_contact'),
     path('chat/<str:chat_box_name>/', views.chat_box, name="chat"),
     # path('videocall/<str:room_name>/', views.video_call, name='video_call'),
     path('call/', views.call_view, name='call'),
@@ -28,6 +29,7 @@ urlpatterns = [
     path('createPost', views.createPost,name='createPost'),
     path('create_post', views.create_post,name='create_post'),
     path('api/comment_post', views.comment_post),
+    path('api/save_messenger', views.save_messenger),
     path('call/<int:id>/', views.rendercall, name='rendercall'),
     path('profile_friend/<int:user_id>/', views.profile_friend, name='profile_friend'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

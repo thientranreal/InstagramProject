@@ -23,11 +23,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = text_data_json["message"]
         id_user = text_data_json["id_user"]
         id_receiver = text_data_json["id_receiver"]
-        senter = await self.get_user(id_user)
-        receiver = await self.get_user(id_receiver)
-
-        # Save message asynchronously
-        await self.save_message(message, senter, receiver)
 
         await self.channel_layer.group_send(
             self.group_name,
@@ -38,40 +33,38 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 "id_receiver": id_receiver,
             },
         )
-         
-    @database_sync_to_async
-    def get_user(self, id):
-        return NguoiDung.objects.get(id=id)
-
-    @database_sync_to_async
-    def save_message(self, message, senter, receiver):
-        # Use database_sync_to_async to wrap synchronous ORM calls
-        save_message_async = database_sync_to_async(TinNhan.objects.create)
-
-        # Create message asynchronously
-        return save_message_async(
-            senter=senter,
-            receiver=receiver,
-            noidung=message,
-            thoigian=timezone.now()
-        )
         
     # Receive message from room group.
+    # async def chatbox_message(self, event):
+    #     message = event["message"]
+    #     id_user = event["id_user"]
+    #     id_receiver = event["id_receiver"]
+    #     #send message and username of senter to websocket
+    #     await self.send(
+    #         text_data=json.dumps(
+    #             {
+    #                 "message": message,
+    #                 "id_user": id_user,
+    #                 "id_receiver": id_receiver,
+    #             }
+    #         )
+    #     )
+    # pass
     async def chatbox_message(self, event):
         message = event["message"]
-        id_user = event["id_user"]
         id_receiver = event["id_receiver"]
-        #send message and username of senter to websocket
-        await self.send(
-            text_data=json.dumps(
-                {
-                    "message": message,
-                    "id_user": id_user,
-                    "id_receiver": id_receiver,
-                }
+        id_user = event["id_user"]
+        # Check if the message is meant for this consumer
+        if id_receiver == self.scope["user"].id:
+            await self.send(
+                text_data=json.dumps(
+                    {
+                        "message": message,
+                        "id_user": id_user,
+                        "id_receiver": id_receiver,
+                    }
+                )
             )
-        )
-    pass
 
 
 class NoftificationConsumer(AsyncWebsocketConsumer):

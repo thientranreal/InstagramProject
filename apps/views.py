@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
-from django.contrib.auth import login as auth_login, get_user_model, authenticate
+from django.contrib.auth import login as auth_login, logout, get_user_model, authenticate
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
@@ -24,26 +24,32 @@ def home(request):
     if not request.user.is_authenticated:
         return redirect("login")
 
-    # Sắp xếp các BinhLuan theo thời gian tạo
-    latest_comments = Prefetch(
-        'binhluan_set', 
-        queryset=BinhLuan.objects.order_by('-timestamp')
-    )
-
-    # Lấy tất cả BaiDang và prefetch 3 BinhLuan mới nhất
-    posts = BaiDang.objects.prefetch_related(latest_comments)
-
-    for post in posts:
-        post.latest_comments = post.binhluan_set.all()[:3]
-        post.latest_comments.reverse()
-        for comment in post.latest_comments:
-            comment.timestamp = format_time_ago(comment.timestamp)
-        post.formatted_thoigiandang = format_time_ago(post.thoigiandang)
-
-    # Lấy username và nội dung tin nhắn mới nhất từ mỗi người gửi
-    messages = []
-    # Hiển thị tin nhắn
+    # Nếu user có thuộc tính người dùng
     if hasattr(request.user, 'nguoidung'):
+        # Lấy bạn bè của người dùng
+        ban_be = BanBe.objects.filter((Q(nguoidung1__user=request.user) | Q(nguoidung2__user=request.user)) & Q(is_banbe=True))
+        # Lấy id từ ban_be
+        ban_be_ids = [bb.nguoidung2.id if bb.nguoidung1.user == request.user else bb.nguoidung1.id for bb in ban_be]
+
+        # Sắp xếp các BinhLuan theo thời gian tạo
+        latest_comments = Prefetch(
+            'binhluan_set', 
+            queryset=BinhLuan.objects.order_by('-timestamp')
+        )
+
+        # Lấy tất cả BaiDang và prefetch 3 BinhLuan mới nhất
+        posts = BaiDang.objects.filter(Q(nguoidung__user=request.user) | Q(nguoidung__id__in=ban_be_ids)).prefetch_related(latest_comments)
+
+        for post in posts:
+            post.latest_comments = post.binhluan_set.all()[:3]
+            post.latest_comments.reverse()
+            for comment in post.latest_comments:
+                comment.timestamp = format_time_ago(comment.timestamp)
+            post.formatted_thoigiandang = format_time_ago(post.thoigiandang)
+
+        # Lấy username và nội dung tin nhắn mới nhất từ mỗi người gửi
+        messages = []
+
         # Lấy các tin nhắn có liên quan tới người dùng hiện tại và tin nhắn mới nhất
         messages_current_user = TinNhan.objects.filter(Q(receiver=request.user.nguoidung) | Q(senter=request.user.nguoidung)).values('senter', 'receiver').annotate(thoigian_moi_nhat=Max('thoigian'))
 
@@ -65,6 +71,9 @@ def home(request):
                 newestTime = message['thoigian_moi_nhat']
                 newestMessage = TinNhan.objects.filter(senter__id=senter_id, thoigian=newestTime).first()
                 messages.append({'nguoidung': senter, 'noidung': newestMessage.noidung})
+    else:
+        logout(request)
+        return redirect("login")
 
     context = {'posts': posts, 'messages': messages}
     return render(request, 'apps/homepage.html', context)
@@ -597,5 +606,45 @@ def comment_post(request):
             
         return JsonResponse({'binhluan': binhluan_data})
 
+def save_messenger(request):
+    # Thêm comment vào bài đăng
+    if request.method == 'POST':
+        # Lấy giá trị gửi từ client
+        data = json.loads(request.body)
+        message = data.get('message') 
+        id_user = data.get('id_user') 
+        id_receiver = data.get('id_receiver') 
+        
+        user = NguoiDung.objects.get(id=id_user)
+        receiver = NguoiDung.objects.get(id=id_receiver)
+
+        tinnhan = TinNhan.objects.create(
+            senter=user,
+            receiver=receiver,
+            noidung=message,
+            thoigian=timezone.now()  # Sử dụng now() để lấy thời gian hiện tại
+        )
+        tinnhan.save()
+
+        # Cập nhật hoặc tạo LienLac tương ứng
+        lienlac, created = LienLac.objects.get_or_create(goc=user, dich=receiver)
+        lienlac.lastmess = message
+        lienlac.thoigiancuoi = timezone.now()
+        lienlac.save()
+
+        return JsonResponse({'status': 'ok'})
 
 
+def delete_contact(request):
+
+    data = json.loads(request.body)
+    id_user = data.get('id_user') 
+    id_receiver = data.get('id_receiver') 
+    
+    user = NguoiDung.objects.get(id=id_user)
+    receiver = NguoiDung.objects.get(id=id_receiver)
+
+    lienlac = LienLac.objects.get_or_create(goc=user, dich=receiver)
+    lienlac.delete()
+
+    return JsonResponse({'status': 'ok'})

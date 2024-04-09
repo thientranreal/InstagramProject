@@ -5,11 +5,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     {% load static %}
-    <!-- <link
-      rel="stylesheet"
-      type="text/css"
-      href="{% static 'css/style.css' %}"
-    /> -->
     <link
       rel="stylesheet"
       type="text/css"
@@ -27,6 +22,27 @@
       type="image/x-icon"
       href="{% static 'image/logomess.png' %}"
     />
+    <script type="text/javascript">
+      var user = "{{request.user}}";
+      function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+          const cookies = document.cookie.split(";");
+          for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === name + "=") {
+              cookieValue = decodeURIComponent(
+                cookie.substring(name.length + 1)
+              );
+              break;
+            }
+          }
+        }
+        return cookieValue;
+      }
+      const csrftoken = getCookie("csrftoken");
+    </script>
   </head>
 
   <body>
@@ -49,29 +65,18 @@
 
           <div class="right">
             <div class="username">
-              <img
-                class="img-video"
-                src="{% static 'messenger/img/video-camera.png' %}"
-                style="
-                  width: 30px;
-                  height: 30px;
-                  margin-top: 20px;
-                  margin-right: 20px;
-                "
-              />
-              <style>
-                .img-video:hover {
-                  background-color: aqua; /* Đổi màu nền khi hover */
-                }
-              </style>
               <div class="settings">
-                <img src="{% static 'messenger/img/settings.svg' %}" />
-                <!-- <img
-                  src="{% static 'messenger/img/video-camera.png' %}"
-                  style="width: 10px; height: 10px"
-                /> -->
-              </div>
+                <img class="dlt_btn" src="{% static 'assets/images/delete.png' %}" onclick="confirmDelete()" style="height:30px; width:30px; margin-top: 20px;"/>
+                <style>
+                  .dlt_btn {
+                    transition: transform 0.3s ease; /* Tạo hiệu ứng chuyển đổi mềm mại */
+                }
 
+                .dlt_btn:hover {
+                    transform: scale(0.9); /* Thu nhỏ hình ảnh khi di chuột qua */
+                }
+                </style>
+              </div>
               {{current_user.user}}
             </div>
 
@@ -105,10 +110,12 @@
         <div class="col" style="width: 900px;">
           <div class="col-content col-mess">
             <section class="message">
-              <div class="grid-message"></div>
+              <div class="grid-message">
+                <img src="/static/assets/images/mmm.webp" width="950px"  alt="">
+              </div>
             </section>
           </div>
-          <div class="col-foot">
+          <div class="col-foot" >
             <div class="compose">
               <input id="input" placeholder="Type a message" />
               <div class="compose-dock">
@@ -120,28 +127,7 @@
           </div>
         </div>
 
-        <div class="col-right" >
-          <!-- <div id="userName">
-            <div
-              style="
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                width: 300px;
-              "
-            >
-              <input
-                placeholder="What should we call you?"
-                style="text-align: center; height: 50px; font-size: xx-large"
-                type="text"
-                name=""
-                id="userNameInput"
-              />
-              <div style="height: 5px"></div>
-              <button onclick="login()" class="actionButton">Login</button>
-            </div>
-          </div> -->
-  
+        <div class="col-right"  style="text-align: center;">
           <!-- to display current login user information  -->
           <div id="userInfo">
             <div
@@ -152,28 +138,30 @@
                 width: 300px;
               "
             >
-              <h1>Hello, <span id="nameHere"></span></h1>
+              <h1><span id="nameHere"></span></h1>
             </div>
           </div>
 
-          <!-- <div id="call">
+          <div id="call">
             <div class="dialWrapper">
-              <input
-                placeholder="Whom to call?"
-                style="text-align: center; height: 50px; font-size: xx-large"
-                type="text"
-                name="callName"
-                id="callName"
-              />
               <div class="dialNumpadHWrapper">
                 <div class="dialNumber"></div>
                 <div class="dialNumber">
-                  <button class="dialActionButton" onclick="call()">Call</button>
+                  <img src="/static/assets/images/call_bt.jpg" width="100px" alt="" class="call-btn" onclick="call()">
+                  <style>
+                    .call-btn {
+                      transition: transform 0.3s ease; /* Tạo hiệu ứng chuyển đổi mềm mại */
+                  }
+
+                  .call-btn:hover {
+                      transform: scale(0.9); /* Thu nhỏ hình ảnh khi di chuột qua */
+                  }
+                  </style>
                 </div>
                 <div class="dialNumber"></div>
               </div>
             </div>
-          </div> -->
+          </div>
   
           <!-- to show incommming call and accept -->
           <div id="answer">
@@ -196,7 +184,7 @@
                 class="itemWrapper"
                 style="display: flex; flex-direction: row; margin-bottom: 20px"
               >
-                <button class="actionButton" onclick="answer()">Answer</button>
+                <img src="/static/assets/images/call_answer" onclick="answer()" alt="">
               </div>
             </div>
           </div>
@@ -270,137 +258,212 @@
 
         </div>
         
-      <div style="flex-grow: 1"></div>
-    </div>
+        <div style="flex-grow: 1"></div>
+    <!-- </div> -->
         <!-- nơi chứa id người nhận -->
         <input type="text" hidden id="id_receiver" />
-    </div>
-    
+    <!-- </div> -->
+    </main>
+    <!-- <script src="{% static 'js/messenger.js'%}"></script> -->
   </body>
 </html>
 
 <!-- {% comment %} Get data for username and chatbox name{% endcomment %}-->
 {{ request.user.id|json_script:"id_user" }}
+{{ request.user.name|json_script:"user_name" }}
 <!-- {{ chat_box_name|json_script:"room-name" }} -->
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-  $(document).ready(function () {
-    $(".messages li").click(function () {
-      var id = $(this).data("id");
-      var dichUser = $(this).find("h3").text();
-      document.getElementById("receiverName").innerText = dichUser;
-      $.ajax({
-        type: "GET",
-        url: "/messengerajax/" + id + "/",
-        success: function (response) {
-          // console.log(response);
-          $(".message .grid-message ").empty();
-          var tinnhan = JSON.parse(response.tinnhan);
-          for (var i = 0; i < tinnhan.length; i++) {
-            var tinNhanItem = tinnhan[i].fields;
-            var noidung = tinNhanItem.noidung;
-            var senter = tinNhanItem.senter;
-            var receiver = tinNhanItem.receiver;
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-            if (senter == id) {
-              $(".message .grid-message ").append(
-                '<div class ="col-message-sent"> <div class="message-sent"><p>' +
-                  noidung +
-                  "</p></div></div>"
-              );
-            } else {
-              document.getElementById("id_receiver").value = receiver;
-              $(".message .grid-message ").append(
-                '<div class ="col-message-received"><div class="message-received"><p>' +
-                  noidung +
-                  "</p></div></div>"
-              );
-            }
-            // $(".col-content").scrollTop($(".col-content")[0].scrollHeight);
-          }
-        },
-        error: function (xhr, status, error) {
-          console.error(error);
-        },
-      });
-    });
-  });
-</script>
-
-<!-- // để lấy thuộc tính id -->
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    var listItems = document.querySelectorAll(".messages li");
-    listItems.forEach(function (item) {
-      item.addEventListener("click", function () {
-        var id = this.getAttribute("data-id");
-        // console.log("Clicked ID:", id);
-        // const id_user = JSON.parse(
-        //     document.getElementById("id_user").textContent
-        //   );
-        //   const id_receiver = JSON.parse(
-        //     document.getElementById("id_receiver").value
-        //   );
-        const chatSocket = new WebSocket(
-          "ws://" + window.location.host + "/ws/chat/"
+function confirmDelete() {
+    let ten = document.getElementById("receiverName").value;
+    if (confirm("Bạn có muốn xoá liên lạc với " + ten + " không?")) {
+        id_senter = id_user
+        id_receiver = document.getElementById("id_recceiver").value;
+
+
+        const id_receiver = JSON.parse(
+            document.getElementById("id_receiver").value
         );
 
-        chatSocket.onmessage = function (e) {
-          const data = JSON.parse(e.data);
-          //dữ liệu trả về
-          // document.querySelector("#chat-text").value +=
-          //   data.message + " sent by " + data.username + "\n";
-          if (data.id_receiver == id) {
-            $(".message .grid-message ").append(
-              '<div class ="col-message-received"><div class="message-received"><p>' +
-                data.message +
-                "</p></div></div>"
-            );
-          }
-        };
-        document.querySelector("#send").onclick = function (e) {
-          const messageInputDom = document.querySelector("#input");
-          const message = messageInputDom.value;
-          const id_user = JSON.parse(
-            document.getElementById("id_user").textContent
-          );
-          const id_receiver = JSON.parse(
-            document.getElementById("id_receiver").value
-          );
-
-          chatSocket.send(
-            JSON.stringify({
-              message: message,
-              id_user: id_user,
-              id_receiver: id_receiver,
+        // Thêm comment vào database
+        fetch('/delete-contact/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                // Thêm CSRF token để Django chấp nhận yêu cầu
+                'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify({
+                message: message,
+                id_user: id_user,
+                id_receiver: id_receiver,
             })
-          );
-          messageInputDom.value = "";
-          $(".message .grid-message ").append(
-            '<div class ="col-message-sent"> <div class="message-sent"><p>' +
-              message +
-              "</p></div></div>"
-          );
-        };
-      });
-    });
-  });
+        })
+            .then(response => response.json())
+            .then(data => {
+                // Thêm bình luận vào database thì sẽ gửi sang websocket
+                if (data.status === 'ok') {
+                    // Gửi comment tới websocket
+                    chatSocket.send(
+                        JSON.stringify({
+                            message: message,
+                            id_user: id_user,
+                            id_receiver: id_receiver,
+                        })
+                    );
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        alert("Xoá thành công")
+    } else {
+        // Nếu người dùng không chấp nhận
+    }
+}
 </script>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 <script>
-  $(document).ready(function () {
+const id_user = JSON.parse(
+    document.getElementById("id_user").textContent
+);
+$(document).ready(function () {
     $(".messages li").click(function () {
-      $(".messages li").removeClass("bold");
-      $(".messages li").not(this).removeClass("clicked");
-      $(this).addClass("bold");
-      $(this).toggleClass("clicked");
+        var id = $(this).data("id");
+        var dichUser = $(this).find("h3").text();
+        document.getElementById("receiverName").innerText = dichUser;
+        document.getElementById("nameHere").innerText = "Call to " + dichUser;
+        document.getElementById("call").style.display = "block";
+        $.ajax({
+            type: "GET",
+            url: "/messengerajax/" + id + "/",
+            success: function (response) {
+                // console.log(response);
+                $(".message .grid-message ").empty();
+                var tinnhan = JSON.parse(response.tinnhan);
+                for (var i = 0; i < tinnhan.length; i++) {
+                    var tinNhanItem = tinnhan[i].fields;
+                    var noidung = tinNhanItem.noidung;
+                    var senter = tinNhanItem.senter;
+                    var receiver = tinNhanItem.receiver;
+
+                    if (senter == id) {
+                        $(".message .grid-message ").append(
+                            '<div class ="col-message-sent"> <div class="message-sent"><p>' +
+                            noidung +
+                            "</p></div></div>"
+                        );
+                    } else {
+                        document.getElementById("id_receiver").value = receiver;
+                        $(".message .grid-message ").append(
+                            '<div class ="col-message-received"><div class="message-received"><p>' +
+                            noidung +
+                            "</p></div></div>"
+                        );
+                    }
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error(error);
+            },
+        });
     });
-  });
+});
+
+
+// để lấy thuộc tính id -->
+
+document.addEventListener("DOMContentLoaded", function () {
+    var listItems = document.querySelectorAll(".messages li");
+    listItems.forEach(function (item) {
+        item.addEventListener("click", function () {
+            var id = this.getAttribute("data-id");
+            const chatSocket = new WebSocket(
+                "ws://" + window.location.host + "/ws/chat/"
+            );
+
+            chatSocket.onmessage = function (e) {
+                const data = JSON.parse(e.data);
+                if (data.id_receiver == id) {
+                    $(".message .grid-message ").append(
+                        '<div class ="col-message-received"><div class="message-received"><p>' +
+                        data.message +
+                        "</p></div></div>"
+                    );
+                }
+            };
+            document.querySelector("#send").onclick = function (e) {
+                // if (e.target.classList.contains("active")) {
+                const messageInputDom = document.querySelector("#input");
+                const message = messageInputDom.value;
+
+                const id_receiver = JSON.parse(
+                    document.getElementById("id_receiver").value
+                );
+
+                // Thêm comment vào database
+                fetch('/api/save_messenger', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        // Thêm CSRF token để Django chấp nhận yêu cầu
+                        'X-CSRFToken': csrftoken
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        id_user: id_user,
+                        id_receiver: id_receiver,
+                    })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Thêm bình luận vào database thì sẽ gửi sang websocket
+                        if (data.status === 'ok') {
+                            // Gửi comment tới websocket
+                            chatSocket.send(
+                                JSON.stringify({
+                                    message: message,
+                                    id_user: id_user,
+                                    id_receiver: id_receiver,
+                                })
+                            );
+                            messageInputDom.value = "";
+                            $(".message .grid-message ").append(
+                                '<div class ="col-message-sent"> <div class="message-sent"><p>' +
+                                message +
+                                "</p></div></div>"
+                            );
+                        }
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                    });
+                // }
+
+            };
+
+        });
+    });
+});
+
+
+$(document).ready(function () {
+    $(".messages li").click(function () {
+        $(".messages li").removeClass("bold");
+        $(".messages li").not(this).removeClass("clicked");
+        $(this).addClass("bold");
+        $(this).toggleClass("clicked");
+    });
+});
+
 </script>
 
-<script src="{% static 'call/call.js' %}"></script>
+<!-- <script src="{% static 'call/call.js' %}"></script> -->
 
 <script
   src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
@@ -413,50 +476,362 @@
   crossorigin="anonymous"
 ></script>
 
+
+<!-- Script của cái call -->
+
+<script>
+const baseURL = "/"
+
+let localVideo = document.querySelector('#localVideo');
+let remoteVideo = document.querySelector('#remoteVideo');
+
+let otherUser;
+let remoteRTCMessage;
+
+let iceCandidatesFromCaller = [];
+let peerConnection;
+let remoteStream;
+let localStream;
+
+let callInProgress = false;
+
+//event from html
+function call() {
+    let userToCall = document.getElementById("id_receiver").value + "name";
+    otherUser = userToCall;
+
+    beReady()
+        .then(bool => {
+            processCall(userToCall)
+        })
+}
+
+//event from html
+function answer() {
+    //do the event firing
+
+    beReady()
+        .then(bool => {
+            processAccept();
+        })
+
+    document.getElementById("answer").style.display = "none";
+}
+
+let pcConfig = {
+    "iceServers":
+        [
+            { "url": "stun:stun.jap.bloggernepal.com:5349" },
+            {
+                "url": "turn:turn.jap.bloggernepal.com:5349",
+                "username": "guest",
+                "credential": "somepassword"
+            },
+            { "url": "stun:stun.l.google.com:19302" }
+        ]
+};
+
+// Set up audio and video regardless of what devices are present.
+let sdpConstraints = {
+    offerToReceiveAudio: true,
+    offerToReceiveVideo: true
+};
+
+/////////////////////////////////////////////
+
+let socket;
+let callSocket;
+function connectSocket() {
+    let ws_scheme = window.location.protocol == "https:" ? "wss://" : "ws://";
+    // console.log(ws_scheme);
+
+    callSocket = new WebSocket(
+        ws_scheme
+        + window.location.host
+        + '/ws/call/'
+    );
+    // console.log(id_user)
+    callSocket.onopen = event => {
+        //let's send myName to the socket
+        callSocket.send(JSON.stringify({
+            type: 'login',
+            data: {
+                name: id_user + "name"
+            }
+        }));
+    }
+
+    callSocket.onmessage = (e) => {
+        let response = JSON.parse(e.data);
+
+        // console.log(response);
+
+        let type = response.type;
+
+        if (type == 'connection') {
+            console.log(response.data.message)
+        }
+
+        if (type == 'call_received') {
+            // console.log(response);
+            onNewCall(response.data)
+        }
+
+        if (type == 'call_answered') {
+            onCallAnswered(response.data);
+        }
+
+        if (type == 'ICEcandidate') {
+            onICECandidate(response.data);
+        }
+    }
+
+    const onNewCall = (data) => {
+        //when other called you
+        //show answer button
+
+        otherUser = data.caller;
+        remoteRTCMessage = data.rtcMessage
+
+        // document.getElementById("profileImageA").src = baseURL + callerProfile.image;
+        document.getElementById("callerName").innerHTML = otherUser;
+        document.getElementById("call").style.display = "none";
+        document.getElementById("answer").style.display = "block";
+    }
+
+    const onCallAnswered = (data) => {
+        //when other accept our call
+        remoteRTCMessage = data.rtcMessage
+        peerConnection.setRemoteDescription(new RTCSessionDescription(remoteRTCMessage));
+
+        document.getElementById("calling").style.display = "none";
+
+        console.log("Call Started. They Answered");
+        // console.log(pc);
+
+        callProgress()
+    }
+
+    const onICECandidate = (data) => {
+        // console.log(data);
+        console.log("GOT ICE candidate");
+
+        let message = data.rtcMessage
+
+        let candidate = new RTCIceCandidate({
+            sdpMLineIndex: message.label,
+            candidate: message.candidate
+        });
+
+        if (peerConnection) {
+            console.log("ICE candidate Added");
+            peerConnection.addIceCandidate(candidate);
+        } else {
+            console.log("ICE candidate Pushed");
+            iceCandidatesFromCaller.push(candidate);
+        }
+
+    }
+
+}
+function sendCall(data) {
+    //to send a call
+    console.log("Send Call");
+
+    // socket.emit("call", data);
+    callSocket.send(JSON.stringify({
+        type: 'call',
+        data
+    }));
+
+    document.getElementById("call").style.display = "none";
+    // document.getElementById("profileImageCA").src = baseURL + otherUserProfile.image;
+    document.getElementById("otherUserNameCA").innerHTML = otherUser;
+    document.getElementById("calling").style.display = "block";
+}
+function answerCall(data) {
+    //to answer a call
+    // socket.emit("answerCall", data);
+    callSocket.send(JSON.stringify({
+        type: 'answer_call',
+        data
+    }));
+    callProgress();
+}
+
+function sendICEcandidate(data) {
+    //send only if we have caller, else no need to
+    console.log("Send ICE candidate");
+    // socket.emit("ICEcandidate", data)
+    callSocket.send(JSON.stringify({
+        type: 'ICEcandidate',
+        data
+    }));
+
+}
+
+function beReady() {
+    return navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: true
+    })
+        .then(stream => {
+            localStream = stream;
+            localVideo.srcObject = stream;
+
+            return createConnectionAndAddStream()
+        })
+        .catch(function (e) {
+            alert('getUserMedia() error: ' + e.name);
+        });
+}
+
+function createConnectionAndAddStream() {
+    createPeerConnection();
+    peerConnection.addStream(localStream);
+    return true;
+}
+
+function processCall(userName) {
+    peerConnection.createOffer((sessionDescription) => {
+        peerConnection.setLocalDescription(sessionDescription);
+        sendCall({
+            name: userName,
+            rtcMessage: sessionDescription
+        })
+    }, (error) => {
+        console.log("Error");
+    });
+}
+
+function processAccept() {
+    peerConnection.setRemoteDescription(new RTCSessionDescription(remoteRTCMessage));
+    peerConnection.createAnswer((sessionDescription) => {
+        peerConnection.setLocalDescription(sessionDescription);
+
+        if (iceCandidatesFromCaller.length > 0) {
+            //I am having issues with call not being processed in real world (internet, not local)
+            //so I will push iceCandidates I received after the call arrived, push it and, once we accept
+            //add it as ice candidate
+            //if the offer rtc message contains all thes ICE candidates we can ingore this.
+            for (let i = 0; i < iceCandidatesFromCaller.length; i++) {
+                //
+                let candidate = iceCandidatesFromCaller[i];
+                console.log("ICE candidate Added From queue");
+                try {
+                    peerConnection.addIceCandidate(candidate).then(done => {
+                        console.log(done);
+                    }).catch(error => {
+                        console.log(error);
+                    })
+                } catch (error) {
+                    console.log(error);
+                }
+            }
+            iceCandidatesFromCaller = [];
+            console.log("ICE candidate queue cleared");
+        } else {
+            console.log("NO Ice candidate in queue");
+        }
+
+        answerCall({
+            caller: otherUser,
+            rtcMessage: sessionDescription
+        })
+
+    }, (error) => {
+        console.log("Error");
+    })
+}
+
+/////////////////////////////////////////////////////////
+
+function createPeerConnection() {
+    try {
+        peerConnection = new RTCPeerConnection(pcConfig);
+        // peerConnection = new RTCPeerConnection();
+        peerConnection.onicecandidate = handleIceCandidate;
+        peerConnection.onaddstream = handleRemoteStreamAdded;
+        peerConnection.onremovestream = handleRemoteStreamRemoved;
+        console.log('Created RTCPeerConnnection');
+        return;
+    } catch (e) {
+        console.log('Failed to create PeerConnection, exception: ' + e.message);
+        alert('Cannot create RTCPeerConnection object.');
+        return;
+    }
+}
+
+function handleIceCandidate(event) {
+    // console.log('icecandidate event: ', event);
+    if (event.candidate) {
+        console.log("Local ICE candidate");
+        // console.log(event.candidate.candidate);
+
+        sendICEcandidate({
+            user: otherUser,
+            rtcMessage: {
+                label: event.candidate.sdpMLineIndex,
+                id: event.candidate.sdpMid,
+                candidate: event.candidate.candidate
+            }
+        })
+
+    } else {
+        console.log('End of candidates.');
+    }
+}
+
+function handleRemoteStreamAdded(event) {
+    console.log('Remote stream added.');
+    remoteStream = event.stream;
+    remoteVideo.srcObject = remoteStream;
+}
+
+function handleRemoteStreamRemoved(event) {
+    console.log('Remote stream removed. Event: ', event);
+    remoteVideo.srcObject = null;
+    localVideo.srcObject = null;
+}
+
+window.onbeforeunload = function () {
+    if (callInProgress) {
+        stop();
+    }
+};
+
+
+function stop() {
+    localStream.getTracks().forEach(track => track.stop());
+    callInProgress = false;
+    peerConnection.close();
+    peerConnection = null;
+    document.getElementById("call").style.display = "block";
+    document.getElementById("answer").style.display = "none";
+    document.getElementById("inCall").style.display = "none";
+    document.getElementById("calling").style.display = "none";
+    document.getElementById("endVideoButton").style.display = "none"
+    otherUser = null;
+}
+
+function callProgress() {
+    document.getElementById("videos").style.display = "block";
+    document.getElementById("otherUserNameC").innerHTML = otherUser;
+    document.getElementById("inCall").style.display = "block";
+
+    callInProgress = true;
+}
+</script>
+
+
 <script>
   document.getElementById("call").style.display = "none";
-  document.getElementById("userInfo").style.display = "none";
   document.getElementById("answer").style.display = "none";
   document.getElementById("inCall").style.display = "none";
   document.getElementById("calling").style.display = "none";
   document.getElementById("videos").style.display = "none";
-
-
-  //  thay hàm login vô
-  const id_user = JSON.parse(
-  document.getElementById("id_user").textContent
-  );
-
-  myName = id_user;
-  document.getElementById("userName").style.display = "none";
-  document.getElementById("call").style.display = "block";
-
-  document.getElementById("nameHere").innerHTML = id_user;
   document.getElementById("userInfo").style.display = "block";
   connectSocket();
 
 </script>
-
-<!-- Script của cái call -->
-
-<!-- <script>
-  function login() {
-    // let userName = document.getElementById("userNameInput").value;
-    const id_user = JSON.parse(
-      document.getElementById("id_user").textContent
-    );
-
-    myName = userName;
-    document.getElementById("userName").style.display = "none";
-    document.getElementById("call").style.display = "block";
-
-    document.getElementById("nameHere").innerHTML = id_user;
-    document.getElementById("userInfo").style.display = "block";
-
-    connectSocket();
-  }
-</script> -->
-
-
-
 

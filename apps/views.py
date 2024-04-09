@@ -400,7 +400,35 @@ def createPost(request):
     current_user = request.user.nguoidung
     return render(request, 'apps/createPost.html',{'nguoi_dung': current_user})
 
+def editPost(request, baidang_id):
+    current_user = request.user.nguoidung
+    baidang = get_object_or_404(BaiDang, pk=baidang_id)
+    return render(request, 'apps/editPost.html',{'nguoi_dung': current_user,'baidang':baidang})
 
+def edit_post(request, baidang_id):
+    # Lấy bài đăng từ cơ sở dữ liệu hoặc trả về 404 nếu không tìm thấy
+    baidang = get_object_or_404(BaiDang, pk=baidang_id)
+
+    if request.method == 'POST':
+        # Lấy dữ liệu từ request
+        noidung = request.POST.get('noidung')
+        baidang.noidung = noidung
+        
+        # Kiểm tra và cập nhật hình ảnh nếu có
+        if 'hinhanh_url' in request.FILES:
+            hinhanh_url = request.FILES['hinhanh_url']
+            baidang.hinhanh = hinhanh_url
+
+        # Lưu các thay đổi vào cơ sở dữ liệu
+        baidang.save()
+
+        # Chuyển hướng người dùng đến trang khác hoặc thông báo thành công
+        return redirect('profile')  # Chuyển hướng về trang chủ sau khi sửa bài đăng
+
+    else:
+        # Xử lý logic khi yêu cầu không phải là POST
+        pass
+    
 def get_admin_nguoidung():
     try:
         admin_user = User.objects.filter(is_staff=True, is_superuser=True).first()  # Lấy người dùng đầu tiên có is_staff và is_superuser là True

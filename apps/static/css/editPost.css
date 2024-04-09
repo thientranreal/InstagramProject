@@ -1,0 +1,50 @@
+.image {
+    position: relative;
+    width: 490px;
+    height: 510px; 
+}
+
+.image-visibility {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 70%;
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
+}
+.image-visibility img{
+    max-width: 90%; 
+    max-height: 90%; 
+    width: auto; 
+    height: auto;
+    display: block;
+    margin-top: -30px;
+    margin-left: -40px;
+}
+.select-icon {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 30%; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-top: 0.5px solid #d0cece;
+}
+
+.select-icon a {
+    text-decoration: none;
+    color: #000;
+
+}
+
+.select-icon i {
+    margin-right: 5px;
+}
+
+.text{
+    border-bottom: none;
+}

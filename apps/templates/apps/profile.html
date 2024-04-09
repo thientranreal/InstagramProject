@@ -89,7 +89,7 @@
                     <form action="{% url 'xoa_baidang' baidang.id %}" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn xóa bài đăng này không?')">
                       {% csrf_token %}
                       <a class="dropdown-item" href="#" onmouseenter="cancelHideTimer()" onmouseleave="hideDropdown()"><button type="submit" class="btn btn-danger" name="action" value="xoa">Xóa</button></a>
-                      <a class="dropdown-item" href="#" onmouseenter="cancelHideTimer()" onmouseleave="hideDropdown()"><button type="submit" class="btn btn-primary" name="action" value="sua">Chỉnh sửa</button></a>
+                      <a class="dropdown-item" href="{% url 'editPost' baidang_id=baidang.id %}" onmouseenter="cancelHideTimer()" onmouseleave="hideDropdown()"><button type="button" class="btn btn-primary" name="action" value="sua">Chỉnh sửa</button></a>
                     </form>
                   </div>
               </div>

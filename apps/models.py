@@ -12,18 +12,17 @@ def user_directory_post_path(instance, filename):
     # file sẽ được lưu vào MEDIA_ROOT / hinh_anh/user_<id>/<filename>
     return f'images/user_{instance.nguoidung.user.username}/posts/{filename}'
 
-
-# Trong User đã có trường email, first name, last name, password
-# Nên NguoiDung k cần những trường trên
 class NguoiDung(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
     ngaysinh = models.DateField(blank=True, null=True)
     avatar = models.ImageField(blank=True, null=True, upload_to=user_directory_path, default='images/download.png')
-    sobanbe = models.IntegerField(blank=True, null=True)
     phone = models.CharField(max_length=15, blank=True, null=True)
     is_online = models.BooleanField(default=False, blank=True, null=True)
     gioitinh=models.CharField(max_length=15, blank=True, null=True)
     mota=models.TextField(blank=True, null=True)
+    
+    def tong_luot_banbe(self):
+        return BanBe.objects.filter(models.Q(nguoidung1=self, is_banbe=True) | models.Q(nguoidung2=self, is_banbe=True)).count()
 
 class BanBe(models.Model):
     nguoidung1 = models.ForeignKey('NguoiDung', on_delete=models.CASCADE, related_name='ban_be_1')
@@ -42,14 +41,18 @@ class LienLac(models.Model):
     dich = models.ForeignKey('NguoiDung', on_delete =models.CASCADE,related_name='dich')
     lastmess = models.TextField(blank=True, null=True)
     thoigiancuoi = models.DateTimeField(blank=True, null=True)
-
+    
 class BaiDang(models.Model): 
     nguoidung = models.ForeignKey('NguoiDung', on_delete=models.CASCADE)
     noidung = models.TextField(blank=True, null=True)
     thoigiandang = models.DateTimeField(blank=True, null=True)
-    tongluotthich = models.IntegerField(blank=True, null=True)
-    tongluotbinhluan = models.IntegerField(blank=True, null=True)
     hinhanh = models.ImageField(blank=True, null=True, upload_to=user_directory_post_path)
+
+    def tong_luot_binh_luan(self):
+        return self.binhluan_set.count() 
+    
+    def tong_luot_thich(self):
+        return self.likebaidang_set.count() 
 
 class ThongBao(models.Model):
     nguoidung = models.ForeignKey('NguoiDung', on_delete=models.CASCADE)
@@ -62,4 +65,8 @@ class BinhLuan(models.Model):
     nguoidung = models.ForeignKey('NguoiDung', on_delete=models.CASCADE)
     noidungbl = models.TextField(blank=True, null=True)
     timestamp = models.DateTimeField(auto_now_add=True)
-
+    
+class LikeBaiDang(models.Model):
+    baidang = models.ForeignKey('BaiDang', on_delete=models.CASCADE)
+    nguoidung = models.ForeignKey('NguoiDung', on_delete=models.CASCADE)
+    thoigian = models.DateTimeField(auto_now_add=True)

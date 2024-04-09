@@ -12,6 +12,7 @@ urlpatterns = [
     path('signup', views.signup, name="signup"),
     path('friend', views.friend, name="friend"),
     path('updatefriend/', views.updatefriend, name="updatefriend"),
+    path('updatelike/', views.updatelike, name="updatelike"),
     path('profile', views.getInfoProfile, name="profile"),
     path('messenger', views.messenger, name="messenger"),
     path('delete-contact/', views.delete_contact, name='delete_contact'),

@@ -18,7 +18,7 @@ def user_directory_post_path(instance, filename):
 class NguoiDung(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
     ngaysinh = models.DateField(blank=True, null=True)
-    avatar = models.ImageField(blank=True, null=True, upload_to=user_directory_path)
+    avatar = models.ImageField(blank=True, null=True, upload_to=user_directory_path, default='images/download.png')
     sobanbe = models.IntegerField(blank=True, null=True)
     phone = models.CharField(max_length=15, blank=True, null=True)
     is_online = models.BooleanField(default=False, blank=True, null=True)

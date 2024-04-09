@@ -40,13 +40,13 @@ def home(request):
             comment.timestamp = format_time_ago(comment.timestamp)
         post.formatted_thoigiandang = format_time_ago(post.thoigiandang)
 
+    # Lấy username và nội dung tin nhắn mới nhất từ mỗi người gửi
+    messages = []
     # Hiển thị tin nhắn
     if hasattr(request.user, 'nguoidung'):
         # Lấy các tin nhắn có liên quan tới người dùng hiện tại và tin nhắn mới nhất
         messages_current_user = TinNhan.objects.filter(Q(receiver=request.user.nguoidung) | Q(senter=request.user.nguoidung)).values('senter', 'receiver').annotate(thoigian_moi_nhat=Max('thoigian'))
 
-        # Lấy username và nội dung tin nhắn mới nhất từ mỗi người gửi
-        messages = []
         for message in messages_current_user:
             senter_id = message['senter']
             receiver_id = message['receiver']

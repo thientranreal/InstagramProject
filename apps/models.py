@@ -29,6 +29,8 @@ class BanBe(models.Model):
     nguoidung2 = models.ForeignKey('NguoiDung', on_delete=models.CASCADE, related_name='ban_be_2')
     is_banbe = models.BooleanField(default=False, blank=True, null=True)
     thoigian = models.DateTimeField(blank=True, null=True)
+    lastmess = models.TextField(blank=True, null=True)
+    thoigiancuoi = models.DateTimeField(blank=True, null=True)
 
 class TinNhan(models.Model):
     senter = models.ForeignKey('NguoiDung', on_delete=models.CASCADE,related_name='nguoi_dung_1')
@@ -36,11 +38,22 @@ class TinNhan(models.Model):
     noidung = models.TextField(blank=True, null=True)
     thoigian = models.DateTimeField(blank=True, null=True)
 
-class LienLac(models.Model):
-    goc = models.ForeignKey('NguoiDung', on_delete=models.CASCADE,related_name='goc')
-    dich = models.ForeignKey('NguoiDung', on_delete =models.CASCADE,related_name='dich')
-    lastmess = models.TextField(blank=True, null=True)
+# class LienLac(models.Model):
+#     goc = models.ForeignKey('NguoiDung', on_delete=models.CASCADE,related_name='goc')
+#     dich = models.ForeignKey('NguoiDung', on_delete =models.CASCADE,related_name='dich')
+#     is_banbe = models.BooleanField(default=False, blank=True, null=True)
+class Nhom(models.Model):
+    name = models.CharField(max_length=100, blank=True, null=True)
+    nguoidung = models.ManyToManyField('NguoiDung', blank=True, null=True)
+    admin = models.ForeignKey('NguoiDung', on_delete=models.CASCADE, blank=True, null=True, related_name='admin')
+    lasstmess = models.TextField(blank=True, null=True)
     thoigiancuoi = models.DateTimeField(blank=True, null=True)
+    
+class TinNhanNhom(models.Model):
+    nhom = models.ForeignKey('Nhom', on_delete=models.CASCADE ,related_name='nhom')
+    noidung = models.TextField(blank=True, null=True)
+    sender = models.ForeignKey('NguoiDung', on_delete=models.CASCADE,related_name='nguoi_dung')
+    thoigian = models.DateTimeField(blank=True, null=True)
     
 class BaiDang(models.Model): 
     nguoidung = models.ForeignKey('NguoiDung', on_delete=models.CASCADE)

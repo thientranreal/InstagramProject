@@ -20,65 +20,62 @@ import json
 import re
 
 def home(request):
-    # Người dùng chưa đăng nhập
     if not request.user.is_authenticated:
         return redirect("login")
 
-    # Nếu user có thuộc tính người dùng
     if hasattr(request.user, 'nguoidung'):
-        # Lấy bạn bè của người dùng
-        ban_be = BanBe.objects.filter((Q(nguoidung1__user=request.user) | Q(nguoidung2__user=request.user)) & Q(is_banbe=True))
-        # Lấy id từ ban_be
+        ban_be = BanBe.objects.filter(
+            Q(nguoidung1__user=request.user) | Q(nguoidung2__user=request.user), 
+            is_banbe=True
+        )
         ban_be_ids = [bb.nguoidung2.id if bb.nguoidung1.user == request.user else bb.nguoidung1.id for bb in ban_be]
 
-        # Sắp xếp các BinhLuan theo thời gian tạo
         latest_comments = Prefetch(
             'binhluan_set', 
             queryset=BinhLuan.objects.order_by('-timestamp')
         )
 
-        # Lấy tất cả BaiDang và prefetch 3 BinhLuan mới nhất
-        posts = BaiDang.objects.filter(Q(nguoidung__user=request.user) | Q(nguoidung__id__in=ban_be_ids)).prefetch_related(latest_comments)
+        # Lấy danh sách bài đăng
+        posts = BaiDang.objects.filter(
+            Q(nguoidung__user=request.user) | Q(nguoidung__id__in=ban_be_ids)
+        ).prefetch_related(latest_comments)
 
+        # Kiểm tra xem người dùng đã like bài đăng đó chưa và thêm biến 'liked' vào mỗi bài đăng
         for post in posts:
-            post.latest_comments = post.binhluan_set.all()[:3]
-            post.latest_comments.reverse()
+            post.latest_comments = post.binhluan_set.all()[:3]  
             for comment in post.latest_comments:
                 comment.timestamp = format_time_ago(comment.timestamp)
             post.formatted_thoigiandang = format_time_ago(post.thoigiandang)
 
-        # Lấy username và nội dung tin nhắn mới nhất từ mỗi người gửi
+            # Kiểm tra xem người dùng đã thích bài đăng đó chưa
+            post.liked = LikeBaiDang.objects.filter(baidang=post, nguoidung=request.user.nguoidung).exists()
+
         messages = []
 
-        # Lấy các tin nhắn có liên quan tới người dùng hiện tại và tin nhắn mới nhất
-        messages_current_user = TinNhan.objects.filter(Q(receiver=request.user.nguoidung) | Q(senter=request.user.nguoidung)).values('senter', 'receiver').annotate(thoigian_moi_nhat=Max('thoigian'))
+        messages_current_user = TinNhan.objects.filter(
+            Q(receiver=request.user.nguoidung) | Q(senter=request.user.nguoidung)
+        ).values('senter', 'receiver').annotate(thoigian_moi_nhat=Max('thoigian'))
 
         for message in messages_current_user:
             senter_id = message['senter']
             receiver_id = message['receiver']
 
-            # Lấy người dùng dựa theo id
             senter = NguoiDung.objects.get(id=senter_id)
             receiver = NguoiDung.objects.get(id=receiver_id)
 
-            # Nếu người gửi là người dùng hiện tại thì sẽ hiển thị người nhận
             if senter.user.username == request.user.username:
                 newestTime = message['thoigian_moi_nhat']
                 newestMessage = TinNhan.objects.filter(receiver__id=receiver_id, thoigian=newestTime).first()
                 messages.append({'nguoidung': receiver, 'noidung': newestMessage.noidung})
-            # Nếu người nhận là người dùng hiện tại thì sẽ hiển thị người gửi
             elif receiver.user.username == request.user.username:
                 newestTime = message['thoigian_moi_nhat']
                 newestMessage = TinNhan.objects.filter(senter__id=senter_id, thoigian=newestTime).first()
                 messages.append({'nguoidung': senter, 'noidung': newestMessage.noidung})
-
-        # Lấy thông báo chưa đọc của người dùng
-        notifications = ThongBao.objects.filter(Q(nguoidung__user=request.user) & Q(is_read=False))
     else:
         logout(request)
         return redirect("login")
 
-    context = {'posts': posts, 'messages': messages, 'notifications': notifications}
+    context = {'posts': posts, 'messages': messages}
     return render(request, 'apps/homepage.html', context)
 
 def signup(request):
@@ -227,65 +224,6 @@ def format_time_ago(timestamp):
     else:
         return timestamp.strftime("%Y-%m-%d %H:%M")
 
-def home(request):
-    if not request.user.is_authenticated:
-        return redirect("login")
-
-    if hasattr(request.user, 'nguoidung'):
-        ban_be = BanBe.objects.filter(
-            Q(nguoidung1__user=request.user) | Q(nguoidung2__user=request.user), 
-            is_banbe=True
-        )
-        ban_be_ids = [bb.nguoidung2.id if bb.nguoidung1.user == request.user else bb.nguoidung1.id for bb in ban_be]
-
-        latest_comments = Prefetch(
-            'binhluan_set', 
-            queryset=BinhLuan.objects.order_by('-timestamp')
-        )
-
-        # Lấy danh sách bài đăng
-        posts = BaiDang.objects.filter(
-            Q(nguoidung__user=request.user) | Q(nguoidung__id__in=ban_be_ids)
-        ).prefetch_related(latest_comments)
-
-        # Kiểm tra xem người dùng đã like bài đăng đó chưa và thêm biến 'liked' vào mỗi bài đăng
-        for post in posts:
-            post.latest_comments = post.binhluan_set.all()[:3]  
-            for comment in post.latest_comments:
-                comment.timestamp = format_time_ago(comment.timestamp)
-            post.formatted_thoigiandang = format_time_ago(post.thoigiandang)
-
-            # Kiểm tra xem người dùng đã thích bài đăng đó chưa
-            post.liked = LikeBaiDang.objects.filter(baidang=post, nguoidung=request.user.nguoidung).exists()
-
-        messages = []
-
-        messages_current_user = TinNhan.objects.filter(
-            Q(receiver=request.user.nguoidung) | Q(senter=request.user.nguoidung)
-        ).values('senter', 'receiver').annotate(thoigian_moi_nhat=Max('thoigian'))
-
-        for message in messages_current_user:
-            senter_id = message['senter']
-            receiver_id = message['receiver']
-
-            senter = NguoiDung.objects.get(id=senter_id)
-            receiver = NguoiDung.objects.get(id=receiver_id)
-
-            if senter.user.username == request.user.username:
-                newestTime = message['thoigian_moi_nhat']
-                newestMessage = TinNhan.objects.filter(receiver__id=receiver_id, thoigian=newestTime).first()
-                messages.append({'nguoidung': receiver, 'noidung': newestMessage.noidung})
-            elif receiver.user.username == request.user.username:
-                newestTime = message['thoigian_moi_nhat']
-                newestMessage = TinNhan.objects.filter(senter__id=senter_id, thoigian=newestTime).first()
-                messages.append({'nguoidung': senter, 'noidung': newestMessage.noidung})
-    else:
-        logout(request)
-        return redirect("login")
-
-    context = {'posts': posts, 'messages': messages}
-    return render(request, 'apps/homepage.html', context)
-
 def messenger(request):
     # current_user = request.user.nguoidung
     current_user = request.user.nguoidung
@@ -382,11 +320,11 @@ def friend(request):
                 Q(id=current_user.id) | 
                 Q(id__in=BanBe.objects.filter(nguoidung1_id=current_user.id).values_list('nguoidung2_id', flat=True)) | 
                 Q(id__in=BanBe.objects.filter(nguoidung2_id=current_user.id).values_list('nguoidung1_id', flat=True)) 
-            ).values('avatar', 'user__username', 'user__first_name', 'user__last_name', 'sobanbe')
+            ).values('avatar', 'user__username', 'user__first_name', 'user__last_name', 'tong_luot_banbe')
             
-            sender_friend_ids = BanBe.objects.filter(nguoidung1_id=current_user.id, nguoidung2_id__in=search_user_ids, is_banbe=False).values('nguoidung2__avatar', 'nguoidung2__user__username', 'nguoidung2__user__first_name', 'nguoidung2__user__last_name', 'nguoidung2__sobanbe')
+            sender_friend_ids = BanBe.objects.filter(nguoidung1_id=current_user.id, nguoidung2_id__in=search_user_ids, is_banbe=False).values('nguoidung2__avatar', 'nguoidung2__user__username', 'nguoidung2__user__first_name', 'nguoidung2__user__last_name', 'nguoidung2__tong_luot_banbe')
             
-            receiver_friend_ids = BanBe.objects.filter(nguoidung2_id=current_user.id, nguoidung1_id__in=search_user_ids, is_banbe=False).values('nguoidung1__avatar', 'nguoidung1__user__username', 'nguoidung1__user__first_name', 'nguoidung1__user__last_name', 'nguoidung1__sobanbe')
+            receiver_friend_ids = BanBe.objects.filter(nguoidung2_id=current_user.id, nguoidung1_id__in=search_user_ids, is_banbe=False).values('nguoidung1__avatar', 'nguoidung1__user__username', 'nguoidung1__user__first_name', 'nguoidung1__user__last_name', 'nguoidung1__tong_luot_banbe')
             
             friend_ids = BanBe.objects.filter(Q(nguoidung1_id=current_user.id, nguoidung2_id__in=search_user_ids) | Q(nguoidung2_id=current_user.id, nguoidung1_id__in=search_user_ids), is_banbe=True).values_list('nguoidung1_id', 'nguoidung2_id')
             all_friend_ids = set()
@@ -395,7 +333,7 @@ def friend(request):
                 all_friend_ids.add(friend[1])
             all_friend_ids.discard(current_user.id)
             
-            friends = NguoiDung.objects.filter(id__in=all_friend_ids).values('avatar', 'user__username', 'user__first_name', 'user__last_name', 'sobanbe')
+            friends = NguoiDung.objects.filter(id__in=all_friend_ids).values('avatar', 'user__username', 'user__first_name', 'user__last_name', 'tong_luot_banbe')
             
             other_users_data = list(other_users)
             sender_friend_ids_data = list(sender_friend_ids)

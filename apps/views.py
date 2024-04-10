@@ -148,7 +148,6 @@ def signup(request):
                     # Đăng nhập với người dùng vừa signup
                     auth_login(request, user)
                     return JsonResponse({'status': 'ok'})
-            
                     
     return render(request, 'apps/signup.html')
 
@@ -205,37 +204,13 @@ def login(request):
         
     return render(request, 'apps/login.html')
 
-def profile(request):
-    return render(request, 'apps/profile.html')
+def is_email(value):
+    email_regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+    return re.match(email_regex, value) is not None
 
-def messenger(request):
-    # current_user = request.user.nguoidung
-    current_user = request.user.nguoidung
-    lienlac = LienLac.objects.filter(Q(goc=current_user) | Q(dich=current_user))
-    context = {'lienlac': lienlac,'current_user': current_user}
-    return render(request, 'apps/messenger.html', context)
-
-def is_ajax(request):
-    return request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
-
-def load_mess(request, id):
-    # if request.method == 'GET' and is_ajax(request=request):
-        try:
-            # item = YourModel.objects.get(id=id)
-
-            tinnhan = TinNhan.objects.all()
-            # tinnhan = TinNhan.objects.filter(senter=id)
-
-            serialized_tinnhan = serializers.serialize('json', tinnhan)
-            data = {
-                'tinnhan':serialized_tinnhan,
-                'id':id
-            }
-            return JsonResponse(data)
-        except TinNhan.DoesNotExist:
-            return JsonResponse({'error': 'Item not found'}, status=404)
-    # else:
-    #     return JsonResponse({'error': 'Invalid request'}, status=400)
+def is_phone_number(phone_number):
+    phone_regex = r'^(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b'
+    return re.match(phone_regex, phone_number) is not None
 
 def format_time_ago(timestamp):
     now = datetime.now()
@@ -252,35 +227,124 @@ def format_time_ago(timestamp):
     else:
         return timestamp.strftime("%Y-%m-%d %H:%M")
 
-def load_comment(request, id):
-    try:
-        # Lấy tất cả các bình luận cho bài đăng có id tương ứng
-        comments = BinhLuan.objects.filter(baidang_id=id)
-        # Tạo một danh sách chứa thông tin bình luận và avatar
-        serialized_comments = []
-        for comment in comments:
-            serialized_comment = {
-                'comment': {
-                    'id': comment.id,
-                    'noidungbl': comment.noidungbl,
-                    'timestamp': format_time_ago(comment.timestamp)
-                },
-                'user_info':{
-                    'id': comment.nguoidung_id,
-                    'avatar': comment.nguoidung.avatar.url if comment.nguoidung.avatar else 'media/download.png',  # Khởi tạo avatar là None, nếu người dùng không tồn tại hoặc không có avatar
-                    'username': comment.nguoidung.user.username
-                }
-            }
-            serialized_comments.append(serialized_comment)
+def home(request):
+    if not request.user.is_authenticated:
+        return redirect("login")
 
-        # Chuyển đổi danh sách serialized_comments thành JSON
-        data = {
-            'binhluan': serialized_comments,
-            'id': id
-        }
-        return JsonResponse(data)
-    except BinhLuan.DoesNotExist:
-        return JsonResponse({'error': 'Comments not found'}, status=404)
+    if hasattr(request.user, 'nguoidung'):
+        ban_be = BanBe.objects.filter(
+            Q(nguoidung1__user=request.user) | Q(nguoidung2__user=request.user), 
+            is_banbe=True
+        )
+        ban_be_ids = [bb.nguoidung2.id if bb.nguoidung1.user == request.user else bb.nguoidung1.id for bb in ban_be]
+
+        latest_comments = Prefetch(
+            'binhluan_set', 
+            queryset=BinhLuan.objects.order_by('-timestamp')
+        )
+
+        # Lấy danh sách bài đăng
+        posts = BaiDang.objects.filter(
+            Q(nguoidung__user=request.user) | Q(nguoidung__id__in=ban_be_ids)
+        ).prefetch_related(latest_comments)
+
+        # Kiểm tra xem người dùng đã like bài đăng đó chưa và thêm biến 'liked' vào mỗi bài đăng
+        for post in posts:
+            post.latest_comments = post.binhluan_set.all()[:3]  
+            for comment in post.latest_comments:
+                comment.timestamp = format_time_ago(comment.timestamp)
+            post.formatted_thoigiandang = format_time_ago(post.thoigiandang)
+
+            # Kiểm tra xem người dùng đã thích bài đăng đó chưa
+            post.liked = LikeBaiDang.objects.filter(baidang=post, nguoidung=request.user.nguoidung).exists()
+
+        messages = []
+
+        messages_current_user = TinNhan.objects.filter(
+            Q(receiver=request.user.nguoidung) | Q(senter=request.user.nguoidung)
+        ).values('senter', 'receiver').annotate(thoigian_moi_nhat=Max('thoigian'))
+
+        for message in messages_current_user:
+            senter_id = message['senter']
+            receiver_id = message['receiver']
+
+            senter = NguoiDung.objects.get(id=senter_id)
+            receiver = NguoiDung.objects.get(id=receiver_id)
+
+            if senter.user.username == request.user.username:
+                newestTime = message['thoigian_moi_nhat']
+                newestMessage = TinNhan.objects.filter(receiver__id=receiver_id, thoigian=newestTime).first()
+                messages.append({'nguoidung': receiver, 'noidung': newestMessage.noidung})
+            elif receiver.user.username == request.user.username:
+                newestTime = message['thoigian_moi_nhat']
+                newestMessage = TinNhan.objects.filter(senter__id=senter_id, thoigian=newestTime).first()
+                messages.append({'nguoidung': senter, 'noidung': newestMessage.noidung})
+    else:
+        logout(request)
+        return redirect("login")
+
+    context = {'posts': posts, 'messages': messages}
+    return render(request, 'apps/homepage.html', context)
+
+def messenger(request):
+    # current_user = request.user.nguoidung
+    current_user = request.user.nguoidung
+    lienlac = LienLac.objects.filter(Q(goc=current_user) | Q(dich=current_user))
+    context = {'lienlac': lienlac,'current_user': current_user}
+    return render(request, 'apps/messenger.html', context)
+
+def is_ajax(request):
+    return request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
+
+def load_mess(request, id):
+    # if request.method == 'GET' and is_ajax(request=request):
+        try:
+            # item = YourModel.objects.get(id=id)
+            tinnhan = TinNhan.objects.all()
+            # tinnhan = TinNhan.objects.filter(senter=id)
+
+            serialized_tinnhan = serializers.serialize('json', tinnhan)
+            data = {
+                'tinnhan':serialized_tinnhan,
+                'id':id
+            }
+            return JsonResponse(data)
+        except TinNhan.DoesNotExist:
+            return JsonResponse({'error': 'Item not found'}, status=404)
+    # else:
+    #     return JsonResponse({'error': 'Invalid request'}, status=400)
+
+def chat_box(request, chat_box_name):
+    # we will get the chatbox name from the url
+    return render(request, 'apps/chatbox.html', {'chat_box_name': chat_box_name})
+
+def save_messenger(request):
+    # Thêm comment vào bài đăng
+    if request.method == 'POST':
+        # Lấy giá trị gửi từ client
+        data = json.loads(request.body)
+        message = data.get('message') 
+        id_user = data.get('id_user') 
+        id_receiver = data.get('id_receiver') 
+        
+        user = NguoiDung.objects.get(id=id_user)
+        receiver = NguoiDung.objects.get(id=id_receiver)
+
+        tinnhan = TinNhan.objects.create(
+            senter=user,
+            receiver=receiver,
+            noidung=message,
+            thoigian=timezone.now()  # Sử dụng now() để lấy thời gian hiện tại
+        )
+        tinnhan.save()
+
+        # Cập nhật hoặc tạo LienLac tương ứng
+        lienlac, created = LienLac.objects.get_or_create(goc=user, dich=receiver)
+        lienlac.lastmess = message
+        lienlac.thoigiancuoi = timezone.now()
+        lienlac.save()
+
+        return JsonResponse({'status': 'ok'})
 
 def video_call(request, room_name):
     return render(request, 'apps/testthu.html', {'room_name': room_name})
@@ -291,19 +355,19 @@ def call_view(request):
 def rendercall(request,id):
     return render(request, 'apps/call.html',{'id':id})
 
-def chat_box(request, chat_box_name):
-    # we will get the chatbox name from the url
-    return render(request, 'apps/chatbox.html', {'chat_box_name': chat_box_name})
+def delete_contact(request):
 
-# Hàm kiểm tra email
-def is_email(value):
-    email_regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
-    return re.match(email_regex, value) is not None
+    data = json.loads(request.body)
+    id_user = data.get('id_user') 
+    id_receiver = data.get('id_receiver') 
+    
+    user = NguoiDung.objects.get(id=id_user)
+    receiver = NguoiDung.objects.get(id=id_receiver)
 
-# Hàm kiểm tra số điện thoại
-def is_phone_number(phone_number):
-    phone_regex = r'^(03|05|07|08|09|01[2|6|8|9])+([0-9]{8})\b'
-    return re.match(phone_regex, phone_number) is not None
+    lienlac = LienLac.objects.get_or_create(goc=user, dich=receiver)
+    lienlac.delete()
+
+    return JsonResponse({'status': 'ok'})
 
 def friend(request):
     current_user = request.user.nguoidung
@@ -403,125 +467,13 @@ def updatefriend(request):
         else:
             return JsonResponse({'error': 'Invalid action'}, status=400)
 
+def profile(request):
+    return render(request, 'apps/profile.html')
+
 def editProfile(request):
     current_user = request.user.nguoidung
     ngay_sinh_formatted = current_user.ngaysinh.strftime('%Y-%m-%d') if current_user.ngaysinh else None
     return render(request, 'apps/editProfile.html',{'nguoi_dung': current_user, 'ngay_sinh_formatted': ngay_sinh_formatted})
-
-def createPost(request):
-    current_user = request.user.nguoidung
-    return render(request, 'apps/createPost.html',{'nguoi_dung': current_user})
-
-def editPost(request, baidang_id):
-    current_user = request.user.nguoidung
-    baidang = get_object_or_404(BaiDang, pk=baidang_id)
-    return render(request, 'apps/editPost.html',{'nguoi_dung': current_user,'baidang':baidang})
-
-def edit_post(request, baidang_id):
-    # Lấy bài đăng từ cơ sở dữ liệu hoặc trả về 404 nếu không tìm thấy
-    baidang = get_object_or_404(BaiDang, pk=baidang_id)
-
-    if request.method == 'POST':
-        # Lấy dữ liệu từ request
-        noidung = request.POST.get('noidung')
-        baidang.noidung = noidung
-        
-        # Kiểm tra và cập nhật hình ảnh nếu có
-        if 'hinhanh_url' in request.FILES:
-            hinhanh_url = request.FILES['hinhanh_url']
-            baidang.hinhanh = hinhanh_url
-
-        # Lưu các thay đổi vào cơ sở dữ liệu
-        baidang.save()
-
-        # Chuyển hướng người dùng đến trang khác hoặc thông báo thành công
-        return redirect('profile')
-    else:
-        # Xử lý logic khi yêu cầu không phải là POST
-        pass
-    
-def get_admin_nguoidung():
-    try:
-        admin_user = User.objects.filter(is_staff=True, is_superuser=True).first()  # Lấy người dùng đầu tiên có is_staff và is_superuser là True
-        if admin_user:
-            nguoidung = NguoiDung.objects.get(user=admin_user)  # Lấy thông tin người dùng tương ứng
-            return nguoidung
-        else:
-            return None  # Trả về None nếu không tìm thấy người dùng admin
-    except NguoiDung.DoesNotExist:
-        return None  # Xử lý trường hợp không tìm thấy thông tin người dùng tương ứng
-    
-def getInfoProfile(request):
-    current_user = request.user.nguoidung
-    # Truyền dữ liệu nguoi_dungs vào template profile.html
-    danh_sach_baidang = BaiDang.objects.filter(nguoidung=current_user)
-    so_luong_baidang = danh_sach_baidang.count()
-    ngay_sinh_formatted = current_user.ngaysinh.strftime('%Y-%m-%d') if current_user.ngaysinh else None
-    context ={'nguoi_dung': current_user,'danh_sach_baidang': danh_sach_baidang, 'so_luong_baidang': so_luong_baidang, 'edit':1, 'ngay_sinh_formatted': ngay_sinh_formatted}
-    if so_luong_baidang <=0:
-        context ={'nguoi_dung': current_user,'danh_sach_baidang': danh_sach_baidang, 'so_luong_baidang': 0, 'edit':1, 'ngay_sinh_formatted': ngay_sinh_formatted}
-    return render(request, 'apps/profile.html', context)
-
-def profile_friend(request, user_id):
-    current_user = request.user.nguoidung
-    nguoi_dung = NguoiDung.objects.get(pk=user_id)
-    if current_user.id == nguoi_dung.id:
-        return getInfoProfile(request)
-    else: 
-        danh_sach_baidang = BaiDang.objects.filter(nguoidung=nguoi_dung)
-        so_luong_baidang = danh_sach_baidang.count()
-        context = {'nguoi_dung': nguoi_dung, 'danh_sach_baidang': danh_sach_baidang, 'so_luong_baidang': so_luong_baidang}
-        if so_luong_baidang <= 0:
-            context = {'nguoi_dung': nguoi_dung, 'danh_sach_baidang': danh_sach_baidang, 'so_luong_baidang': 0}
-        return render(request, 'apps/profile.html', context)
-
-
-def create_post(request):
-    if request.method == 'POST':
-        # Lấy dữ liệu từ request
-        noidung = request.POST.get('noidung')
-        if 'hinhanh_url' in request.FILES:
-            hinhanh_url = request.FILES['hinhanh_url']
-        else:
-            hinhanh_url = None
-        # Tạo một bài đăng mới
-        baidang = BaiDang.objects.create(
-            nguoidung=request.user.nguoidung,  # Sử dụng người dùng hiện tại đang đăng nhập
-            noidung=noidung,
-            thoigiandang=datetime.now(),
-            tongluotthich=0,
-            tongluotbinhluan=0,
-        )
-        baidang.hinhanh=hinhanh_url
-        baidang.save()
-
-        # Chuyển hướng người dùng đến trang khác hoặc thông báo thành công
-        return redirect('home')  # Chuyển hướng về trang chủ sau khi chia sẻ thành công
-    else:
-        # Xử lý logic khi yêu cầu không phải là POST
-        pass
-
-def xoa_baidang(request, baidang_id):
-    try:
-        # Lấy bài đăng từ cơ sở dữ liệu
-        baidang = BaiDang.objects.get(id=baidang_id)
-    except BaiDang.DoesNotExist:
-        # Trả về 404 nếu không tìm thấy bài đăng
-        return HttpResponseNotFound()
-
-    if request.method == 'POST':
-        if 'action' in request.POST and request.POST['action'] == 'xoa':
-            # Xóa bài đăng
-            baidang.delete()
-            
-            # Chuyển hướng người dùng đến một trang nào đó sau khi xóa thành công
-            return redirect(request.META.get('HTTP_REFERER'))
-        else:
-            # Trả về lỗi 400 Bad Request nếu action không hợp lệ
-            return HttpResponseBadRequest("Yêu cầu không hợp lệ")
-    else:
-        # Nếu yêu cầu không phải từ phương thức POST, trả về 405 Method Not Allowed
-        return HttpResponseNotAllowed(['POST'])
 
 def edit_profile(request):
     if request.method == 'POST':
@@ -553,6 +505,155 @@ def edit_profile(request):
     else:
         # Xử lý logic khi yêu cầu không phải là POST
         pass
+
+def profile_friend(request, user_id):
+    current_user = request.user.nguoidung
+    nguoi_dung = NguoiDung.objects.get(pk=user_id)
+    if current_user.id == nguoi_dung.id:
+        return getInfoProfile(request)
+    else: 
+        danh_sach_baidang = BaiDang.objects.filter(nguoidung=nguoi_dung)
+        so_luong_baidang = danh_sach_baidang.count()
+        context = {'nguoi_dung': nguoi_dung, 'danh_sach_baidang': danh_sach_baidang, 'so_luong_baidang': so_luong_baidang}
+        if so_luong_baidang <= 0:
+            context = {'nguoi_dung': nguoi_dung, 'danh_sach_baidang': danh_sach_baidang, 'so_luong_baidang': 0}
+        return render(request, 'apps/profile.html', context)
+
+def createPost(request):
+    current_user = request.user.nguoidung
+    return render(request, 'apps/createPost.html',{'nguoi_dung': current_user})
+
+def create_post(request):
+    if request.method == 'POST':
+        # Lấy dữ liệu từ request
+        noidung = request.POST.get('noidung')
+        if 'hinhanh_url' in request.FILES:
+            hinhanh_url = request.FILES['hinhanh_url']
+        else:
+            hinhanh_url = None
+        # Tạo một bài đăng mới
+        baidang = BaiDang.objects.create(
+            nguoidung=request.user.nguoidung,  # Sử dụng người dùng hiện tại đang đăng nhập
+            noidung=noidung,
+            thoigiandang=datetime.now(),
+        )
+        baidang.hinhanh=hinhanh_url
+        baidang.save()
+
+        # Chuyển hướng người dùng đến trang khác hoặc thông báo thành công
+        return redirect('home')  # Chuyển hướng về trang chủ sau khi chia sẻ thành công
+    else:
+        # Xử lý logic khi yêu cầu không phải là POST
+        pass
+
+def editPost(request, baidang_id):
+    current_user = request.user.nguoidung
+    baidang = get_object_or_404(BaiDang, pk=baidang_id)
+    return render(request, 'apps/editPost.html',{'nguoi_dung': current_user,'baidang':baidang})
+
+def edit_post(request, baidang_id):
+    # Lấy bài đăng từ cơ sở dữ liệu hoặc trả về 404 nếu không tìm thấy
+    baidang = get_object_or_404(BaiDang, pk=baidang_id)
+
+    if request.method == 'POST':
+        # Lấy dữ liệu từ request
+        noidung = request.POST.get('noidung')
+        baidang.noidung = noidung
+        
+        # Kiểm tra và cập nhật hình ảnh nếu có
+        if 'hinhanh_url' in request.FILES:
+            hinhanh_url = request.FILES['hinhanh_url']
+            baidang.hinhanh = hinhanh_url
+
+        # Lưu các thay đổi vào cơ sở dữ liệu
+        baidang.save()
+
+        # Chuyển hướng người dùng đến trang khác hoặc thông báo thành công
+        return redirect('profile')
+    else:
+        # Xử lý logic khi yêu cầu không phải là POST
+        pass
+  
+def xoa_baidang(request, baidang_id):
+    try:
+        # Lấy bài đăng từ cơ sở dữ liệu
+        baidang = BaiDang.objects.get(id=baidang_id)
+    except BaiDang.DoesNotExist:
+        # Trả về 404 nếu không tìm thấy bài đăng
+        return HttpResponseNotFound()
+
+    if request.method == 'POST':
+        if 'action' in request.POST and request.POST['action'] == 'xoa':
+            # Xóa bài đăng
+            baidang.delete()
+            
+            # Chuyển hướng người dùng đến một trang nào đó sau khi xóa thành công
+            return redirect(request.META.get('HTTP_REFERER'))
+        else:
+            # Trả về lỗi 400 Bad Request nếu action không hợp lệ
+            return HttpResponseBadRequest("Yêu cầu không hợp lệ")
+    else:
+        # Nếu yêu cầu không phải từ phương thức POST, trả về 405 Method Not Allowed
+        return HttpResponseNotAllowed(['POST'])
+
+def load_comment(request, id):
+    try:
+        # Lấy tất cả các bình luận cho bài đăng có id tương ứng
+        comments = BinhLuan.objects.filter(baidang_id=id)
+        # Tạo một danh sách chứa thông tin bình luận và avatar
+        serialized_comments = []
+        for comment in comments:
+            serialized_comment = {
+                'comment': {
+                    'id': comment.id,
+                    'noidungbl': comment.noidungbl,
+                    'timestamp': format_time_ago(comment.timestamp)
+                },
+                'user_info':{
+                    'id': comment.nguoidung_id,
+                    'avatar': comment.nguoidung.avatar.url if comment.nguoidung.avatar else 'media/download.png',  # Khởi tạo avatar là None, nếu người dùng không tồn tại hoặc không có avatar
+                    'username': comment.nguoidung.user.username
+                }
+            }
+            serialized_comments.append(serialized_comment)
+
+        # Chuyển đổi danh sách serialized_comments thành JSON
+        data = {
+            'binhluan': serialized_comments,
+            'id': id
+        }
+        return JsonResponse(data)
+    except BinhLuan.DoesNotExist:
+        return JsonResponse({'error': 'Comments not found'}, status=404)
+
+def updatelike(request):
+    print("aaaaa")
+    if request.method == 'POST':
+        nguoidung = request.user.nguoidung
+        data = json.loads(request.body)
+        idPost = data['idPost']  
+        action = data['action']
+
+        try:
+            baidang = BaiDang.objects.get(id=idPost)
+        except BaiDang.DoesNotExist:
+            return JsonResponse({'error': 'BaiDang not found'}, status=404)
+
+        if action == 'like':
+            LikeBaiDang.objects.create(baidang=baidang, nguoidung=nguoidung).save()
+            return JsonResponse({'message': 'Like successfully'}, status=200)
+        elif action == 'remove':
+            # Kiểm tra xem người dùng đã like bài đăng này trước đó không
+            try:
+                like = LikeBaiDang.objects.get(baidang=baidang, nguoidung=nguoidung)
+            except LikeBaiDang.DoesNotExist:
+                return JsonResponse({'error': 'You have not liked this post yet'}, status=400)
+            # Xóa lượt thích khỏi cơ sở dữ liệu
+            like.delete()
+            return JsonResponse({'message': 'Like removed successfully'}, status=200)
+
+    # Trả về lỗi nếu yêu cầu không phải là POST
+    return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 def comment_post(request):
     # Thêm comment vào bài đăng
@@ -608,46 +709,25 @@ def comment_post(request):
             })
             
         return JsonResponse({'binhluan': binhluan_data})
-
-def save_messenger(request):
-    # Thêm comment vào bài đăng
-    if request.method == 'POST':
-        # Lấy giá trị gửi từ client
-        data = json.loads(request.body)
-        message = data.get('message') 
-        id_user = data.get('id_user') 
-        id_receiver = data.get('id_receiver') 
-        
-        user = NguoiDung.objects.get(id=id_user)
-        receiver = NguoiDung.objects.get(id=id_receiver)
-
-        tinnhan = TinNhan.objects.create(
-            senter=user,
-            receiver=receiver,
-            noidung=message,
-            thoigian=timezone.now()  # Sử dụng now() để lấy thời gian hiện tại
-        )
-        tinnhan.save()
-
-        # Cập nhật hoặc tạo LienLac tương ứng
-        lienlac, created = LienLac.objects.get_or_create(goc=user, dich=receiver)
-        lienlac.lastmess = message
-        lienlac.thoigiancuoi = timezone.now()
-        lienlac.save()
-
-        return JsonResponse({'status': 'ok'})
-
-
-def delete_contact(request):
-
-    data = json.loads(request.body)
-    id_user = data.get('id_user') 
-    id_receiver = data.get('id_receiver') 
     
-    user = NguoiDung.objects.get(id=id_user)
-    receiver = NguoiDung.objects.get(id=id_receiver)
-
-    lienlac = LienLac.objects.get_or_create(goc=user, dich=receiver)
-    lienlac.delete()
-
-    return JsonResponse({'status': 'ok'})
+def get_admin_nguoidung():
+    try:
+        admin_user = User.objects.filter(is_staff=True, is_superuser=True).first()  # Lấy người dùng đầu tiên có is_staff và is_superuser là True
+        if admin_user:
+            nguoidung = NguoiDung.objects.get(user=admin_user)  # Lấy thông tin người dùng tương ứng
+            return nguoidung
+        else:
+            return None  # Trả về None nếu không tìm thấy người dùng admin
+    except NguoiDung.DoesNotExist:
+        return None  # Xử lý trường hợp không tìm thấy thông tin người dùng tương ứng
+    
+def getInfoProfile(request):
+    current_user = request.user.nguoidung
+    # Truyền dữ liệu nguoi_dungs vào template profile.html
+    danh_sach_baidang = BaiDang.objects.filter(nguoidung=current_user)
+    so_luong_baidang = danh_sach_baidang.count()
+    ngay_sinh_formatted = current_user.ngaysinh.strftime('%Y-%m-%d') if current_user.ngaysinh else None
+    context ={'nguoi_dung': current_user,'danh_sach_baidang': danh_sach_baidang, 'so_luong_baidang': so_luong_baidang, 'edit':1, 'ngay_sinh_formatted': ngay_sinh_formatted}
+    if so_luong_baidang <=0:
+        context ={'nguoi_dung': current_user,'danh_sach_baidang': danh_sach_baidang, 'so_luong_baidang': 0, 'edit':1, 'ngay_sinh_formatted': ngay_sinh_formatted}
+    return render(request, 'apps/profile.html', context)

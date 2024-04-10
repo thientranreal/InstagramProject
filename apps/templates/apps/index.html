@@ -188,7 +188,12 @@
         </div>
       </div>
     </nav>
-    {% block friend %}{% endblock friend %} {% block profile %}{% endblock profile %} {% block homepage %}{% endblock homepage %}
+    {% block friend %}{% endblock friend %} 
+    {% block profile %}{% endblock profile %} 
+    {% block homepage %}{% endblock homepage %}
+
+
+
     <script>
       let currentScroll = 0;
       let scrollAmount = 320;
@@ -264,8 +269,9 @@
         console.log("Disconnected from the server.");
       };
     </script>
+    <script src="{% static 'js/addFriend.js'%}"></script>
+    <script src="{% static 'js/home.js'%}"></script>
     <script type="module" src="{% static 'js/addFriend.js'%}"></script>
-    <script type="module" src="{% static 'js/comment.js' %}"></script>
   </body>
 
 </html>

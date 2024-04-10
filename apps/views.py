@@ -71,11 +71,14 @@ def home(request):
                 newestTime = message['thoigian_moi_nhat']
                 newestMessage = TinNhan.objects.filter(senter__id=senter_id, thoigian=newestTime).first()
                 messages.append({'nguoidung': senter, 'noidung': newestMessage.noidung})
+
+        # Lấy thông báo chưa đọc của người dùng
+        notifications = ThongBao.objects.filter(Q(nguoidung__user=request.user) & Q(is_read=False))
     else:
         logout(request)
         return redirect("login")
 
-    context = {'posts': posts, 'messages': messages}
+    context = {'posts': posts, 'messages': messages, 'notifications': notifications}
     return render(request, 'apps/homepage.html', context)
 
 def signup(request):

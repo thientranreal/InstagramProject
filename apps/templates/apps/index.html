@@ -44,6 +44,7 @@
   </head>
 
   <body>
+    <div id="username" style="display: none;">{{user.username}}</div>
     <nav class="navbar1">
       <div class="navbar-wrapper">
         <a href="{% url 'home' %}">
@@ -270,7 +271,7 @@
     </script>
     <script src="{% static 'js/addFriend.js'%}"></script>
     <script src="{% static 'js/home.js'%}"></script>
-    <script type="module" src="{% static 'js/comment.js' %}"></script>
+    <script type="module" src="{% static 'js/addFriend.js'%}"></script>
   </body>
 
 </html>

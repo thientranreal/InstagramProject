@@ -91,7 +91,7 @@
               />
               {%else%}
               <img
-                src="{% static '/images/download.png' %}"
+                src="{% static '/image/download.png' %}"
                 alt="Profile Image"
               />
               {%endif%}
@@ -250,7 +250,6 @@
     </script> -->
     <script type="text/javascript">
       let defaultAvatarUrl = "{% static 'assets/images/profile/status-0.png' %}";
-      let username = "{{user.username}}";
     </script>
     <script src="{% static 'js/PersonalPage.js' %}"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>

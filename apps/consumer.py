@@ -142,6 +142,51 @@ class CommentConsumer(AsyncWebsocketConsumer):
                 }
             )
         )
+
+class AddFriendConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        self.group_name = "addfriend"
+
+        await self.channel_layer.group_add(
+            self.group_name, 
+            self.channel_name
+        )
+
+        await self.accept()
+
+    async def disconnect(self, close_code):
+        pass
+
+    async def receive(self, text_data):
+        # Xử lý dữ liệu nhận được nếu cần thiết
+        text_data_json = json.loads(text_data)
+        friend_username = text_data_json['friendUsername']
+        current_user = text_data_json['currentUser']
+
+        # Gửi lại thông báo cho client
+        await self.channel_layer.group_send(
+            self.group_name,
+            {
+                "type": "add_friend_message",
+                "friend_username": friend_username,
+                "current_user": current_user,
+            },
+        )
+
+    # Receive message from room group.
+    async def add_friend_message(self, event):
+        friend_username = event["friend_username"]
+        current_user = event["current_user"]
+        #send message and username of senter to websocket
+        await self.send(
+            text_data=json.dumps(
+                {
+                    "type": "addfriend",
+                    "friend_username": friend_username,
+                    "current_user": current_user,
+                }
+            )
+        )
 # code phần client tương tự trên
 
 

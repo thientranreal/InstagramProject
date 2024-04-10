@@ -1,3 +1,17 @@
+let username = document.getElementById("username").innerText;
+
+// Websocket add friend
+let urlAddFriend = `ws://${window.location.host}/ws/addfriend/`;
+const addFriendSocket = new WebSocket(urlAddFriend);
+
+addFriendSocket.onmessage = function(e) {
+    let data = JSON.parse(e.data);
+    // Nếu là type addfriend và đang được người khác kết bạn
+    if (data.type === "addfriend" && data.friend_username === username) {
+        location.reload();
+    }
+};
+
 var btnUpdate = document.getElementsByClassName('updatefriend');
 for (let index = 0; index < btnUpdate.length; index++) {
     btnUpdate[index].addEventListener('click', function () {
@@ -158,7 +172,14 @@ function updateUserOrder(userId, action) {
         })
         .then((data) => {
             console.log('Data:', data);
-            location.reload(); 
+
+            // Gửi qua websocket
+            addFriendSocket.send(JSON.stringify({
+                friendUsername: userId,
+                currentUser: username,
+            }));
+
+            location.reload();
         })
         .catch((error) => {
             console.error('Error:', error);

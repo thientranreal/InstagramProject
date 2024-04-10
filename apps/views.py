@@ -19,6 +19,68 @@ from .models import *
 import json
 import re
 
+def home(request):
+    # Người dùng chưa đăng nhập
+    if not request.user.is_authenticated:
+        return redirect("login")
+
+    # Nếu user có thuộc tính người dùng
+    if hasattr(request.user, 'nguoidung'):
+        # Lấy bạn bè của người dùng
+        ban_be = BanBe.objects.filter((Q(nguoidung1__user=request.user) | Q(nguoidung2__user=request.user)) & Q(is_banbe=True))
+        # Lấy id từ ban_be
+        ban_be_ids = [bb.nguoidung2.id if bb.nguoidung1.user == request.user else bb.nguoidung1.id for bb in ban_be]
+
+        # Sắp xếp các BinhLuan theo thời gian tạo
+        latest_comments = Prefetch(
+            'binhluan_set', 
+            queryset=BinhLuan.objects.order_by('-timestamp')
+        )
+
+        # Lấy tất cả BaiDang và prefetch 3 BinhLuan mới nhất
+        posts = BaiDang.objects.filter(Q(nguoidung__user=request.user) | Q(nguoidung__id__in=ban_be_ids)).prefetch_related(latest_comments)
+
+        for post in posts:
+            post.latest_comments = post.binhluan_set.all()[:3]
+            post.latest_comments.reverse()
+            for comment in post.latest_comments:
+                comment.timestamp = format_time_ago(comment.timestamp)
+            post.formatted_thoigiandang = format_time_ago(post.thoigiandang)
+
+        # Lấy username và nội dung tin nhắn mới nhất từ mỗi người gửi
+        messages = []
+
+        # Lấy các tin nhắn có liên quan tới người dùng hiện tại và tin nhắn mới nhất
+        messages_current_user = TinNhan.objects.filter(Q(receiver=request.user.nguoidung) | Q(senter=request.user.nguoidung)).values('senter', 'receiver').annotate(thoigian_moi_nhat=Max('thoigian'))
+
+        for message in messages_current_user:
+            senter_id = message['senter']
+            receiver_id = message['receiver']
+
+            # Lấy người dùng dựa theo id
+            senter = NguoiDung.objects.get(id=senter_id)
+            receiver = NguoiDung.objects.get(id=receiver_id)
+
+            # Nếu người gửi là người dùng hiện tại thì sẽ hiển thị người nhận
+            if senter.user.username == request.user.username:
+                newestTime = message['thoigian_moi_nhat']
+                newestMessage = TinNhan.objects.filter(receiver__id=receiver_id, thoigian=newestTime).first()
+                messages.append({'nguoidung': receiver, 'noidung': newestMessage.noidung})
+            # Nếu người nhận là người dùng hiện tại thì sẽ hiển thị người gửi
+            elif receiver.user.username == request.user.username:
+                newestTime = message['thoigian_moi_nhat']
+                newestMessage = TinNhan.objects.filter(senter__id=senter_id, thoigian=newestTime).first()
+                messages.append({'nguoidung': senter, 'noidung': newestMessage.noidung})
+
+        # Lấy thông báo chưa đọc của người dùng
+        notifications = ThongBao.objects.filter(Q(nguoidung__user=request.user) & Q(is_read=False))
+    else:
+        logout(request)
+        return redirect("login")
+
+    context = {'posts': posts, 'messages': messages, 'notifications': notifications}
+    return render(request, 'apps/homepage.html', context)
+
 def signup(request):
     if request.method == 'POST':
         # Lấy giá trị gửi từ client

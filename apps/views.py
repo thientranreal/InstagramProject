@@ -277,10 +277,10 @@ def save_messenger(request):
         tinnhan.save()
 
         # Cập nhật hoặc tạo LienLac tương ứng
-        lienlac, created = LienLac.objects.get_or_create(goc=user, dich=receiver)
-        lienlac.lastmess = message
-        lienlac.thoigiancuoi = timezone.now()
-        lienlac.save()
+        lienlac= LienLac.objects.filter(goc=user, dich=receiver)
+        lienlac.update(lastmess=message,thoigiancuoi=timezone.now())
+        
+
 
         return JsonResponse({'status': 'ok'})
 

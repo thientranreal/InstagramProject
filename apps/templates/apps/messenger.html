@@ -93,7 +93,7 @@
           <div class="col-contents col-item">
             <div class="messages">
               {% for ll in lienlac %}
-              <li data-id="{{ ll.id }}">
+              <li data-id="{{ ll.dich.id }}">
                 <div class="avatar">
                   <div class="avatar-image">
                     <div class="status online"></div>
@@ -107,11 +107,12 @@
             </div>
           </div>
         </div>
+        <style></style>
         <div class="col" style="width: 900px;">
           <div class="col-content col-mess">
             <section class="message">
               <div class="grid-message">
-                <img src="/static/assets/images/mmm.webp" width="950px"  alt="">
+                <!-- <img src="/static/assets/images/mmm.webp" width="950px"  alt=""> -->
               </div>
             </section>
           </div>
@@ -254,8 +255,13 @@
               ></video>
             </div>
           </div>
-          <div style="flex-grow: 1"></div>
+          <!-- <div style="flex-grow: 1"></div> -->
 
+          <div id="controls">
+            <button id="muteButton">Mute</button>
+            <button id="videoButton">Stop Video</button>
+          </div>
+          
         </div>
         
         <div style="flex-grow: 1"></div>
@@ -284,9 +290,9 @@ function confirmDelete() {
         id_receiver = document.getElementById("id_recceiver").value;
 
 
-        const id_receiver = JSON.parse(
-            document.getElementById("id_receiver").value
-        );
+        // const id_receiver = JSON.parse(
+        //     document.getElementById("id_receiver").value
+        // );
 
         // Thêm comment vào database
         fetch('/delete-contact/', {
@@ -335,6 +341,7 @@ const id_user = JSON.parse(
 $(document).ready(function () {
     $(".messages li").click(function () {
         var id = $(this).data("id");
+        document.getElementById("id_receiver").value = id;
         var dichUser = $(this).find("h3").text();
         document.getElementById("receiverName").innerText = dichUser;
         document.getElementById("nameHere").innerText = "Call to " + dichUser;
@@ -389,7 +396,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
             chatSocket.onmessage = function (e) {
                 const data = JSON.parse(e.data);
-                if (data.id_receiver == id) {
+                // alert(data.id_receiver+ "nhan " + data.id_user + "gui"+ id + "Hien tai");
+                if (data.id_user == id) {
                     $(".message .grid-message ").append(
                         '<div class ="col-message-received"><div class="message-received"><p>' +
                         data.message +
@@ -402,9 +410,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 const messageInputDom = document.querySelector("#input");
                 const message = messageInputDom.value;
 
-                const id_receiver = JSON.parse(
-                    document.getElementById("id_receiver").value
-                );
+                // const id_receiver = JSON.parse(
+                //     document.getElementById("id_receiver").value
+                // );
+                const id_receiver =id;
 
                 // Thêm comment vào database
                 fetch('/api/save_messenger', {
@@ -816,11 +825,59 @@ function stop() {
 
 function callProgress() {
     document.getElementById("videos").style.display = "block";
+    document.getElementById("controls").style.display = "block";
     document.getElementById("otherUserNameC").innerHTML = otherUser;
     document.getElementById("inCall").style.display = "block";
 
     callInProgress = true;
 }
+let muteButton = document.getElementById('muteButton');
+let videoButton = document.getElementById('videoButton');
+
+muteButton.addEventListener('click', toggleMute);
+videoButton.addEventListener('click', toggleVideo);
+
+function toggleMute() {
+  let tracks = localStream.getAudioTracks();
+  tracks.forEach(track => {
+    track.enabled = !track.enabled; // Bật hoặc tắt âm thanh
+  });
+}
+
+function toggleVideo() {
+  let tracks = localStream.getVideoTracks();
+  tracks.forEach(track => {
+    track.enabled = !track.enabled; // Bật hoặc tắt video
+  });
+}
+function toggleMute() {
+  let tracks = localStream.getAudioTracks();
+  tracks.forEach(track => {
+    track.enabled = !track.enabled; // Bật hoặc tắt âm thanh
+  });
+
+  // Cập nhật giao diện người dùng
+  if (tracks[0].enabled) {
+    muteButton.textContent = 'Mute';
+  } else {
+    muteButton.textContent = 'Unmute';
+  }
+}
+
+function toggleVideo() {
+  let tracks = localStream.getVideoTracks();
+  tracks.forEach(track => {
+    track.enabled = !track.enabled; // Bật hoặc tắt video
+  });
+
+  // Cập nhật giao diện người dùng
+  if (tracks[0].enabled) {
+    videoButton.textContent = 'Stop Video';
+  } else {
+    videoButton.textContent = 'Start Video';
+  }
+}
+
 </script>
 
 
@@ -830,6 +887,7 @@ function callProgress() {
   document.getElementById("inCall").style.display = "none";
   document.getElementById("calling").style.display = "none";
   document.getElementById("videos").style.display = "none";
+  document.getElementById("controls").style.display = "none";
   document.getElementById("userInfo").style.display = "block";
   connectSocket();
 

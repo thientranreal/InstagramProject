@@ -253,7 +253,7 @@ class CallConsumer(WebsocketConsumer):
             
             if eventType == 'call':
                 name = text_data_json['data']['name']
-                print(self.my_name, "is calling", name)
+                # print(self.my_name, "is calling", name)
                 # print(text_data_json)
 
 
@@ -275,7 +275,7 @@ class CallConsumer(WebsocketConsumer):
                 # we can notify to the group with the caller name
                 
                 caller = text_data_json['data']['caller']
-                # print(self.my_name, "is answering", caller, "calls.")
+                print(self.my_name, "is answering", caller, "calls.")
 
                 async_to_sync(self.channel_layer.group_send)(
                     caller,

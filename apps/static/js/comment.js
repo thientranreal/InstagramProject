@@ -1,5 +1,7 @@
 import { csrftoken } from "./csrfToken.js";
 
+let username = document.getElementById("username").innerText;
+
 // Websocket comment
 let urlComment = `ws://${window.location.host}/ws/commment/`;
 const commentSocket = new WebSocket(urlComment);

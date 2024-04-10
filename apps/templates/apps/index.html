@@ -44,6 +44,7 @@
   </head>
 
   <body>
+    <div id="username" style="display: none;">{{user.username}}</div>
     <nav class="navbar1">
       <div class="navbar-wrapper">
         <a href="{% url 'home' %}">
@@ -263,7 +264,7 @@
         console.log("Disconnected from the server.");
       };
     </script>
-    <script src="{% static 'js/addFriend.js'%}"></script>
+    <script type="module" src="{% static 'js/addFriend.js'%}"></script>
     <script type="module" src="{% static 'js/comment.js' %}"></script>
   </body>
 

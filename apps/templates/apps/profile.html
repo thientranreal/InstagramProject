@@ -75,13 +75,14 @@
             <li class="gallery-item-likes">
               <span class="visually-hidden">Likes:</span
               ><i class="fas fa-heart" aria-hidden="true"></i>
-              {{baidang.tongluotthich}}
+              {{baidang.tong_luot_thich}}
             </li>
             <li class="gallery-item-comments">
               <span class="visually-hidden">Comments:</span
               ><i class="fas fa-comment" aria-hidden="true"></i>
-              {{baidang.tongluotbinhluan}}
+              {{baidang.tong_luot_binh_luan}}
             </li>
+            {%if edit%}
             <li class="gallery-item-more" style="padding-left: 20px;">
               <div class="dropdown" onmouseenter="showDropdown()" onmouseleave="hideDropdown()">
                   <i class="fas fa-ellipsis-h" aria-hidden="true"></i>
@@ -94,6 +95,7 @@
                   </div>
               </div>
           </li>
+          {%endif%}
           
           
           </ul>

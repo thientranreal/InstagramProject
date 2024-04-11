@@ -25,7 +25,7 @@ function hideDropdown() {
         dropdownMenus.forEach(function(dropdownMenu) {
             dropdownMenu.classList.remove('show');
         });
-    }, 1000); // Ẩn menu sau 1 giây
+    }, 100); // Ẩn menu sau 1 giây
 }
 
 function cancelHideTimer() {

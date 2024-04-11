@@ -141,10 +141,18 @@
               style="height: 24px; position: relative" />
             <ul id="nav">
               <li id="notification_li">
-                <span id="notification_count">{{notifications.count}}</span>
+                  {% if notifications.count > 0 %}
+                  <span id="notification_count">
+                    {{notifications.count}}
+                  </span>
+                  {% endif %}
                 <div id="notificationContainer">
                   <div id="notificationTitle">Notifications</div>
-                  <div id="notificationsBody" class="notifications"></div>
+                  <div id="notificationsBody" class="notifications">
+                    {% for notification in notifications %}
+                    {{notification.noidung|safe}}
+                    {% endfor %}
+                  </div>
                   <div id="notificationFooter"><a href="#">See All</a></div>
                 </div>
               </li>
@@ -221,7 +229,13 @@
         // Toggle notification container on notification link click
         $("#notificationLink").click(function (event) {
           $("#notificationContainer").fadeToggle(300);
-          $("#notification_count").fadeOut("slow");
+          $("#notification_count").fadeOut("slow", function() {
+            $(this).remove();
+            // đặt tất cả thông báo của người dùng hiện tại là đã đọc
+            $.get("/is_read_notification", function(data, status){
+                console.log("Data: " + data + "\nStatus: " + status);
+            });
+          });
           event.stopPropagation(); // Prevent the event from reaching the document
           return false;
         });

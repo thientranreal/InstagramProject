@@ -162,6 +162,7 @@ class AddFriendConsumer(AsyncWebsocketConsumer):
         text_data_json = json.loads(text_data)
         friend_username = text_data_json['friendUsername']
         current_user = text_data_json['currentUser']
+        action = text_data_json['action']
 
         # Gửi lại thông báo cho client
         await self.channel_layer.group_send(
@@ -170,6 +171,7 @@ class AddFriendConsumer(AsyncWebsocketConsumer):
                 "type": "add_friend_message",
                 "friend_username": friend_username,
                 "current_user": current_user,
+                "action": action
             },
         )
 
@@ -177,11 +179,12 @@ class AddFriendConsumer(AsyncWebsocketConsumer):
     async def add_friend_message(self, event):
         friend_username = event["friend_username"]
         current_user = event["current_user"]
+        action = event["action"]
         #send message and username of senter to websocket
         await self.send(
             text_data=json.dumps(
                 {
-                    "type": "addfriend",
+                    "type": action,
                     "friend_username": friend_username,
                     "current_user": current_user,
                 }

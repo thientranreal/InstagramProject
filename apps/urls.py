@@ -35,6 +35,8 @@ urlpatterns = [
     path('call/<int:id>/', views.rendercall, name='rendercall'),
     path('profile_friend/<int:user_id>/', views.profile_friend, name='profile_friend'),
     path('xoa_baidang/<int:baidang_id>/', views.xoa_baidang, name='xoa_baidang'),
+    path('add_notification', views.add_notification),
+    path('is_read_notification', views.set_isread_notification),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
       

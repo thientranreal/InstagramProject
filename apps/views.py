@@ -651,3 +651,21 @@ def delete_contact(request):
     lienlac.delete()
 
     return JsonResponse({'status': 'ok'})
+
+def add_notification(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+
+        noidung = data.get('noidung')
+        thong_bao_moi = ThongBao.objects.create(nguoidung=request.user.nguoidung, noidung=noidung, is_read=False)
+        thong_bao_moi.save()
+        
+        return JsonResponse({'status': 'ok'})
+    
+def set_isread_notification(request):
+    if request.method == 'GET':
+        # người dùng hiện tại đọc hết tin nhắn
+        ThongBao.objects.filter(nguoidung__user=request.user).update(is_read=True)
+        return JsonResponse({'status': 'ok'})
+
+

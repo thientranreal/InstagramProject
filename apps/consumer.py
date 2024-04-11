@@ -23,7 +23,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = text_data_json["message"]
         id_user = text_data_json["id_user"]
         id_receiver = text_data_json["id_receiver"]
-
         await self.channel_layer.group_send(
             self.group_name,
             {
@@ -142,6 +141,54 @@ class CommentConsumer(AsyncWebsocketConsumer):
                 }
             )
         )
+
+class AddFriendConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        self.group_name = "addfriend"
+
+        await self.channel_layer.group_add(
+            self.group_name, 
+            self.channel_name
+        )
+
+        await self.accept()
+
+    async def disconnect(self, close_code):
+        pass
+
+    async def receive(self, text_data):
+        # Xử lý dữ liệu nhận được nếu cần thiết
+        text_data_json = json.loads(text_data)
+        friend_username = text_data_json['friendUsername']
+        current_user = text_data_json['currentUser']
+        action = text_data_json['action']
+
+        # Gửi lại thông báo cho client
+        await self.channel_layer.group_send(
+            self.group_name,
+            {
+                "type": "add_friend_message",
+                "friend_username": friend_username,
+                "current_user": current_user,
+                "action": action
+            },
+        )
+
+    # Receive message from room group.
+    async def add_friend_message(self, event):
+        friend_username = event["friend_username"]
+        current_user = event["current_user"]
+        action = event["action"]
+        #send message and username of senter to websocket
+        await self.send(
+            text_data=json.dumps(
+                {
+                    "type": action,
+                    "friend_username": friend_username,
+                    "current_user": current_user,
+                }
+            )
+        )
 # code phần client tương tự trên
 
 
@@ -208,7 +255,7 @@ class CallConsumer(WebsocketConsumer):
             
             if eventType == 'call':
                 name = text_data_json['data']['name']
-                print(self.my_name, "is calling", name)
+                # print(self.my_name, "is calling", name)
                 # print(text_data_json)
 
 
@@ -230,7 +277,7 @@ class CallConsumer(WebsocketConsumer):
                 # we can notify to the group with the caller name
                 
                 caller = text_data_json['data']['caller']
-                # print(self.my_name, "is answering", caller, "calls.")
+                print(self.my_name, "is answering", caller, "calls.")
 
                 async_to_sync(self.channel_layer.group_send)(
                     caller,

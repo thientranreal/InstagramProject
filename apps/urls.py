@@ -12,6 +12,7 @@ urlpatterns = [
     path('signup', views.signup, name="signup"),
     path('friend', views.friend, name="friend"),
     path('updatefriend/', views.updatefriend, name="updatefriend"),
+    path('updatelike/', views.updatelike, name="updatelike"),
     path('profile', views.getInfoProfile, name="profile"),
     path('messenger', views.messenger, name="messenger"),
     path('delete-contact/', views.delete_contact, name='delete_contact'),
@@ -35,6 +36,8 @@ urlpatterns = [
     path('call/<int:id>/', views.rendercall, name='rendercall'),
     path('profile_friend/<int:user_id>/', views.profile_friend, name='profile_friend'),
     path('xoa_baidang/<int:baidang_id>/', views.xoa_baidang, name='xoa_baidang'),
+    path('add_notification', views.add_notification),
+    path('is_read_notification', views.set_isread_notification),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
       

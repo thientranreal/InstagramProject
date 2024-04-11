@@ -17,7 +17,7 @@
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/friend.css' %}" />
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js" defer></script>
     <!-- <script src="https://kit.fontawesome.com/83ccd457ed.js" crossorigin="anonymous"></script> -->
     <title>Instagram</title>
     <script type="text/javascript">
@@ -44,6 +44,7 @@
   </head>
 
   <body>
+    <div id="username" style="display: none;">{{user.username}}</div>
     <nav class="navbar1">
       <div class="navbar-wrapper">
         <a href="{% url 'home' %}">
@@ -140,10 +141,18 @@
               style="height: 24px; position: relative" />
             <ul id="nav">
               <li id="notification_li">
-                <span id="notification_count">3</span>
+                  {% if notifications.count > 0 %}
+                  <span id="notification_count">
+                    {{notifications.count}}
+                  </span>
+                  {% endif %}
                 <div id="notificationContainer">
                   <div id="notificationTitle">Notifications</div>
-                  <div id="notificationsBody" class="notifications"></div>
+                  <div id="notificationsBody" class="notifications">
+                    {% for notification in notifications %}
+                    {{notification.noidung|safe}}
+                    {% endfor %}
+                  </div>
                   <div id="notificationFooter"><a href="#">See All</a></div>
                 </div>
               </li>
@@ -187,7 +196,12 @@
         </div>
       </div>
     </nav>
-    {% block friend %}{% endblock friend %} {% block profile %}{% endblock profile %} {% block homepage %}{% endblock homepage %}
+    {% block friend %}{% endblock friend %} 
+    {% block profile %}{% endblock profile %} 
+    {% block homepage %}{% endblock homepage %}
+
+
+
     <script>
       let currentScroll = 0;
       let scrollAmount = 320;
@@ -220,7 +234,13 @@
         // Toggle notification container on notification link click
         $("#notificationLink").click(function (event) {
           $("#notificationContainer").fadeToggle(300);
-          $("#notification_count").fadeOut("slow");
+          $("#notification_count").fadeOut("slow", function() {
+            $(this).remove();
+            // đặt tất cả thông báo của người dùng hiện tại là đã đọc
+            $.get("/is_read_notification", function(data, status){
+                console.log("Data: " + data + "\nStatus: " + status);
+            });
+          });
           event.stopPropagation(); // Prevent the event from reaching the document
           return false;
         });
@@ -264,7 +284,7 @@
       };
     </script>
     <script src="{% static 'js/addFriend.js'%}"></script>
-    <script type="module" src="{% static 'js/comment.js' %}"></script>
+    <script src="{% static 'js/home.js'%}"></script>
   </body>
 
 </html>

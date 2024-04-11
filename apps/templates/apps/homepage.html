@@ -91,7 +91,7 @@
               />
               {%else%}
               <img
-                src="{% static '/images/download.png' %}"
+                src="{% static '/image/download.png' %}"
                 alt="Profile Image"
               />
               {%endif%}
@@ -133,20 +133,22 @@
         
         <div class="post-content">
           <div class="reaction-wrapper">
-            <img
-              src="{% static 'assets/images/nav-items/like.PNG' %}"
-              class="icons"
-            />
-            <img
-              src="{% static 'assets/images/nav-items/comment.PNG' %}"
-              class="icons"
-            />
-            <img
-              src="{% static 'assets/images/nav-items/send.PNG' %}"
-              class="icons"
-            />
+            {% if post.liked %}
+                  <img
+                  data-product="{{post.id}}" data-action="remove"
+                  src="{% static 'assets/images/nav-items/like2.PNG' %}"
+                  class="icons iconLike"
+                />
+                {% else %}
+                    <img
+                    data-product="{{post.id}}" data-action="like"
+                    src="{% static 'assets/images/nav-items/like.PNG' %}"
+                    class="icons iconLike"
+                  />
+                {% endif %}
+           
+          <p class="m-0">Liked by <b>{{post.tong_luot_thich}} people</b></p>
           </div>
-          <p>Liked by <b>{{post.tongluotthich}} people</b></p>
           <p class="description">
             <span>{{post.nguoidung.user}}</span>{{post.noidung}}
           </p>
@@ -248,7 +250,6 @@
     </script> -->
     <script type="text/javascript">
       let defaultAvatarUrl = "{% static 'assets/images/profile/status-0.png' %}";
-      let username = "{{user.username}}";
     </script>
     <script src="{% static 'js/PersonalPage.js' %}"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>

@@ -44,7 +44,7 @@ class TinNhan(models.Model):
 #     is_banbe = models.BooleanField(default=False, blank=True, null=True)
 class Nhom(models.Model):
     name = models.CharField(max_length=100, blank=True, null=True)
-    nguoidung = models.ManyToManyField('NguoiDung', blank=True, null=True)
+    nguoidung = models.ManyToManyField('NguoiDung', blank=True)
     admin = models.ForeignKey('NguoiDung', on_delete=models.CASCADE, blank=True, null=True, related_name='admin')
     lasstmess = models.TextField(blank=True, null=True)
     thoigiancuoi = models.DateTimeField(blank=True, null=True)

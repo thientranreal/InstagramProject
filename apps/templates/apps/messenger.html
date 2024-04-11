@@ -93,15 +93,28 @@
           <div class="col-contents col-item">
             <div class="messages">
               {% for ll in lienlac %}
-              <li data-id="{{ ll.dich.id }}">
-                <div class="avatar">
-                  <div class="avatar-image">
-                    <div class="status online"></div>
-                    <img src="media/{{ ll.dich.avatar }}" />
-                  </div>
-                </div>
-                <h3>{{ ll.dich.user }}</h3>
-                <p>{{ ll.lastmess }}</p>
+              <!-- <li data-id="{{ ll.dich.id }}"> -->
+                {% if ll.nguoidung1.id != current_user.id %}
+                  <li data-id="{{ ll.nguoidung1.id }}">
+                    <div class="avatar">
+                      <div class="avatar-image">
+                        <div class="status online"></div>
+                        <img src="media/{{ ll.nguoidung1.avatar }}" />
+                      </div>
+                    </div>
+                    <h3>{{ ll.nguoidung1.user }}</h3>
+                    <p>{{ ll.lastmess }}</p>
+                {% else %}
+                  <li data-id="{{ ll.nguoidung2.id }}">
+                    <div class="avatar">
+                      <div class="avatar-image">
+                        <div class="status online"></div>
+                        <img src="media/{{ ll.nguoidung2.avatar }}" />
+                      </div>
+                    </div>
+                    <h3>{{ ll.nguoidung2.user }}</h3>
+                    <p>{{ ll.lastmess }}</p>
+                {% endif %}
               </li>
               {% endfor %}
             </div>
@@ -185,7 +198,7 @@
                 class="itemWrapper"
                 style="display: flex; flex-direction: row; margin-bottom: 20px"
               >
-                <img src="/static/assets/images/call_answer" onclick="answer()" alt="">
+                <img src="/static/assets/images/call_answer.png"   style="padding: 30px; width: 140px; height: 140px" onclick="answer()" alt="">
               </div>
             </div>
           </div>
@@ -269,6 +282,7 @@
         <!-- nơi chứa id người nhận -->
         <input type="text" hidden id="id_receiver" />
     <!-- </div> -->
+    
     </main>
     <!-- <script src="{% static 'js/messenger.js'%}"></script> -->
   </body>
@@ -308,23 +322,6 @@ function confirmDelete() {
                 id_receiver: id_receiver,
             })
         })
-            .then(response => response.json())
-            .then(data => {
-                // Thêm bình luận vào database thì sẽ gửi sang websocket
-                if (data.status === 'ok') {
-                    // Gửi comment tới websocket
-                    chatSocket.send(
-                        JSON.stringify({
-                            message: message,
-                            id_user: id_user,
-                            id_receiver: id_receiver,
-                        })
-                    );
-                }
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
         alert("Xoá thành công")
     } else {
         // Nếu người dùng không chấp nhận
@@ -342,6 +339,7 @@ $(document).ready(function () {
     $(".messages li").click(function () {
         var id = $(this).data("id");
         document.getElementById("id_receiver").value = id;
+        userToCall = id + "name";
         var dichUser = $(this).find("h3").text();
         document.getElementById("receiverName").innerText = dichUser;
         document.getElementById("nameHere").innerText = "Call to " + dichUser;
@@ -359,7 +357,7 @@ $(document).ready(function () {
                     var senter = tinNhanItem.senter;
                     var receiver = tinNhanItem.receiver;
 
-                    if (senter == id) {
+                    if (senter != id) {
                         $(".message .grid-message ").append(
                             '<div class ="col-message-sent"> <div class="message-sent"><p>' +
                             noidung +
@@ -414,7 +412,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 //     document.getElementById("id_receiver").value
                 // );
                 const id_receiver =id;
-
                 // Thêm comment vào database
                 fetch('/api/save_messenger', {
                     method: 'POST',
@@ -494,6 +491,7 @@ const baseURL = "/"
 let localVideo = document.querySelector('#localVideo');
 let remoteVideo = document.querySelector('#remoteVideo');
 
+let userToCall;
 let otherUser;
 let remoteRTCMessage;
 
@@ -506,7 +504,7 @@ let callInProgress = false;
 
 //event from html
 function call() {
-    let userToCall = document.getElementById("id_receiver").value + "name";
+    // let userToCall = document.getElementById("id_receiver").value + "name";
     otherUser = userToCall;
 
     beReady()

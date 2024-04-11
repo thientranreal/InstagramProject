@@ -227,7 +227,7 @@ def format_time_ago(timestamp):
 def messenger(request):
     # current_user = request.user.nguoidung
     current_user = request.user.nguoidung
-    lienlac = LienLac.objects.filter(Q(goc=current_user) | Q(dich=current_user))
+    lienlac = BanBe.objects.filter(Q(nguoidung1=current_user) | Q(nguoidung2=current_user))
     context = {'lienlac': lienlac,'current_user': current_user}
     return render(request, 'apps/messenger.html', context)
 
@@ -239,7 +239,7 @@ def load_mess(request, id):
         try:
             # item = YourModel.objects.get(id=id)
             tinnhan = TinNhan.objects.all()
-            # tinnhan = TinNhan.objects.filter(senter=id)
+            # tinnhan = TinNhan.objects.filter(Q(senter=id,receiver=User.id) | Q(senter=User.id, receiver=id))
 
             serialized_tinnhan = serializers.serialize('json', tinnhan)
             data = {
@@ -272,15 +272,14 @@ def save_messenger(request):
             senter=user,
             receiver=receiver,
             noidung=message,
-            thoigian=timezone.now()  # Sử dụng now() để lấy thời gian hiện tại
+            thoigian=timezone.now()  
         )
         tinnhan.save()
+        lienlac, created = BanBe.objects.get_or_create(Q(nguoidung1=user, nguoidung2=receiver) | Q(nguoidung1=receiver, nguoidung2=user))
 
-        # Cập nhật hoặc tạo LienLac tương ứng
-        lienlac= LienLac.objects.filter(goc=user, dich=receiver)
-        lienlac.update(lastmess=message,thoigiancuoi=timezone.now())
-        
-
+        lienlac.lastmess = message
+        lienlac.thoigiancuoi = timezone.now()
+        lienlac.save()
 
         return JsonResponse({'status': 'ok'})
 
@@ -302,7 +301,7 @@ def delete_contact(request):
     user = NguoiDung.objects.get(id=id_user)
     receiver = NguoiDung.objects.get(id=id_receiver)
 
-    lienlac = LienLac.objects.get_or_create(goc=user, dich=receiver)
+    lienlac = BanBe.objects.get_or_create(Q(nguoidung1=user, nguoidung2=receiver) | Q(nguoidung1=receiver, nguoidung2=user))
     lienlac.delete()
 
     return JsonResponse({'status': 'ok'})

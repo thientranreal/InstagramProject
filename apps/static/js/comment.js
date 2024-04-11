@@ -1,6 +1,7 @@
 import { csrftoken } from "./csrfToken.js";
 
 let username = document.getElementById("username").innerText;
+let notificationsBody = document.getElementById("notificationsBody");
 
 // Websocket comment
 let urlComment = `ws://${window.location.host}/ws/commment/`;
@@ -10,6 +11,7 @@ commentSocket.onmessage = function(e) {
     let data = JSON.parse(e.data);
     if (data.type === "comment") {
         let postElement = document.querySelector('.post[data-id="' + data.post_id + '"]');
+        let postOwner = postElement.querySelector('.username > a').innerText;
         let hienblElement = postElement.querySelector('.hienbl');
         let no_comment = document.querySelector('.no-comments');
 
@@ -17,13 +19,12 @@ commentSocket.onmessage = function(e) {
         if (no_comment.innerText === "View all comments"){
             let allDivs = Array.from(hienblElement.querySelectorAll('div')).slice(0,2);
             hienblElement.innerHTML = "";
-            hienblElement.innerHTML = "";
             for (let div of allDivs) {
                 hienblElement.innerHTML += div.outerHTML;
             }
         }
         // Thêm bình luận với vào bài đăng
-        hienblElement.insertAdjacentHTML('beforeend', `<div>
+        hienblElement.insertAdjacentHTML('afterbegin', `<div>
                                                             <img 
                                                                 src="${data.avatar}" 
                                                                 class="icons user-account rounded-circle" 
@@ -37,6 +38,44 @@ commentSocket.onmessage = function(e) {
                                                                 <i>${data.timestamp}</i>
                                                             </p>
                                                         </div>`);
+
+        // Nếu người gửi comment không phải là chủ bài đăng thì thêm thông báo cho chủ bài đăng
+        if (username === postOwner && data.username !== username) {
+            // Nội dung
+            let noidung = `<p>${data.username} just commented your post</p>`;
+            let notificationCount = document.getElementById("notification_count");
+
+            // Thêm thông báo có người comment bài viết
+            fetch('/add_notification', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Thêm CSRF token để Django chấp nhận yêu cầu
+                    'X-CSRFToken': csrftoken
+                },
+                body: JSON.stringify({
+                    noidung: noidung,
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Nếu thêm thành công thì sẽ hiện thông báo cho người dùng nếu là chủ bài đăng biết
+                if (data.status === 'ok') {
+                    // Tăng số lượng thông báo hiện có
+                    if (!notificationCount) {
+                        document.getElementById("notification_li").insertAdjacentHTML('afterbegin', '<span id="notification_count">1</span>');
+                    }
+                    else {
+                        notificationCount.innerHTML = parseInt(notificationCount.innerHTML) + 1;
+                    }
+                    // Thêm thông báo mới vào đầu
+                    notificationsBody.insertAdjacentHTML('afterbegin', noidung);
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        }
     }
 };
 

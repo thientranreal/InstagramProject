@@ -669,3 +669,19 @@ def getInfoProfile(request):
     if so_luong_baidang <=0:
         context ={'nguoi_dung': current_user,'danh_sach_baidang': danh_sach_baidang, 'so_luong_baidang': 0, 'edit':1, 'ngay_sinh_formatted': ngay_sinh_formatted}
     return render(request, 'apps/profile.html', context)
+
+def add_notification(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+
+        noidung = data.get('noidung')
+        thong_bao_moi = ThongBao.objects.create(nguoidung=request.user.nguoidung, noidung=noidung, is_read=False)
+        thong_bao_moi.save()
+        
+        return JsonResponse({'status': 'ok'})
+    
+def set_isread_notification(request):
+    if request.method == 'GET':
+        # người dùng hiện tại đọc hết tin nhắn
+        ThongBao.objects.filter(nguoidung__user=request.user).update(is_read=True)
+        return JsonResponse({'status': 'ok'})

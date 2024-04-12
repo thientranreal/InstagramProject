@@ -6,6 +6,8 @@ ws_urlpatterns=[
     # path("ws/chat/test/", GraphConsumer.as_asgi()),
     # re_path(r"ws/chat/(?P<chat_box_name>\w+)/", ChatConsumer.as_asgi()),
     re_path(r"ws/chat/", ChatConsumer.as_asgi()),
+    # re_path(r"ws/groupchat/<int:id>/", GroupChatConsumer.as_asgi()),
+    re_path(r"ws/groupchat/", GroupChatConsumer.as_asgi()),
     re_path(r'ws/notification/', NoftificationConsumer.as_asgi()),
     re_path(r'ws/commment/', CommentConsumer.as_asgi()),
     re_path(r'ws/addfriend/', AddFriendConsumer.as_asgi()),

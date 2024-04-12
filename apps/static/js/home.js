@@ -84,10 +84,10 @@ function loadUserLike(idPost) {
                 } else if (user.friendStatus === true) {
                     buttonHtml = `<button data-product="${user.user__username}" data-action="remove" class="btn btn-white border-dark remove-btn updatefriend">Unfriend</button>`;
                 } else if (user.friendStatus === "pending_sender") {
-                    buttonHtml = `<button data-product="${user.nguoidung2__user__username}" data-action="cancel" class="btn btn-white border-dark cancel-btn updatefriend">Cancel</button>`;
+                    buttonHtml = `<button data-product="${user.user__username}" data-action="cancel" class="btn btn-white border-dark cancel-btn updatefriend">Cancel</button>`;
                 } else if (user.friendStatus === "pending_receiver") {
-                    buttonHtml = `<button data-product="${user.nguoidung1__user__username}" data-action="accept" class="btn btn-primary me-3 pull-right accept-btn updatefriend">Accept</button>
-                                  <button data-product="${user.nguoidung1__user__username}" data-action="refuse" class="btn btn-white border-dark refuse-btn updatefriend">Refuse</button>`;
+                    buttonHtml = `<button data-product="${user.user__username}" data-action="accept" class="btn btn-primary me-3 pull-right accept-btn updatefriend">Accept</button>
+                                  <button data-product="${user.user__username}" data-action="refuse" class="btn btn-white border-dark refuse-btn updatefriend">Refuse</button>`;
                 }
                 load.innerHTML += `
                 <div class="nearby-user">
@@ -153,39 +153,20 @@ function updateUserOrder(element, userId, action) {
                 currentUser: username,
                 action: action,
             }));
-
+            
+            var buttonHtml;
             if (data.message === 'Friendship added successfully') {
-                var successMessage = document.createElement('p');
-                successMessage.textContent = 'Đã gửi lời mời';
-                element.parentNode.insertBefore(successMessage, element);
-                element.style.display = 'none';
-                // element.parentNode.removeChild(element);
-                
-            }else if(data.message === 'Friendship removed successfully'){
-                var successMessage = document.createElement('p');
-                successMessage.textContent = 'Đã xóa bạn bè';
-                element.parentNode.insertBefore(successMessage, element);
-                element.style.display = 'none';
-
-            }else if(data.message === 'Friendship cancel successfully'){
-                var successMessage = document.createElement('p');
-                successMessage.textContent = 'Đã hủy lời mời';
-                element.parentNode.insertBefore(successMessage, element);
-                element.style.display = 'none';
-                
-            }else if(data.message === 'Friendship accepted successfully'){
-                var successMessage = document.createElement('p');
-                successMessage.textContent = 'Đã trở thành bạn bè';
-                element.parentNode.insertBefore(successMessage, element);
-                element.style.display = 'none';
-
-            }else if(data.message === 'Friendship refuse successfully'){
-                var successMessage = document.createElement('p');
-                successMessage.textContent = 'Đã hủy lời mời kết bạn';
-                element.parentNode.insertBefore(successMessage, element);
-                element.style.display = 'none';
-
+                buttonHtml = `<button data-product="${userId}" data-action="cancel" class="btn btn-white border-dark cancel-btn updatefriend">Cancel</button>`;
+            } else if (data.message === 'Friendship removed successfully') {
+                buttonHtml = `<button data-product="${userId}" data-action="add" class="btn btn-primary pull-right add-btn updatefriend">Add friend</button>`;
+            } else if (data.message === 'Friendship cancel successfully') {
+                buttonHtml = `<button data-product="${userId}" data-action="add" class="btn btn-primary pull-right add-btn updatefriend">Add friend</button>`;
+            } else if (data.message === 'Friendship accepted successfully') {
+                buttonHtml = `<button data-product="${userId}" data-action="remove" class="btn btn-white border-dark remove-btn updatefriend">Unfriend</button>`;
+            } else if (data.message === 'Friendship refuse successfully') {
+                buttonHtml = `<button data-product="${userId}" data-action="add" class="btn btn-primary pull-right add-btn updatefriend">Add friend</button>`;
             }
+            element.outerHTML = buttonHtml;
         })
         .catch((error) => {
             console.error('Error:', error);

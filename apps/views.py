@@ -706,7 +706,6 @@ def loaduserlike(request):
     
     return JsonResponse({'error': 'Invalid request'})
 
-
 def comment_post(request):
     # Thêm comment vào bài đăng
     if request.method == 'POST':

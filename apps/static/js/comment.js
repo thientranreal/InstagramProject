@@ -176,20 +176,6 @@ document.querySelectorAll(".no-comments").forEach(function (commentElement) {
                                                             <i>${binhluan.timestamp}</i>
                                                         </p>
                                                 </div>`;
-                    console.log(`<div>
-                    <img 
-                        src="${binhluan.avatar}" 
-                        class="icons user-account rounded-circle" 
-                        alt="User Profile" 
-                        style="width: 27px; height: 27px;" />
-                        <p>
-                            <b>${binhluan.username}</b>
-                            <br />
-                            ${binhluan.noidungbl}
-                            <br />
-                            <i>${binhluan.timestamp}</i>
-                        </p>
-                </div>`)
                 }
             })
             .catch((error) => {

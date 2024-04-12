@@ -6,7 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
 from django.core import serializers
 from django.core.serializers import serialize
-from django.db.models import Max, Q, Prefetch
+from django.db.models import Max, Q, Prefetch, Count
 from datetime import *
 from django.shortcuts import redirect, get_object_or_404
 from django.http import *
@@ -378,41 +378,49 @@ def create_group(request):
 
 def friend(request):
     current_user = request.user.nguoidung
-
     if request.method == 'POST':
         data = json.loads(request.body)
         search_users = User.objects.filter(username__icontains=data['searchData'])
         if search_users.exists():
-            search_user_ids = [user.id for user in search_users] 
-            
+            search_user_ids = [user.nguoidung.id for user in search_users] 
+
             other_users = NguoiDung.objects.filter(id__in=search_user_ids).exclude(
                 Q(id=current_user.id) | 
                 Q(id__in=BanBe.objects.filter(nguoidung1_id=current_user.id).values_list('nguoidung2_id', flat=True)) | 
                 Q(id__in=BanBe.objects.filter(nguoidung2_id=current_user.id).values_list('nguoidung1_id', flat=True)) 
-            ).values('avatar', 'user__username', 'user__first_name', 'user__last_name', 'tong_luot_banbe')
+            )
             
-            sender_friend_ids = BanBe.objects.filter(nguoidung1_id=current_user.id, nguoidung2_id__in=search_user_ids, is_banbe=False).values('nguoidung2__avatar', 'nguoidung2__user__username', 'nguoidung2__user__first_name', 'nguoidung2__user__last_name', 'nguoidung2__tong_luot_banbe')
-            
-            receiver_friend_ids = BanBe.objects.filter(nguoidung2_id=current_user.id, nguoidung1_id__in=search_user_ids, is_banbe=False).values('nguoidung1__avatar', 'nguoidung1__user__username', 'nguoidung1__user__first_name', 'nguoidung1__user__last_name', 'nguoidung1__tong_luot_banbe')
-            
-            friend_ids = BanBe.objects.filter(Q(nguoidung1_id=current_user.id, nguoidung2_id__in=search_user_ids) | Q(nguoidung2_id=current_user.id, nguoidung1_id__in=search_user_ids), is_banbe=True).values_list('nguoidung1_id', 'nguoidung2_id')
+            sender_friend_ids = BanBe.objects.filter(
+                nguoidung1_id=current_user.id, 
+                nguoidung2_id__in=search_user_ids, 
+                is_banbe=False
+            )
+
+            receiver_friend_ids = BanBe.objects.filter(
+                nguoidung2_id=current_user.id, 
+                nguoidung1_id__in=search_user_ids, 
+                is_banbe=False
+            )
+
+            friend_ids = BanBe.objects.filter(
+                Q(nguoidung1_id=current_user.id, nguoidung2_id__in=search_user_ids) | 
+                Q(nguoidung2_id=current_user.id, nguoidung1_id__in=search_user_ids), 
+                is_banbe=True
+            )
             all_friend_ids = set()
             for friend in friend_ids:
-                all_friend_ids.add(friend[0])
-                all_friend_ids.add(friend[1])
+                all_friend_ids.add(friend.nguoidung1_id)
+                all_friend_ids.add(friend.nguoidung2_id)
             all_friend_ids.discard(current_user.id)
             
-            friends = NguoiDung.objects.filter(id__in=all_friend_ids).values('avatar', 'user__username', 'user__first_name', 'user__last_name', 'tong_luot_banbe')
+            friends = NguoiDung.objects.filter(id__in=all_friend_ids)
             
-            other_users_data = list(other_users)
-            sender_friend_ids_data = list(sender_friend_ids)
-            receiver_friend_ids_data = list(receiver_friend_ids)
-            friends_data = list(friends)
-
-            return JsonResponse({'other_users': other_users_data, 
-                                'sender_friend_ids': sender_friend_ids_data, 
-                                'receiver_friend_ids': receiver_friend_ids_data, 
-                                'friends': friends_data})
+            return JsonResponse({
+                'other_users': list(other_users.values('avatar', 'user__username', 'user__first_name', 'user__last_name')), 
+                'sender_friend_ids': list(sender_friend_ids.values('nguoidung2__avatar', 'nguoidung2__user__username', 'nguoidung2__user__first_name', 'nguoidung2__user__last_name')), 
+                'receiver_friend_ids': list(receiver_friend_ids.values('nguoidung1__avatar', 'nguoidung1__user__username', 'nguoidung1__user__first_name', 'nguoidung1__user__last_name')), 
+                'friends': list(friends.values('avatar', 'user__username', 'user__first_name', 'user__last_name'))
+            })
     else:
         # Sử dụng truy vấn mặc định khi không có yêu cầu POST
         other_users = NguoiDung.objects.exclude(
@@ -460,7 +468,7 @@ def updatefriend(request):
         elif action == 'cancel':
             friendship = BanBe.objects.get(nguoidung1=nguoidung1, nguoidung2=nguoidung2)
             friendship.delete()
-            return JsonResponse({'message': 'Friendship removed successfully'}, status=200)
+            return JsonResponse({'message': 'Friendship cancel successfully'}, status=200)
         elif action == 'accept':
             friendship = BanBe.objects.get(nguoidung1=nguoidung2, nguoidung2=nguoidung1)
             friendship.is_banbe = True
@@ -470,7 +478,7 @@ def updatefriend(request):
         elif action == 'refuse':
             friendship = BanBe.objects.get(nguoidung1=nguoidung2, nguoidung2=nguoidung1)
             friendship.delete()
-            return JsonResponse({'message': 'Friendship removed successfully'}, status=200)
+            return JsonResponse({'message': 'Friendship refuse successfully'}, status=200)
         else:
             return JsonResponse({'error': 'Invalid action'}, status=400)
 
@@ -634,7 +642,6 @@ def load_comment(request, id):
         return JsonResponse({'error': 'Comments not found'}, status=404)
 
 def updatelike(request):
-    print("aaaaa")
     if request.method == 'POST':
         nguoidung = request.user.nguoidung
         data = json.loads(request.body)
@@ -661,6 +668,44 @@ def updatelike(request):
 
     # Trả về lỗi nếu yêu cầu không phải là POST
     return JsonResponse({'error': 'Invalid request method'}, status=405)
+
+def loaduserlike(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        id_post = data.get('idPost')
+        current_user_id = request.user.nguoidung.id
+        like_users_info = NguoiDung.objects.filter(likebaidang__baidang__id=id_post).values(
+            'id', 'avatar', 'user__username', 'user__first_name', 'user__last_name')
+        
+        # Xét trạng thái bạn bè của các người dùng đã thích bài đăng
+        for user_info in like_users_info:
+            is_friend = False
+            user_id = user_info['id']
+            
+            # Kiểm tra xem người dùng có phải là người dùng hiện tại không
+            if user_id == current_user_id:
+                is_friend = "self"
+            
+            # Kiểm tra nếu là bạn bè
+            if BanBe.objects.filter(Q(nguoidung1_id=current_user_id, nguoidung2_id=user_id, is_banbe=True) |
+                                     Q(nguoidung1_id=user_id, nguoidung2_id=current_user_id, is_banbe=True)).exists():
+                is_friend = True
+            
+            # Kiểm tra nếu người dùng đã gửi lời mời kết bạn
+            elif BanBe.objects.filter(nguoidung1_id=current_user_id, nguoidung2_id=user_id, is_banbe=False).exists():
+                is_friend = "pending_sender"
+            
+            # Kiểm tra nếu người dùng đã nhận lời mời kết bạn
+            elif BanBe.objects.filter(nguoidung1_id=user_id, nguoidung2_id=current_user_id, is_banbe=False).exists():
+                is_friend = "pending_receiver"
+            
+            # Lưu trạng thái bạn bè vào thông tin người dùng
+            user_info['friendStatus'] = is_friend
+        
+        return JsonResponse({'likeUsers': list(like_users_info)})
+    
+    return JsonResponse({'error': 'Invalid request'})
+
 
 def comment_post(request):
     # Thêm comment vào bài đăng

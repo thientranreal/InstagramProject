@@ -32,38 +32,62 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 "id_receiver": id_receiver,
             },
         )
-        
-    # Receive message from room group.
-    # async def chatbox_message(self, event):
-    #     message = event["message"]
-    #     id_user = event["id_user"]
-    #     id_receiver = event["id_receiver"]
-    #     #send message and username of senter to websocket
-    #     await self.send(
-    #         text_data=json.dumps(
-    #             {
-    #                 "message": message,
-    #                 "id_user": id_user,
-    #                 "id_receiver": id_receiver,
-    #             }
-    #         )
-    #     )
-    # pass
     async def chatbox_message(self, event):
         message = event["message"]
         id_receiver = event["id_receiver"]
         id_user = event["id_user"]
         # Check if the message is meant for this consumer
-        if id_receiver == self.scope["user"].id:
-            await self.send(
-                text_data=json.dumps(
-                    {
-                        "message": message,
-                        "id_user": id_user,
-                        "id_receiver": id_receiver,
-                    }
-                )
+        # if id_receiver == self.scope["user"].id:
+        await self.send(
+            text_data=json.dumps(
+                {
+                    "message": message,
+                    "id_user": id_user,
+                    "id_receiver": id_receiver,
+                }
             )
+        )
+
+class GroupChatConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        # self.chat_box_name = self.scope["url_route"]["kwargs"]["id"]
+        # self.group_name = "groupchat"+self.chat_box_name
+        self.group_name = "groupchat"
+        await self.channel_layer.group_add(self.group_name, self.channel_name)
+        await self.accept()
+
+    async def disconnect(self, close_code):
+        await self.channel_layer.group_discard(self.group_name, self.channel_name)
+    # This function receive messages from WebSocket.
+    async def receive(self, text_data):
+        text_data_json = json.loads(text_data)
+        message = text_data_json["message"]
+        id_user = text_data_json["id_user"]
+        user_name =text_data_json["user_name"]
+        await self.channel_layer.group_send(
+            self.group_name,
+            {
+                "type": "chatbox_message",
+                "message": message,
+                "id_user": id_user,
+                "user_name": user_name,
+            },
+        )
+    async def chatbox_message(self, event):
+        message = event["message"]
+        user_name = event["user_name"]
+        id_user = event["id_user"]
+        # Check if the message is meant for this consumer
+        # if id_receiver == self.scope["user"].id:
+        await self.send(
+            text_data=json.dumps(
+                {
+                    "message": message,
+                    "id_user": id_user,
+                    "user_name": user_name,
+                }
+            )
+        )
 
 
 class NoftificationConsumer(AsyncWebsocketConsumer):

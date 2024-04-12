@@ -228,7 +228,12 @@ def messenger(request):
     # current_user = request.user.nguoidung
     current_user = request.user.nguoidung
     lienlac = BanBe.objects.filter(Q(nguoidung1=current_user) | Q(nguoidung2=current_user))
-    context = {'lienlac': lienlac,'current_user': current_user}
+    
+    admin_groups = Nhom.objects.filter(admin=current_user)
+    member_groups = Nhom.objects.filter(nguoidung=current_user)
+    
+    nhoms = (admin_groups | member_groups).distinct()
+    context = {'lienlac': lienlac,'current_user': current_user,'nhoms':nhoms}
     return render(request, 'apps/messenger.html', context)
 
 def is_ajax(request):
@@ -238,8 +243,8 @@ def load_mess(request, id):
     # if request.method == 'GET' and is_ajax(request=request):
         try:
             # item = YourModel.objects.get(id=id)
-            tinnhan = TinNhan.objects.all()
-            # tinnhan = TinNhan.objects.filter(Q(senter=id,receiver=User.id) | Q(senter=User.id, receiver=id))
+            # tinnhan = TinNhan.objects.all()
+            tinnhan = TinNhan.objects.filter(Q(senter=id,receiver=request.user.id) | Q(senter=request.user.id, receiver=id))
 
             serialized_tinnhan = serializers.serialize('json', tinnhan)
             data = {
@@ -249,12 +254,24 @@ def load_mess(request, id):
             return JsonResponse(data)
         except TinNhan.DoesNotExist:
             return JsonResponse({'error': 'Item not found'}, status=404)
+
+def load_mess_group(request, id):
+    # if request.method == 'GET' and is_ajax(request=request):
+        try:            
+            nhom = Nhom.objects.get(id=id)
+            tinnhan = TinNhanNhom.objects.filter(nhom=nhom).select_related('sender')
+                
+            serialized_tinnhan = serializers.serialize('json', tinnhan)
+            data = {
+                'tinnhan':serialized_tinnhan,
+                'id':id
+            }
+            
+            return JsonResponse(data)
+        except TinNhan.DoesNotExist:
+            return JsonResponse({'error': 'Item not found'}, status=404)
     # else:
     #     return JsonResponse({'error': 'Invalid request'}, status=400)
-
-def chat_box(request, chat_box_name):
-    # we will get the chatbox name from the url
-    return render(request, 'apps/chatbox.html', {'chat_box_name': chat_box_name})
 
 def save_messenger(request):
     # Thêm comment vào bài đăng
@@ -275,11 +292,41 @@ def save_messenger(request):
             thoigian=timezone.now()  
         )
         tinnhan.save()
-        lienlac, created = BanBe.objects.get_or_create(Q(nguoidung1=user, nguoidung2=receiver) | Q(nguoidung1=receiver, nguoidung2=user))
+        
+        # lienlac, created = BanBe.objects.get_or_create(Q(nguoidung1=user, nguoidung2=receiver) | Q(nguoidung1=receiver, nguoidung2=user))
+        # lienlac.lastmess = message
+        # lienlac.thoigiancuoi = timezone.now()
+        # lienlac.save()
 
-        lienlac.lastmess = message
-        lienlac.thoigiancuoi = timezone.now()
-        lienlac.save()
+        return JsonResponse({'status': 'ok'})
+    
+def save_messenger_group(request):
+    # Thêm comment vào bài đăng
+    if request.method == 'POST':
+        # Lấy giá trị gửi từ client
+        data = json.loads(request.body)
+        message = data.get('message') 
+        id_user = data.get('id_user') 
+        # id_receiver = data.get('id_receiver') 
+        id_nhom = data.get('id_nhom')
+        # k can user_name
+        
+        user = NguoiDung.objects.get(id=id_user)
+        nhom = Nhom.objects.get(id=id_nhom)
+        # receiver = NguoiDung.objects.get(id=id_receiver)
+
+        tinnhannhom = TinNhanNhom.objects.create(
+            nhom=nhom,
+            sender=user,
+            noidung=message,
+            thoigian=timezone.now()  
+        )
+        tinnhannhom.save()
+        
+        # lienlac, created = BanBe.objects.get_or_create(Q(nguoidung1=user, nguoidung2=receiver) | Q(nguoidung1=receiver, nguoidung2=user))
+        # lienlac.lastmess = message
+        # lienlac.thoigiancuoi = timezone.now()
+        # lienlac.save()
 
         return JsonResponse({'status': 'ok'})
 
@@ -305,6 +352,29 @@ def delete_contact(request):
     lienlac.delete()
 
     return JsonResponse({'status': 'ok'})
+
+def create_group(request):
+    if request.method == 'POST':
+        tennhom = request.POST.get('tennhom')
+        tennhom = request.POST.get('tennhom')
+        selectedmembers = request.POST.getlist('danhsach')
+        selected_members_ids = '2,3'
+        selected_members_ids_list = selected_members_ids.split(',')
+
+        # Lấy người dùng hiện tại
+        current_user = request.user.nguoidung
+
+        # Tạo nhóm mới
+        new_group = Nhom.objects.create(name=tennhom, admin=current_user)
+        
+        for i in selected_members_ids_list:
+            selected_members = NguoiDung.objects.filter(id=i)
+            new_group.nguoidung.add(*selected_members)        
+        # Lưu lại nhóm
+        new_group.save()
+           
+
+    return redirect('messenger')
 
 def friend(request):
     current_user = request.user.nguoidung

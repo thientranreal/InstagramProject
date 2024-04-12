@@ -66,7 +66,17 @@
           <div class="right">
             <div class="username">
               <div class="settings">
-                <img class="dlt_btn" src="{% static 'assets/images/delete.png' %}" onclick="confirmDelete()" style="height:30px; width:30px; margin-top: 20px;"/>
+                <img class="cra-chatroom" id="openFormBtn" src="{% static 'assets/images/create-chatroom.png' %}" style="height:30px; width:30px; margin-top: 20px; "/>
+                <style>
+                  .cra-chatroom {
+                    transition: transform 0.3s ease; /* Tạo hiệu ứng chuyển đổi mềm mại */
+                }
+
+                  .cra-chatroom:hover {
+                      transform: scale(0.9); /* Thu nhỏ hình ảnh khi di chuột qua */
+                  }
+                </style>
+                <img class="dlt_btn" src="{% static 'assets/images/delete.png' %}" onclick="confirmDelete()" style="height:30px; width:30px; margin-top: 20px; margin-left: 20px;"/>
                 <style>
                   .dlt_btn {
                     transition: transform 0.3s ease; /* Tạo hiệu ứng chuyển đổi mềm mại */
@@ -95,7 +105,7 @@
               {% for ll in lienlac %}
               <!-- <li data-id="{{ ll.dich.id }}"> -->
                 {% if ll.nguoidung1.id != current_user.id %}
-                  <li data-id="{{ ll.nguoidung1.id }}">
+                  <li data-id="{{ ll.nguoidung1.id }}" data-nhom="ko"> 
                     <div class="avatar">
                       <div class="avatar-image">
                         <div class="status online"></div>
@@ -104,8 +114,9 @@
                     </div>
                     <h3>{{ ll.nguoidung1.user }}</h3>
                     <p>{{ ll.lastmess }}</p>
+                  </li>
                 {% else %}
-                  <li data-id="{{ ll.nguoidung2.id }}">
+                  <li data-id="{{ ll.nguoidung2.id }}" data-nhom="ko">
                     <div class="avatar">
                       <div class="avatar-image">
                         <div class="status online"></div>
@@ -114,8 +125,21 @@
                     </div>
                     <h3>{{ ll.nguoidung2.user }}</h3>
                     <p>{{ ll.lastmess }}</p>
+                  </li>
                 {% endif %}
-              </li>
+              
+              {% endfor %}
+              {% for n in nhoms %}
+                <li data-id="{{ n.id }}" data-nhom="co">
+                  <div class="avatar">
+                    <div class="avatar-image">
+                      <div class="status online"></div>
+                      <img src="/static/assets/images/group.png" alt="">
+                    </div>
+                  </div>
+                  <h3>{{ n.name }}</h3>
+                  <p>{{ n.lasstmess }}</p>
+                </li>
               {% endfor %}
             </div>
           </div>
@@ -143,7 +167,7 @@
 
         <div class="col-right"  style="text-align: center;">
           <!-- to display current login user information  -->
-          <div id="userInfo">
+          <div id="userInfo" style="text-align: center;">
             <div
               style="
                 display: flex;
@@ -241,23 +265,15 @@
           <br />
   
           <!-- to show local and remote video -->
-          <div id="videos">
-            <div
-              style="
-                position: absolute;
-                top: 0;
-                right: 0;
-                padding-right: 20px;
-                padding-top: 20px;
-              "
-            >
+          <div id="videos" style="text-align: center;">
+            <div>
               <video
-                width="100px"
+                width="500px"
                 id="localVideo"
                 autoplay
-                muted
                 playsinline
               ></video>
+
             </div>
             <div id="remoteVideoDiv">
               <video
@@ -270,7 +286,7 @@
           </div>
           <!-- <div style="flex-grow: 1"></div> -->
 
-          <div id="controls">
+          <div id="controls" style="text-align: center;">
             <button id="muteButton">Mute</button>
             <button id="videoButton">Stop Video</button>
           </div>
@@ -282,9 +298,40 @@
         <!-- nơi chứa id người nhận -->
         <input type="text" hidden id="id_receiver" />
     <!-- </div> -->
+    <div class="form-popup" id="myForm">
+      <form class="form-container" method="POST" id="formcreate"  action="{% url 'create_group' %}">
+        {% csrf_token %}
+        <h1>Tạo nhóm chat</h1>
     
+        <label for="tennhom"><b>Tên nhóm chat</b></label>
+        <input type="text" placeholder="Nhập tên nhóm chat" name="tennhom" id="tennhom" required>
+    
+        <!-- <label for="psw"><b>Thêm thành viên</b></label>
+        <input type="password" placeholder="Enter Password" name="psw" required> -->
+        <div class="dropdown">
+          <button class="dropbtn" disabled>Chọn thành viên</button>
+          <div class="dropdown-content">
+            {% for ll in lienlac %}
+            <!-- <li data-id="{{ ll.dich.id }}"> -->
+              {% if ll.nguoidung1.id != current_user.id %}
+                <a href="#" onclick="toggleMember('{{ ll.nguoidung1.id }}')"><img src="media/{{ ll.nguoidung1.avatar }}" alt=""> {{ ll.nguoidung1.user }}</a>
+              {% else %}
+              <a href="#" onclick="toggleMember('{{ ll.nguoidung2.id }}')"><img src="media/{{ ll.nguoidung1.avatar }}" alt="">{{ ll.nguoidung2.user }}</a>
+              {% endif %}
+            </li>
+            {% endfor %}
+          </div>
+        </div>
+        <input type="text" name="danhsach" id="danhsach" multiple hidden>
+        <p style="margin-top: 10px;">Danh sách thành viên thành viên: (Chọn để xoá) </p>
+        <ul id="selectedMembers" name="selectedMembers">          
+        </ul>
+        <button type="submit" class="btn" id="submitFormButton" >Tạo</button>
+        <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+      </form>
+    </div>
     </main>
-    <!-- <script src="{% static 'js/messenger.js'%}"></script> -->
+    <script src="{% static 'js/messenger.js'%}"></script>
   </body>
 </html>
 
@@ -329,8 +376,6 @@ function confirmDelete() {
 }
 </script>
 
-
-
 <script>
 const id_user = JSON.parse(
     document.getElementById("id_user").textContent
@@ -338,45 +383,84 @@ const id_user = JSON.parse(
 $(document).ready(function () {
     $(".messages li").click(function () {
         var id = $(this).data("id");
-        document.getElementById("id_receiver").value = id;
-        userToCall = id + "name";
-        var dichUser = $(this).find("h3").text();
-        document.getElementById("receiverName").innerText = dichUser;
-        document.getElementById("nameHere").innerText = "Call to " + dichUser;
-        document.getElementById("call").style.display = "block";
-        $.ajax({
-            type: "GET",
-            url: "/messengerajax/" + id + "/",
-            success: function (response) {
-                // console.log(response);
-                $(".message .grid-message ").empty();
-                var tinnhan = JSON.parse(response.tinnhan);
-                for (var i = 0; i < tinnhan.length; i++) {
-                    var tinNhanItem = tinnhan[i].fields;
-                    var noidung = tinNhanItem.noidung;
-                    var senter = tinNhanItem.senter;
-                    var receiver = tinNhanItem.receiver;
-
-                    if (senter != id) {
-                        $(".message .grid-message ").append(
-                            '<div class ="col-message-sent"> <div class="message-sent"><p>' +
-                            noidung +
-                            "</p></div></div>"
-                        );
-                    } else {
-                        document.getElementById("id_receiver").value = receiver;
-                        $(".message .grid-message ").append(
-                            '<div class ="col-message-received"><div class="message-received"><p>' +
-                            noidung +
-                            "</p></div></div>"
-                        );
+        var is_nhom = $(this).data("nhom");
+        if (is_nhom == "co") {
+            document.getElementById("id_receiver").value = id;
+            userToCall = id + "name";
+            var dichUser = $(this).find("h3").text();
+            document.getElementById("receiverName").innerText = dichUser;
+            document.getElementById("nameHere").innerText = "Call to " + dichUser;
+            document.getElementById("call").style.display = "block";
+            $.ajax({
+                type: "GET",
+                url: "/groupmessengerajax/" + id + "/",
+                success: function (response) {
+                    $(".message .grid-message ").empty();
+                    var tinnhan = JSON.parse(response.tinnhan);
+                    for (var i = 0; i < tinnhan.length; i++) {
+                        var tinNhanItem = tinnhan[i].fields;
+                        var noidung = tinNhanItem.noidung
+                        var sender=tinNhanItem.sender
+                        if (sender == id_user) {
+                            $(".message .grid-message ").append(
+                                '<div class ="col-message-sent"> <div class="message-sent"><p>' +
+                                noidung +
+                                "</p></div></div>"
+                            );
+                        } else {
+                            $(".message .grid-message ").append(
+                                '<div class ="col-message-received"><div class="message-received"><p>' + sender + ": " +
+                                noidung +
+                                "</p></div></div>"
+                            );
+                        }
                     }
-                }
-            },
-            error: function (xhr, status, error) {
-                console.error(error);
-            },
-        });
+                },
+                error: function (xhr, status, error) {
+                    console.error(error);
+                },
+            });
+        } else {
+            document.getElementById("id_receiver").value = id;
+            userToCall = id + "name";
+            var dichUser = $(this).find("h3").text();
+            document.getElementById("receiverName").innerText = dichUser;
+            document.getElementById("nameHere").innerText = "Call to " + dichUser;
+            document.getElementById("call").style.display = "block";
+            $.ajax({
+                type: "GET",
+                url: "/messengerajax/" + id + "/",
+                success: function (response) {
+                    // console.log(response);
+                    $(".message .grid-message ").empty();
+                    var tinnhan = JSON.parse(response.tinnhan);
+                    for (var i = 0; i < tinnhan.length; i++) {
+                        var tinNhanItem = tinnhan[i].fields;
+                        var noidung = tinNhanItem.noidung;
+                        var senter = tinNhanItem.senter;
+                        var receiver = tinNhanItem.receiver;
+
+                        if (senter != id) {
+                            $(".message .grid-message ").append(
+                                '<div class ="col-message-sent"> <div class="message-sent"><p>' +
+                                noidung +
+                                "</p></div></div>"
+                            );
+                        } else {
+                            document.getElementById("id_receiver").value = receiver;
+                            $(".message .grid-message ").append(
+                                '<div class ="col-message-received"><div class="message-received"><p>' +
+                                noidung +
+                                "</p></div></div>"
+                            );
+                        }
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error(error);
+                },
+            });
+        }
     });
 });
 
@@ -388,70 +472,137 @@ document.addEventListener("DOMContentLoaded", function () {
     listItems.forEach(function (item) {
         item.addEventListener("click", function () {
             var id = this.getAttribute("data-id");
-            const chatSocket = new WebSocket(
-                "ws://" + window.location.host + "/ws/chat/"
-            );
+            var is_nhom = this.getAttribute("data-nhom");
+            const user_name = JSON.parse( document.getElementById("user_name").textContent)
+            if (is_nhom == "co") {
+                const groupchatSocket = new WebSocket(
+                    // "ws://" + window.location.host + "/ws/groupchat/"+id+"/"
+                    "ws://" + window.location.host + "/ws/groupchat/"
 
-            chatSocket.onmessage = function (e) {
-                const data = JSON.parse(e.data);
-                // alert(data.id_receiver+ "nhan " + data.id_user + "gui"+ id + "Hien tai");
-                if (data.id_user == id) {
-                    $(".message .grid-message ").append(
-                        '<div class ="col-message-received"><div class="message-received"><p>' +
-                        data.message +
-                        "</p></div></div>"
-                    );
-                }
-            };
-            document.querySelector("#send").onclick = function (e) {
-                // if (e.target.classList.contains("active")) {
-                const messageInputDom = document.querySelector("#input");
-                const message = messageInputDom.value;
+                );
 
-                // const id_receiver = JSON.parse(
-                //     document.getElementById("id_receiver").value
-                // );
-                const id_receiver =id;
-                // Thêm comment vào database
-                fetch('/api/save_messenger', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        // Thêm CSRF token để Django chấp nhận yêu cầu
-                        'X-CSRFToken': csrftoken
-                    },
-                    body: JSON.stringify({
-                        message: message,
-                        id_user: id_user,
-                        id_receiver: id_receiver,
+                groupchatSocket.onmessage = function (e) {
+                    const data = JSON.parse(e.data);
+                    if (data.id_user =! id_user) {
+                        $(".message .grid-message ").append(
+                            '<div class ="col-message-received"><div class="message-received"><p>' +user_name + ": " +
+                            data.message +
+                            "</p></div></div>"
+                        );
+                    }
+                };
+                document.querySelector("#send").onclick = function (e) {
+                    // if (e.target.classList.contains("active")) {
+                    const messageInputDom = document.querySelector("#input");
+                    const message = messageInputDom.value;
+                    // Thêm comment vào database
+                    fetch('/api/save_messenger_group', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            // Thêm CSRF token để Django chấp nhận yêu cầu
+                            'X-CSRFToken': csrftoken
+                        },
+                        body: JSON.stringify({
+                            id_nhom : id,
+                            message: message,
+                            id_user: id_user,
+                            user_name:user_name,
+                        })
                     })
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        // Thêm bình luận vào database thì sẽ gửi sang websocket
-                        if (data.status === 'ok') {
-                            // Gửi comment tới websocket
-                            chatSocket.send(
-                                JSON.stringify({
-                                    message: message,
-                                    id_user: id_user,
-                                    id_receiver: id_receiver,
-                                })
-                            );
-                            messageInputDom.value = "";
-                            $(".message .grid-message ").append(
-                                '<div class ="col-message-sent"> <div class="message-sent"><p>' +
-                                message +
-                                "</p></div></div>"
-                            );
-                        }
-                    })
-                    .catch((error) => {
-                        console.error('Error:', error);
-                    });
-                // }
+                        .then(response => response.json())
+                        .then(data => {
+                            // Thêm bình luận vào database thì sẽ gửi sang websocket
+                            if (data.status === 'ok') {
+                                // Gửi comment tới websocket
+                                groupchatSocket.send(
+                                    JSON.stringify({
+                                        id_nhom :id,
+                                        message: message,
+                                        id_user: id_user,
+                                        user_name: user_name,
+                                    })
+                                );
+                                messageInputDom.value = "";
+                                $(".message .grid-message ").append(
+                                    '<div class ="col-message-sent"> <div class="message-sent"><p>' +
+                                    message +
+                                    "</p></div></div>"
+                                );
+                            }
+                        })
+                        .catch((error) => {
+                            console.error('Error:', error);
+                        });
+                    // }
 
-            };
+                };
+            } 
+            else {
+                const chatSocket = new WebSocket(
+                    "ws://" + window.location.host + "/ws/chat/"
+                );
+
+                chatSocket.onmessage = function (e) {
+                    const data = JSON.parse(e.data);
+                    if (data.id_receiver == id_user) {
+                        $(".message .grid-message ").append(
+                            '<div class ="col-message-received"><div class="message-received"><p>' +
+                            data.message +
+                            "</p></div></div>"
+                        );
+                    }
+                };
+                document.querySelector("#send").onclick = function (e) {
+                    // if (e.target.classList.contains("active")) {
+                    const messageInputDom = document.querySelector("#input");
+                    const message = messageInputDom.value;
+
+                    // const id_receiver = JSON.parse(
+                    //     document.getElementById("id_receiver").value
+                    // );
+                    const id_receiver = id;
+                    // Thêm comment vào database
+                    fetch('/api/save_messenger', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            // Thêm CSRF token để Django chấp nhận yêu cầu
+                            'X-CSRFToken': csrftoken
+                        },
+                        body: JSON.stringify({
+                            message: message,
+                            id_user: id_user,
+                            id_receiver: id_receiver,
+                        })
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            // Thêm bình luận vào database thì sẽ gửi sang websocket
+                            if (data.status === 'ok') {
+                                // Gửi comment tới websocket
+                                chatSocket.send(
+                                    JSON.stringify({
+                                        message: message,
+                                        id_user: id_user,
+                                        id_receiver: id_receiver,
+                                    })
+                                );
+                                messageInputDom.value = "";
+                                $(".message .grid-message ").append(
+                                    '<div class ="col-message-sent"> <div class="message-sent"><p>' +
+                                    message +
+                                    "</p></div></div>"
+                                );
+                            }
+                        })
+                        .catch((error) => {
+                            console.error('Error:', error);
+                        });
+
+                };
+            }
+
 
         });
     });

@@ -244,7 +244,7 @@ def load_mess(request, id):
         try:
             # item = YourModel.objects.get(id=id)
             # tinnhan = TinNhan.objects.all()
-            tinnhan = TinNhan.objects.filter(Q(senter=id,receiver=request.user.id) | Q(senter=request.user.id, receiver=id))
+            tinnhan = TinNhan.objects.filter(Q(senter=id,receiver=request.user.id) | Q(senter=request.user.id, receiver=id)).order_by('thoigian')
 
             serialized_tinnhan = serializers.serialize('json', tinnhan)
             data = {
@@ -259,7 +259,7 @@ def load_mess_group(request, id):
     # if request.method == 'GET' and is_ajax(request=request):
         try:            
             nhom = Nhom.objects.get(id=id)
-            tinnhan = TinNhanNhom.objects.filter(nhom=nhom).select_related('sender')
+            tinnhan = TinNhanNhom.objects.filter(nhom=nhom).select_related('sender').order_by('thoigian')
                 
             serialized_tinnhan = serializers.serialize('json', tinnhan)
             data = {

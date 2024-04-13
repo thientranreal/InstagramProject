@@ -1,7 +1,28 @@
+///////////--------Phần thông báo tin nhắn mới---------////////////////////
+function showPopup(sender, message) {
+    var popup = document.getElementById("popup");
+    var senderElement = document.getElementById("sender");
+    var messageElement = document.getElementById("message");
 
+    senderElement.textContent = sender;
+    messageElement.textContent = message;
+
+    popup.classList.add("show");
+    setTimeout(function () {
+        popup.classList.remove("show");
+    }, 5000);
+}
+
+function closePopup() {
+    var popup = document.getElementById("popup");
+    popup.classList.remove("show");
+}
+
+///////////--------Hết phần thông báo tin nhắn mới---------////////////////////
+
+
+///////////--------Phần tạo nhóm mới---------////////////////////
 var selectedMembers = {};
-var tennhom = document.getElementById("tennhom").value;
-
 function toggleMember(member) {
     if (selectedMembers[member]) {
         // Member already selected, remove from list
@@ -35,5 +56,47 @@ function closeForm() {
 
 document.getElementById("openFormBtn").addEventListener("click", openForm);
 
-//xoa doan chat
+///////////--------Hết phần tạo nhóm mới---------////////////////////
+
+///////////-------- phần xử lý xoá liên lạc---------////////////////////
+
+function confirmDelete() {
+    let ten = document.getElementById("receiverName").value;
+    if (confirm("Bạn có muốn xoá liên lạc với " + ten + " không?")) {
+        id_senter = id_user
+        id_receiver = document.getElementById("id_recceiver").value;
+
+
+        // const id_receiver = JSON.parse(
+        //     document.getElementById("id_receiver").value
+        // );
+
+        // Thêm comment vào database
+        fetch('/delete-contact/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                // Thêm CSRF token để Django chấp nhận yêu cầu
+                'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify({
+                message: message,
+                id_user: id_user,
+                id_receiver: id_receiver,
+            })
+        })
+        alert("Xoá thành công")
+    } else {
+        // Nếu người dùng không chấp nhận
+    }
+}
+
+///////////-------- hết phần xử lý xoá liên lạc---------////////////////////
+
+
+
+
+
+
+// để lấy thuộc tính id -->
 

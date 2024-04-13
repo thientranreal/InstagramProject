@@ -5,23 +5,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     {% load static %}
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="{% static 'messenger/css/style.css' %}"
-    />
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="{% static 'messenger/css/normalize.css' %}"
-    />
+    <link rel="stylesheet" type="text/css"  href="{% static 'messenger/css/style.css' %}" />
+    <link  rel="stylesheet"  type="text/css" href="{% static 'css/messenger.css' %}"  />
+    <link  rel="stylesheet" type="text/css"  href="{% static 'messenger/css/normalize.css' %}" />
 
     <title>Messenger</title>
-    <link
-      rel="icon"
-      type="image/x-icon"
-      href="{% static 'image/logomess.png' %}"
-    />
+    <link rel="icon" type="image/x-icon"  href="{% static 'image/logomess.png' %}" />
     <script type="text/javascript">
       var user = "{{request.user}}";
       function getCookie(name) {
@@ -66,36 +55,28 @@
           <div class="right">
             <div class="username">
               <div class="settings">
-                <img class="dlt_btn" src="{% static 'assets/images/delete.png' %}" onclick="confirmDelete()" style="height:30px; width:30px; margin-top: 20px;"/>
-                <style>
-                  .dlt_btn {
-                    transition: transform 0.3s ease; /* Tạo hiệu ứng chuyển đổi mềm mại */
-                }
-
-                .dlt_btn:hover {
-                    transform: scale(0.9); /* Thu nhỏ hình ảnh khi di chuột qua */
-                }
-                </style>
+                <a href="{% url 'home' %}"><img class="right-icon" src="{% static 'assets/images/home.png' %}" style="height:30px; width:30px; margin-top: 20px; "/></a>
+                <img class="right-icon" id="openFormBtn" src="{% static 'assets/images/create-chatroom.png' %}" style="height:30px; width:30px; margin-top: 20px; margin-left: 20px;"/>
+                <img class="right-icon" src="{% static 'assets/images/delete.png' %}" onclick="confirmDelete()" style="height:30px; width:30px; margin-top: 20px; margin-left: 20px;"/>
               </div>
               {{current_user.user}}
             </div>
 
             <div class="avatar">
-              <!-- <img src="{% static 'messenger/img/avatar.png' %}" /> -->
               <img src="media/{{ current_user.avatar }}" alt="" />
             </div>
           </div>
         </div>
       </header>
 
-      <main style="height: 90%">
+    <main style="height: 90%">
         <div class="col-left">
           <div class="col-contents col-item">
             <div class="messages">
               {% for ll in lienlac %}
               <!-- <li data-id="{{ ll.dich.id }}"> -->
                 {% if ll.nguoidung1.id != current_user.id %}
-                  <li data-id="{{ ll.nguoidung1.id }}">
+                  <li data-id="{{ ll.nguoidung1.id }}" data-nhom="ko"> 
                     <div class="avatar">
                       <div class="avatar-image">
                         <div class="status online"></div>
@@ -104,8 +85,9 @@
                     </div>
                     <h3>{{ ll.nguoidung1.user }}</h3>
                     <p>{{ ll.lastmess }}</p>
+                  </li>
                 {% else %}
-                  <li data-id="{{ ll.nguoidung2.id }}">
+                  <li data-id="{{ ll.nguoidung2.id }}" data-nhom="ko">
                     <div class="avatar">
                       <div class="avatar-image">
                         <div class="status online"></div>
@@ -114,13 +96,27 @@
                     </div>
                     <h3>{{ ll.nguoidung2.user }}</h3>
                     <p>{{ ll.lastmess }}</p>
+                  </li>
                 {% endif %}
-              </li>
+              
+              {% endfor %}
+              {% for n in nhoms %}
+                <li data-id="{{ n.id }}" data-nhom="co">
+                  <div class="avatar">
+                    <div class="avatar-image">
+                      <div class="status online"></div>
+                      <img src="/static/assets/images/group.png" alt="">
+                    </div>
+                  </div>
+                  <h3>{{ n.name }}</h3>
+                  <p>{{ n.lasstmess }}</p>
+                </li>
               {% endfor %}
             </div>
           </div>
         </div>
-        <style></style>
+        
+
         <div class="col" style="width: 900px;">
           <div class="col-content col-mess">
             <section class="message">
@@ -143,7 +139,7 @@
 
         <div class="col-right"  style="text-align: center;">
           <!-- to display current login user information  -->
-          <div id="userInfo">
+          <div id="userInfo" style="text-align: center;">
             <div
               style="
                 display: flex;
@@ -156,7 +152,7 @@
             </div>
           </div>
 
-          <div id="call">
+          <div id="call" style="text-align: center;">
             <div class="dialWrapper">
               <div class="dialNumpadHWrapper">
                 <div class="dialNumber"></div>
@@ -165,11 +161,10 @@
                   <style>
                     .call-btn {
                       transition: transform 0.3s ease; /* Tạo hiệu ứng chuyển đổi mềm mại */
-                  }
-
-                  .call-btn:hover {
+                    }
+                    .call-btn:hover {
                       transform: scale(0.9); /* Thu nhỏ hình ảnh khi di chuột qua */
-                  }
+                    }
                   </style>
                 </div>
                 <div class="dialNumber"></div>
@@ -178,8 +173,8 @@
           </div>
   
           <!-- to show incommming call and accept -->
-          <div id="answer">
-            <div class="incomingWrapper">
+          <div id="answer" style="text-align: center;">
+            <div class="incomingWrapper" style="text-align: center;">
               <div class="itemWrapper">
                 <h2>Incomming Call</h2>
               </div>
@@ -194,11 +189,9 @@
               <div class="itemWrapper">
                 <h2 style="line-height: 0px"><span id="callerName"></span></h2>
               </div>
-              <div
-                class="itemWrapper"
-                style="display: flex; flex-direction: row; margin-bottom: 20px"
-              >
+              <div class="itemWrapper" >
                 <img src="/static/assets/images/call_answer.png"   style="padding: 30px; width: 140px; height: 140px" onclick="answer()" alt="">
+                <img src="/static/assets/images/call_off.png"   style="padding: 30px; width: 140px; height: 140px" onclick="stop()" alt="">
               </div>
             </div>
           </div>
@@ -217,11 +210,11 @@
                   alt=""
                 />
               </div>
-              <div class="itemWrapper">
+              <!-- <div class="itemWrapper">
                 <h3 style="line-height: 0px">
                   <span id="otherUserNameCA"></span>
                 </h3>
-              </div>
+              </div> -->
             </div>
           </div>
   
@@ -229,39 +222,26 @@
           <div id="inCall">
             <div class="incomingWrapper">
               <div class="itemWrapper">
-                <h3>On Call With</h3>
-                <h2 style="line-height: 0px">
-                  <span id="otherUserNameC"></span>
-                </h2>
+                <h2>On Call</h2>
               </div>
             </div>
           
           </div>
-
-          <br />
   
           <!-- to show local and remote video -->
-          <div id="videos">
-            <div
-              style="
-                position: absolute;
-                top: 0;
-                right: 0;
-                padding-right: 20px;
-                padding-top: 20px;
-              "
-            >
+          <div id="videos" style="text-align: center;">
+            <div>
               <video
-                width="100px"
+                style="width:100%; "
                 id="localVideo"
                 autoplay
-                muted
                 playsinline
               ></video>
+
             </div>
             <div id="remoteVideoDiv">
               <video
-                style="width: 500px"
+                style="width:100%;"
                 id="remoteVideo"
                 autoplay
                 playsinline
@@ -270,21 +250,67 @@
           </div>
           <!-- <div style="flex-grow: 1"></div> -->
 
-          <div id="controls">
-            <button id="muteButton">Mute</button>
-            <button id="videoButton">Stop Video</button>
+          <div id="controls" style="text-align: center;">
+            <img id="mutene" src="/static/assets/images/unmute.jpg" style="width: 50px; height: 50px;" alt="">
+            <img id="videone" src="/static/assets/images/unvideo.jpg" style="width: 50px; height: 50px; "alt="">
+            
+          </div>
+          <div id="calloff" style="text-align: center;">
+            <img src="/static/assets/images/call_off.png"   style="padding: 30px; width: 140px; height: 140px" onclick="stop()" alt=""> 
           </div>
           
         </div>
         
-        <div style="flex-grow: 1"></div>
-    <!-- </div> -->
-        <!-- nơi chứa id người nhận -->
-        <input type="text" hidden id="id_receiver" />
-    <!-- </div> -->
-    
+        <!-- <div style="flex-grow: 1"></div> -->
+
+      <input type="text" hidden id="id_receiver" />
+      <script src="{% static 'js/messenger.js'%}"></script> 
+      <script src="{% static 'js/call.js'%}"></script>
+
     </main>
-    <!-- <script src="{% static 'js/messenger.js'%}"></script> -->
+    </div>
+    
+
+    <div class="form-popup" id="myForm">
+      <form class="form-container" method="POST" id="formcreate"  action="{% url 'create_group' %}">
+        {% csrf_token %}
+        <h1>Tạo nhóm chat</h1>
+    
+        <label for="tennhom"><b>Tên nhóm chat</b></label>
+        <input type="text" placeholder="Nhập tên nhóm chat" name="tennhom" id="tennhom" required>
+    
+        <!-- <label for="psw"><b>Thêm thành viên</b></label>
+        <input type="password" placeholder="Enter Password" name="psw" required> -->
+        <div class="dropdown">
+          <button class="dropbtn" disabled>Chọn thành viên</button>
+          <div class="dropdown-content">
+            {% for ll in lienlac %}
+            <!-- <li data-id="{{ ll.dich.id }}"> -->
+              {% if ll.nguoidung1.id != current_user.id %}
+                <a href="#" onclick="toggleMember('{{ ll.nguoidung1.id }}')"><img src="media/{{ ll.nguoidung1.avatar }}" style="width: 50px; height: 50px;" alt=""> {{ ll.nguoidung1.user }}</a>
+              {% else %}
+              <a href="#" onclick="toggleMember('{{ ll.nguoidung2.id }}')"><img src="media/{{ ll.nguoidung1.avatar }}" style="width: 50px; height: 50px; "alt="">{{ ll.nguoidung2.user }}</a>
+              {% endif %}
+            <!-- </li> -->
+            {% endfor %}
+          </div>
+        </div>
+        <input type="text" name="danhsach" id="danhsach" multiple hidden>
+        <p style="margin-top: 10px;">Danh sách thành viên thành viên: (Chọn để xoá) </p>
+        <ul id="selectedMembers" name="selectedMembers">          
+        </ul>
+        <button type="submit" class="btn" id="submitFormButton" >Tạo</button>
+        <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+      </form>
+    </div>
+
+    <!-- thông báo -->
+    <div id="popup" class="popup">
+      <span class="close" onclick="closePopup()">&times;</span>
+      <p><span id="sender"></span> Nhắn tin cho bạn : <span id="message"></span></p>
+    </div>
+
+
   </body>
 </html>
 
@@ -297,161 +323,227 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
 <script>
-function confirmDelete() {
-    let ten = document.getElementById("receiverName").value;
-    if (confirm("Bạn có muốn xoá liên lạc với " + ten + " không?")) {
-        id_senter = id_user
-        id_receiver = document.getElementById("id_recceiver").value;
-
-
-        // const id_receiver = JSON.parse(
-        //     document.getElementById("id_receiver").value
-        // );
-
-        // Thêm comment vào database
-        fetch('/delete-contact/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                // Thêm CSRF token để Django chấp nhận yêu cầu
-                'X-CSRFToken': csrftoken
-            },
-            body: JSON.stringify({
-                message: message,
-                id_user: id_user,
-                id_receiver: id_receiver,
-            })
-        })
-        alert("Xoá thành công")
-    } else {
-        // Nếu người dùng không chấp nhận
-    }
-}
-</script>
-
-
-
-<script>
 const id_user = JSON.parse(
     document.getElementById("id_user").textContent
 );
+const groupchatSocket = new WebSocket(
+    "ws://" + window.location.host + "/ws/groupchat/"
+);
+const chatSocket = new WebSocket(
+    "ws://" + window.location.host + "/ws/chat/"
+);
+
 $(document).ready(function () {
     $(".messages li").click(function () {
         var id = $(this).data("id");
-        document.getElementById("id_receiver").value = id;
-        userToCall = id + "name";
-        var dichUser = $(this).find("h3").text();
-        document.getElementById("receiverName").innerText = dichUser;
-        document.getElementById("nameHere").innerText = "Call to " + dichUser;
-        document.getElementById("call").style.display = "block";
-        $.ajax({
-            type: "GET",
-            url: "/messengerajax/" + id + "/",
-            success: function (response) {
-                // console.log(response);
-                $(".message .grid-message ").empty();
-                var tinnhan = JSON.parse(response.tinnhan);
-                for (var i = 0; i < tinnhan.length; i++) {
-                    var tinNhanItem = tinnhan[i].fields;
-                    var noidung = tinNhanItem.noidung;
-                    var senter = tinNhanItem.senter;
-                    var receiver = tinNhanItem.receiver;
-
-                    if (senter != id) {
-                        $(".message .grid-message ").append(
-                            '<div class ="col-message-sent"> <div class="message-sent"><p>' +
-                            noidung +
-                            "</p></div></div>"
-                        );
-                    } else {
-                        document.getElementById("id_receiver").value = receiver;
-                        $(".message .grid-message ").append(
-                            '<div class ="col-message-received"><div class="message-received"><p>' +
-                            noidung +
-                            "</p></div></div>"
-                        );
+        var is_nhom = $(this).data("nhom");
+        if (is_nhom == "co") {
+            document.getElementById("id_receiver").value = id;
+            userToCall = id + "name";
+            var dichUser = $(this).find("h3").text();
+            document.getElementById("receiverName").innerText = dichUser;
+            document.getElementById("nameHere").innerText = "Call to " + dichUser;
+            document.getElementById("call").style.display = "block";
+            $.ajax({
+                type: "GET",
+                url: "/groupmessengerajax/" + id + "/",
+                success: function (response) {
+                    $(".message .grid-message ").empty();
+                    var tinnhan = JSON.parse(response.tinnhan);
+                    for (var i = 0; i < tinnhan.length; i++) {
+                        var tinNhanItem = tinnhan[i].fields;
+                        var noidung = tinNhanItem.noidung
+                        var sender = tinNhanItem.sender
+                        if (sender == id_user) {
+                            $(".message .grid-message ").append(
+                                '<div class ="col-message-sent"> <div class="message-sent"><p>' +
+                                noidung +
+                                "</p></div></div>"
+                            );
+                        } else {
+                            $(".message .grid-message ").append(
+                                '<div class ="col-message-received"><div class="message-received"><p>' + sender + ": " +
+                                noidung +
+                                "</p></div></div>"
+                            );
+                        }
                     }
-                }
-            },
-            error: function (xhr, status, error) {
-                console.error(error);
-            },
-        });
+                },
+                error: function (xhr, status, error) {
+                    console.error(error);
+                },
+            });
+        } else {
+            document.getElementById("id_receiver").value = id;
+            userToCall = id + "name";
+            var dichUser = $(this).find("h3").text();
+            document.getElementById("receiverName").innerText = dichUser;
+            document.getElementById("nameHere").innerText = "Call to " + dichUser;
+            document.getElementById("call").style.display = "block";
+            $.ajax({
+                type: "GET",
+                url: "/messengerajax/" + id + "/",
+                success: function (response) {
+                    // console.log(response);
+                    $(".message .grid-message ").empty();
+                    var tinnhan = JSON.parse(response.tinnhan);
+                    for (var i = 0; i < tinnhan.length; i++) {
+                        var tinNhanItem = tinnhan[i].fields;
+                        var noidung = tinNhanItem.noidung;
+                        var senter = tinNhanItem.senter;
+                        var receiver = tinNhanItem.receiver;
+
+                        if (senter != id) {
+                            $(".message .grid-message ").append(
+                                '<div class ="col-message-sent"> <div class="message-sent"><p>' +
+                                noidung +
+                                "</p></div></div>"
+                            );
+                        } else {
+                            document.getElementById("id_receiver").value = receiver;
+                            $(".message .grid-message ").append(
+                                '<div class ="col-message-received"><div class="message-received"><p>' +
+                                noidung +
+                                "</p></div></div>"
+                            );
+                        }
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error(error);
+                },
+            });
+        }
     });
 });
-
-
-// để lấy thuộc tính id -->
-
 document.addEventListener("DOMContentLoaded", function () {
     var listItems = document.querySelectorAll(".messages li");
     listItems.forEach(function (item) {
         item.addEventListener("click", function () {
             var id = this.getAttribute("data-id");
-            const chatSocket = new WebSocket(
-                "ws://" + window.location.host + "/ws/chat/"
-            );
-
-            chatSocket.onmessage = function (e) {
-                const data = JSON.parse(e.data);
-                // alert(data.id_receiver+ "nhan " + data.id_user + "gui"+ id + "Hien tai");
-                if (data.id_user == id) {
-                    $(".message .grid-message ").append(
-                        '<div class ="col-message-received"><div class="message-received"><p>' +
-                        data.message +
-                        "</p></div></div>"
-                    );
-                }
-            };
-            document.querySelector("#send").onclick = function (e) {
-                // if (e.target.classList.contains("active")) {
-                const messageInputDom = document.querySelector("#input");
-                const message = messageInputDom.value;
-
-                // const id_receiver = JSON.parse(
-                //     document.getElementById("id_receiver").value
-                // );
-                const id_receiver =id;
-                // Thêm comment vào database
-                fetch('/api/save_messenger', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        // Thêm CSRF token để Django chấp nhận yêu cầu
-                        'X-CSRFToken': csrftoken
-                    },
-                    body: JSON.stringify({
-                        message: message,
-                        id_user: id_user,
-                        id_receiver: id_receiver,
+            var is_nhom = this.getAttribute("data-nhom");
+            const user_name = JSON.parse(document.getElementById("user_name").textContent)
+            if (is_nhom == "co") {
+                groupchatSocket.onmessage = function (e) {
+                    const data = JSON.parse(e.data);
+                    if (data.id_user = !id_user) {
+                        $(".message .grid-message ").append(
+                            '<div class ="col-message-received"><div class="message-received"><p>' + user_name + ": " +
+                            data.message +
+                            "</p></div></div>"
+                        );
+                        showPopup(user_name, data.message);
+                    }
+                };
+                document.querySelector("#send").onclick = function (e) {
+                    // if (e.target.classList.contains("active")) {
+                    const messageInputDom = document.querySelector("#input");
+                    const message = messageInputDom.value;
+                    // Thêm comment vào database
+                    fetch('/api/save_messenger_group', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            // Thêm CSRF token để Django chấp nhận yêu cầu
+                            'X-CSRFToken': csrftoken
+                        },
+                        body: JSON.stringify({
+                            id_nhom: id,
+                            message: message,
+                            id_user: id_user,
+                            user_name: user_name,
+                        })
                     })
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        // Thêm bình luận vào database thì sẽ gửi sang websocket
-                        if (data.status === 'ok') {
-                            // Gửi comment tới websocket
-                            chatSocket.send(
-                                JSON.stringify({
-                                    message: message,
-                                    id_user: id_user,
-                                    id_receiver: id_receiver,
-                                })
-                            );
-                            messageInputDom.value = "";
-                            $(".message .grid-message ").append(
-                                '<div class ="col-message-sent"> <div class="message-sent"><p>' +
-                                message +
-                                "</p></div></div>"
-                            );
-                        }
-                    })
-                    .catch((error) => {
-                        console.error('Error:', error);
-                    });
-                // }
+                        .then(response => response.json())
+                        .then(data => {
+                            // Thêm bình luận vào database thì sẽ gửi sang websocket
+                            if (data.status === 'ok') {
+                                // Gửi comment tới websocket
+                                groupchatSocket.send(
+                                    JSON.stringify({
+                                        id_nhom: id,
+                                        message: message,
+                                        id_user: id_user,
+                                        user_name: user_name,
+                                    })
+                                );
+                                messageInputDom.value = "";
+                                $(".message .grid-message ").append(
+                                    '<div class ="col-message-sent"> <div class="message-sent"><p>' +
+                                    message +
+                                    "</p></div></div>"
+                                );
+                            }
+                        })
+                        .catch((error) => {
+                            console.error('Error:', error);
+                        });
+                    // }
 
-            };
+                };
+            }
+            else {
+                chatSocket.onmessage = function (e) {
+                    const data = JSON.parse(e.data);
+                    if (data.id_receiver == id_user) {
+                        $(".message .grid-message ").append(
+                            '<div class ="col-message-received"><div class="message-received"><p>' +
+                            data.message +
+                            "</p></div></div>"
+                        );
+                        showPopup("Tin Nhắn riêng", data.message);
+                    }
+                };
+                document.querySelector("#send").onclick = function (e) {
+                    // if (e.target.classList.contains("active")) {
+                    const messageInputDom = document.querySelector("#input");
+                    const message = messageInputDom.value;
+
+                    // const id_receiver = JSON.parse(
+                    //     document.getElementById("id_receiver").value
+                    // );
+                    const id_receiver = id;
+                    // Thêm comment vào database
+                    fetch('/api/save_messenger', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            // Thêm CSRF token để Django chấp nhận yêu cầu
+                            'X-CSRFToken': csrftoken
+                        },
+                        body: JSON.stringify({
+                            message: message,
+                            id_user: id_user,
+                            id_receiver: id_receiver,
+                        })
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            // Thêm bình luận vào database thì sẽ gửi sang websocket
+                            if (data.status === 'ok') {
+                                // Gửi comment tới websocket
+                                chatSocket.send(
+                                    JSON.stringify({
+                                        message: message,
+                                        id_user: id_user,
+                                        id_receiver: id_receiver,
+                                    })
+                                );
+                                messageInputDom.value = "";
+                                $(".message .grid-message ").append(
+                                    '<div class ="col-message-sent"> <div class="message-sent"><p>' +
+                                    message +
+                                    "</p></div></div>"
+                                );
+                            }
+                        })
+                        .catch((error) => {
+                            console.error('Error:', error);
+                        });
+
+                };
+            }
+
 
         });
     });
@@ -469,7 +561,6 @@ $(document).ready(function () {
 
 </script>
 
-<!-- <script src="{% static 'call/call.js' %}"></script> -->
 
 <script
   src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
@@ -482,412 +573,4 @@ $(document).ready(function () {
   crossorigin="anonymous"
 ></script>
 
-
-<!-- Script của cái call -->
-
-<script>
-const baseURL = "/"
-
-let localVideo = document.querySelector('#localVideo');
-let remoteVideo = document.querySelector('#remoteVideo');
-
-let userToCall;
-let otherUser;
-let remoteRTCMessage;
-
-let iceCandidatesFromCaller = [];
-let peerConnection;
-let remoteStream;
-let localStream;
-
-let callInProgress = false;
-
-//event from html
-function call() {
-    // let userToCall = document.getElementById("id_receiver").value + "name";
-    otherUser = userToCall;
-
-    beReady()
-        .then(bool => {
-            processCall(userToCall)
-        })
-}
-
-//event from html
-function answer() {
-    //do the event firing
-
-    beReady()
-        .then(bool => {
-            processAccept();
-        })
-
-    document.getElementById("answer").style.display = "none";
-}
-
-let pcConfig = {
-    "iceServers":
-        [
-            { "url": "stun:stun.jap.bloggernepal.com:5349" },
-            {
-                "url": "turn:turn.jap.bloggernepal.com:5349",
-                "username": "guest",
-                "credential": "somepassword"
-            },
-            { "url": "stun:stun.l.google.com:19302" }
-        ]
-};
-
-// Set up audio and video regardless of what devices are present.
-let sdpConstraints = {
-    offerToReceiveAudio: true,
-    offerToReceiveVideo: true
-};
-
-/////////////////////////////////////////////
-
-let socket;
-let callSocket;
-function connectSocket() {
-    let ws_scheme = window.location.protocol == "https:" ? "wss://" : "ws://";
-    // console.log(ws_scheme);
-
-    callSocket = new WebSocket(
-        ws_scheme
-        + window.location.host
-        + '/ws/call/'
-    );
-    // console.log(id_user)
-    callSocket.onopen = event => {
-        //let's send myName to the socket
-        callSocket.send(JSON.stringify({
-            type: 'login',
-            data: {
-                name: id_user + "name"
-            }
-        }));
-    }
-
-    callSocket.onmessage = (e) => {
-        let response = JSON.parse(e.data);
-
-        // console.log(response);
-
-        let type = response.type;
-
-        if (type == 'connection') {
-            console.log(response.data.message)
-        }
-
-        if (type == 'call_received') {
-            // console.log(response);
-            onNewCall(response.data)
-        }
-
-        if (type == 'call_answered') {
-            onCallAnswered(response.data);
-        }
-
-        if (type == 'ICEcandidate') {
-            onICECandidate(response.data);
-        }
-    }
-
-    const onNewCall = (data) => {
-        //when other called you
-        //show answer button
-
-        otherUser = data.caller;
-        remoteRTCMessage = data.rtcMessage
-
-        // document.getElementById("profileImageA").src = baseURL + callerProfile.image;
-        document.getElementById("callerName").innerHTML = otherUser;
-        document.getElementById("call").style.display = "none";
-        document.getElementById("answer").style.display = "block";
-    }
-
-    const onCallAnswered = (data) => {
-        //when other accept our call
-        remoteRTCMessage = data.rtcMessage
-        peerConnection.setRemoteDescription(new RTCSessionDescription(remoteRTCMessage));
-
-        document.getElementById("calling").style.display = "none";
-
-        console.log("Call Started. They Answered");
-        // console.log(pc);
-
-        callProgress()
-    }
-
-    const onICECandidate = (data) => {
-        // console.log(data);
-        console.log("GOT ICE candidate");
-
-        let message = data.rtcMessage
-
-        let candidate = new RTCIceCandidate({
-            sdpMLineIndex: message.label,
-            candidate: message.candidate
-        });
-
-        if (peerConnection) {
-            console.log("ICE candidate Added");
-            peerConnection.addIceCandidate(candidate);
-        } else {
-            console.log("ICE candidate Pushed");
-            iceCandidatesFromCaller.push(candidate);
-        }
-
-    }
-
-}
-function sendCall(data) {
-    //to send a call
-    console.log("Send Call");
-
-    // socket.emit("call", data);
-    callSocket.send(JSON.stringify({
-        type: 'call',
-        data
-    }));
-
-    document.getElementById("call").style.display = "none";
-    // document.getElementById("profileImageCA").src = baseURL + otherUserProfile.image;
-    document.getElementById("otherUserNameCA").innerHTML = otherUser;
-    document.getElementById("calling").style.display = "block";
-}
-function answerCall(data) {
-    //to answer a call
-    // socket.emit("answerCall", data);
-    callSocket.send(JSON.stringify({
-        type: 'answer_call',
-        data
-    }));
-    callProgress();
-}
-
-function sendICEcandidate(data) {
-    //send only if we have caller, else no need to
-    console.log("Send ICE candidate");
-    // socket.emit("ICEcandidate", data)
-    callSocket.send(JSON.stringify({
-        type: 'ICEcandidate',
-        data
-    }));
-
-}
-
-function beReady() {
-    return navigator.mediaDevices.getUserMedia({
-        audio: true,
-        video: true
-    })
-        .then(stream => {
-            localStream = stream;
-            localVideo.srcObject = stream;
-
-            return createConnectionAndAddStream()
-        })
-        .catch(function (e) {
-            alert('getUserMedia() error: ' + e.name);
-        });
-}
-
-function createConnectionAndAddStream() {
-    createPeerConnection();
-    peerConnection.addStream(localStream);
-    return true;
-}
-
-function processCall(userName) {
-    peerConnection.createOffer((sessionDescription) => {
-        peerConnection.setLocalDescription(sessionDescription);
-        sendCall({
-            name: userName,
-            rtcMessage: sessionDescription
-        })
-    }, (error) => {
-        console.log("Error");
-    });
-}
-
-function processAccept() {
-    peerConnection.setRemoteDescription(new RTCSessionDescription(remoteRTCMessage));
-    peerConnection.createAnswer((sessionDescription) => {
-        peerConnection.setLocalDescription(sessionDescription);
-
-        if (iceCandidatesFromCaller.length > 0) {
-            //I am having issues with call not being processed in real world (internet, not local)
-            //so I will push iceCandidates I received after the call arrived, push it and, once we accept
-            //add it as ice candidate
-            //if the offer rtc message contains all thes ICE candidates we can ingore this.
-            for (let i = 0; i < iceCandidatesFromCaller.length; i++) {
-                //
-                let candidate = iceCandidatesFromCaller[i];
-                console.log("ICE candidate Added From queue");
-                try {
-                    peerConnection.addIceCandidate(candidate).then(done => {
-                        console.log(done);
-                    }).catch(error => {
-                        console.log(error);
-                    })
-                } catch (error) {
-                    console.log(error);
-                }
-            }
-            iceCandidatesFromCaller = [];
-            console.log("ICE candidate queue cleared");
-        } else {
-            console.log("NO Ice candidate in queue");
-        }
-
-        answerCall({
-            caller: otherUser,
-            rtcMessage: sessionDescription
-        })
-
-    }, (error) => {
-        console.log("Error");
-    })
-}
-
-/////////////////////////////////////////////////////////
-
-function createPeerConnection() {
-    try {
-        peerConnection = new RTCPeerConnection(pcConfig);
-        // peerConnection = new RTCPeerConnection();
-        peerConnection.onicecandidate = handleIceCandidate;
-        peerConnection.onaddstream = handleRemoteStreamAdded;
-        peerConnection.onremovestream = handleRemoteStreamRemoved;
-        console.log('Created RTCPeerConnnection');
-        return;
-    } catch (e) {
-        console.log('Failed to create PeerConnection, exception: ' + e.message);
-        alert('Cannot create RTCPeerConnection object.');
-        return;
-    }
-}
-
-function handleIceCandidate(event) {
-    // console.log('icecandidate event: ', event);
-    if (event.candidate) {
-        console.log("Local ICE candidate");
-        // console.log(event.candidate.candidate);
-
-        sendICEcandidate({
-            user: otherUser,
-            rtcMessage: {
-                label: event.candidate.sdpMLineIndex,
-                id: event.candidate.sdpMid,
-                candidate: event.candidate.candidate
-            }
-        })
-
-    } else {
-        console.log('End of candidates.');
-    }
-}
-
-function handleRemoteStreamAdded(event) {
-    console.log('Remote stream added.');
-    remoteStream = event.stream;
-    remoteVideo.srcObject = remoteStream;
-}
-
-function handleRemoteStreamRemoved(event) {
-    console.log('Remote stream removed. Event: ', event);
-    remoteVideo.srcObject = null;
-    localVideo.srcObject = null;
-}
-
-window.onbeforeunload = function () {
-    if (callInProgress) {
-        stop();
-    }
-};
-
-
-function stop() {
-    localStream.getTracks().forEach(track => track.stop());
-    callInProgress = false;
-    peerConnection.close();
-    peerConnection = null;
-    document.getElementById("call").style.display = "block";
-    document.getElementById("answer").style.display = "none";
-    document.getElementById("inCall").style.display = "none";
-    document.getElementById("calling").style.display = "none";
-    document.getElementById("endVideoButton").style.display = "none"
-    otherUser = null;
-}
-
-function callProgress() {
-    document.getElementById("videos").style.display = "block";
-    document.getElementById("controls").style.display = "block";
-    document.getElementById("otherUserNameC").innerHTML = otherUser;
-    document.getElementById("inCall").style.display = "block";
-
-    callInProgress = true;
-}
-let muteButton = document.getElementById('muteButton');
-let videoButton = document.getElementById('videoButton');
-
-muteButton.addEventListener('click', toggleMute);
-videoButton.addEventListener('click', toggleVideo);
-
-function toggleMute() {
-  let tracks = localStream.getAudioTracks();
-  tracks.forEach(track => {
-    track.enabled = !track.enabled; // Bật hoặc tắt âm thanh
-  });
-}
-
-function toggleVideo() {
-  let tracks = localStream.getVideoTracks();
-  tracks.forEach(track => {
-    track.enabled = !track.enabled; // Bật hoặc tắt video
-  });
-}
-function toggleMute() {
-  let tracks = localStream.getAudioTracks();
-  tracks.forEach(track => {
-    track.enabled = !track.enabled; // Bật hoặc tắt âm thanh
-  });
-
-  // Cập nhật giao diện người dùng
-  if (tracks[0].enabled) {
-    muteButton.textContent = 'Mute';
-  } else {
-    muteButton.textContent = 'Unmute';
-  }
-}
-
-function toggleVideo() {
-  let tracks = localStream.getVideoTracks();
-  tracks.forEach(track => {
-    track.enabled = !track.enabled; // Bật hoặc tắt video
-  });
-
-  // Cập nhật giao diện người dùng
-  if (tracks[0].enabled) {
-    videoButton.textContent = 'Stop Video';
-  } else {
-    videoButton.textContent = 'Start Video';
-  }
-}
-
-</script>
-
-
-<script>
-  document.getElementById("call").style.display = "none";
-  document.getElementById("answer").style.display = "none";
-  document.getElementById("inCall").style.display = "none";
-  document.getElementById("calling").style.display = "none";
-  document.getElementById("videos").style.display = "none";
-  document.getElementById("controls").style.display = "none";
-  document.getElementById("userInfo").style.display = "block";
-  connectSocket();
-
-</script>
 

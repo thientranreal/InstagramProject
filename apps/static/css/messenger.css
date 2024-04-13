@@ -1,0 +1,37 @@
+.right-icon {
+    transition: transform 0.3s ease; /* Tạo hiệu ứng chuyển đổi mềm mại */
+}
+
+.right-icon:hover {
+    transform: scale(0.8); /* Thu nhỏ hình ảnh khi di chuột qua */
+}
+
+.popup {
+    display: none;
+    position: fixed;
+    /* bottom: 20px; */
+    top:100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #f3f3f3;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 20px;
+    z-index: 1;
+  }
+  
+  .popup p {
+    margin: 0;
+  }
+  
+  .popup .close {
+    position: absolute;
+    top: 5px;
+    right: 7px;
+    cursor: pointer;
+  }
+  
+  .popup.show {
+    display: block;
+  }
+  

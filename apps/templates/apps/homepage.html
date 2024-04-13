@@ -1,24 +1,16 @@
 {% extends 'apps/index.html' %} {% load static %} {% block homepage %}
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <link rel="stylesheet" href="{% static 'css/PersonalPage.css' %}" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+{% comment %} <link rel="stylesheet" href="{% static 'css/PersonalPage.css' %}" /> {% endcomment %}
 <section class="main">
   <div class="wrapper">
     <div class="left-col">
       <div class="status-wrapper">
-        <button
-          class="story--scroll"
-          id="scroll-left"
-          onclick="scrollHorizontal(1)"
-        >
+        <button class="story--scroll" id="scroll-left" onclick="scrollHorizontal(1)">
           <i class="fas fa-chevron-left"></i>
         </button>
-        <button
-          class="story--scroll"
-          id="scroll-right"
-          onclick="scrollHorizontal(-1)"
-        >
+        <button class="story--scroll" id="scroll-right" onclick="scrollHorizontal(-1)">
           <i class="fas fa-chevron-right"></i>
         </button>
         <div class="stories">
@@ -85,27 +77,22 @@
           <div class="user">
             <div class="status-pic">
               {%if post.nguoidung.avatar%}
-              <img
-                src="{{post.nguoidung.avatar.url}}"
-                alt="Profile Image"
-              />
+              <img src="{{post.nguoidung.avatar.url}}" alt="Profile Image" />
               {%else%}
-              <img
-                src="{% static '/image/download.png' %}"
-                alt="Profile Image"
-              />
+              <img src="{% static '/image/download.png' %}" alt="Profile Image" />
               {%endif%}
             </div>
-            <p class="username"><a href="{% url 'profile_friend' user_id=post.nguoidung.id %}" style="text-decoration: none; color: black;">{{post.nguoidung.user}}</a></p>
+            <p class="username">
+              <a href="{% url 'profile_friend' user_id=post.nguoidung.id %}"
+                style="text-decoration: none; color: black">{{post.nguoidung.user}}</a>
+            </p>
 
-            <p
-              style="
+            <p style="
                 font-size: 0.8em;
                 color: #888;
                 margin-top: 7px;
                 margin-left: 5px;
-              "
-            >
+              ">
               {{post.formatted_thoigiandang}}
             </p>
           </div>
@@ -113,71 +100,64 @@
           <div class="dropdown" onmouseenter="showDropdown()" onmouseleave="hideDropdown()">
             <i class="fas fa-ellipsis-h" aria-hidden="true"></i>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-              <form action="{% url 'xoa_baidang' post.id %}" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn xóa bài đăng này không?')">
+              <form action="{% url 'xoa_baidang' post.id %}" method="post"
+                onsubmit="return confirm('Bạn có chắc chắn muốn xóa bài đăng này không?')">
                 {% csrf_token %}
-                <a class="dropdown-item" href="#" onmouseenter="cancelHideTimer()" onmouseleave="hideDropdown()"><button type="submit" class="btn btn-danger" name="action" value="xoa">Xóa</button></a>
-                <a class="dropdown-item" href="{% url 'editPost' baidang_id=post.id %}" onmouseenter="cancelHideTimer()" onmouseleave="hideDropdown()"><button type="button" class="btn btn-primary" name="action" value="sua">Chỉnh sửa</button></a>
+                <a class="dropdown-item" href="#" onmouseenter="cancelHideTimer()" onmouseleave="hideDropdown()"><button
+                    type="submit" class="btn btn-danger" name="action" value="xoa">
+                    Xóa
+                  </button></a>
+                <a class="dropdown-item" href="{% url 'editPost' baidang_id=post.id %}" onmouseenter="cancelHideTimer()"
+                  onmouseleave="hideDropdown()"><button type="button" class="btn btn-primary" name="action" value="sua">
+                    Chỉnh sửa
+                  </button></a>
               </form>
             </div>
-        </div>
+          </div>
           {% endif %}
         </div>
         {%if post.hinhanh%}
-        <img
-          src="{{post.hinhanh.url}}"
-          class="post-image"
-          alt="Geeks for Geeks post"
-        />
-        
+        <img src="{{post.hinhanh.url}}" class="post-image" alt="Geeks for Geeks post" />
+
         {%endif%}
-        
+
         <div class="post-content">
           <div class="reaction-wrapper">
             {% if post.liked %}
-                  <img
-                  data-product="{{post.id}}" data-action="remove"
-                  src="{% static 'assets/images/nav-items/like2.PNG' %}"
-                  class="icons iconLike"
-                />
-                {% else %}
-                    <img
-                    data-product="{{post.id}}" data-action="like"
-                    src="{% static 'assets/images/nav-items/like.PNG' %}"
-                    class="icons iconLike"
-                  />
-                {% endif %}
-           
-          <p class="m-0">Liked by <b>{{post.tong_luot_thich}} people</b></p>
+            <img data-product="{{post.id}}" data-action="remove" src="{% static 'assets/images/nav-items/like2.PNG' %}"
+              class="icons iconLike" />
+            {% else %}
+            <img data-product="{{post.id}}" data-action="like" src="{% static 'assets/images/nav-items/like.PNG' %}"
+              class="icons iconLike" />
+            {% endif %}
+
+            <p class="m-0 loadUserLike" data-product="{{post.id}}"style="cursor: pointer;">
+              Liked by <b>{{post.tong_luot_thich}} people</b>
+            </p>
           </div>
           <p class="description">
             <span>{{post.nguoidung.user}}</span>{{post.noidung}}
           </p>
           <p class="no-comments">View all comments</p>
           {% comment %} Hiển thị bình luận {% endcomment %}
-          <div class="hienbl" style="overflow-y: auto; max-height: 300px;">
+          <div class="hienbl" style="overflow-y: auto; max-height: 300px">
             {% for binhluan in post.latest_comments reversed %}
-              <div>
-                {% if binhluan.nguoidung.avatar %}
-                  <img 
-                    src="{{binhluan.nguoidung.avatar.url}}" 
-                    alt="avatar" 
-                    class="icons user-account rounded-circle" 
-                    style="width: 27px; height: 27px;">
-                {% else %}
-                  <img 
-                    src="{% static "assets/images/profile/status-0.png" %}" 
-                    alt="avatar" 
-                    class="icons user-account rounded-circle" 
-                    style="width: 27px; height: 27px;">
-                {% endif %}
-                <p>
-                  <b>{{binhluan.nguoidung.user.username}}</b>
-                  <br />
-                  {{binhluan.noidungbl}}
-                  <br />
-                  <i>{{binhluan.timestamp}}</i>
-                </p>
-              </div>
+            <div>
+              {% if binhluan.nguoidung.avatar %}
+              <img src="{{binhluan.nguoidung.avatar.url}}" alt="avatar" class="icons user-account rounded-circle"
+                style="width: 27px; height: 27px" />
+              {% else %} <img src="{% static
+              " assets/images/profile/status-0.png" %}" alt="avatar" class="icons
+              user-account rounded-circle" style="width: 27px; height: 27px;">
+              {% endif %}
+              <p>
+                <b>{{binhluan.nguoidung.user.username}}</b>
+                <br />
+                {{binhluan.noidungbl}}
+                <br />
+                <i>{{binhluan.timestamp}}</i>
+              </p>
+            </div>
             {% endfor %}
           </div>
           <style>
@@ -189,73 +169,30 @@
         </div>
         <!-- <hr /> -->
         <div class="comment-wrapper">
-          <input
-            type="text"
-            class="comment-box"
-            placeholder="Add a comment..."
-          />
+          <input type="text" class="comment-box" placeholder="Add a comment..." />
           <button class="comment-btn">Post</button>
         </div>
       </div>
       {% endfor %}
     </div>
-</div>
-    <!-- <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        // Lắng nghe sự kiện click trên phần tử có class là 'no-comments'
-        document.querySelectorAll(".no-comments").forEach(function (commentElement) {
-            commentElement.addEventListener("click", function () {
-              // Lấy ID của bài post từ thuộc tính 'data-id' của phần tử cha
-            var postId = commentElement.closest(".post").dataset.id;
-            var postElement = document.querySelector('.post[data-id="' + postId + '"]');
-            var hienblElement = postElement.querySelector('.hienbl');
-            $.ajax({
-                type: "GET",
-                url: "/commentajax/" + postId + "/",
-                success: function (response) {
-                  console.log(response);
-                  var binhluan = JSON.parse(response.binhluan);
-                  for (var i = 0; i < binhluan.length; i++) {
-                    var binhluanItem = binhluan[i].fields;
-                    var noidung = binhluanItem.noidungbl;
-                    var nguoidung = binhluanItem.nguoidung;
-                    // var receiver = binhluanItem.receiver;
-                    // console.log(noidung);
-                    // if (senter == id) {
-                        hienblElement.innerHTML+=
-                        '<p><b> ' +nguoidung+' </b>'+
-                          noidung +
-                          "</p>";
-                    //   $(".hienbl").append(
-                    //     '<p><b> ' +nguoidung+' </b>'+
-                    //       noidung +
-                    //       "</p>"
-                    //   );
-                    // } else {
-                    //   $(".message .grid-message ").append(
-                    //     '<div class ="col-message-received"><div class="message-received"><p>' +
-                    //       noidung +
-                    //       "</p></div></div>"
-                    //   );
-                    // }
-                    }
-                },
-                error: function (xhr, status, error) {
-                  console.error(error);
-                },
-              });
-            });
-          });
-      });
-    </script> -->
-    <script type="text/javascript">
-      let defaultAvatarUrl = "{% static 'assets/images/profile/status-0.png' %}";
-    </script>
-    <script src="{% static 'js/PersonalPage.js' %}"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    {% endblock homepage %}
   </div>
 </section>
+{% comment %} <div class="hienUserLike bg-light" style="width: 500px; max-height: 300px; overflow-y: auto; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+</div> {% endcomment %}
+<div class="hienUserLike bg-light" id="hienUserLike" style="width: 700px; max-height: 300px; overflow-y: auto; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+</div>
+
+  <script type="text/javascript">
+    let defaultAvatarUrl =
+      "{% static 'assets/images/profile/status-0.png' %}";
+  </script>
+  <script type="module" src="{% static 'js/csrfToken.js' %}"></script>
+  <script type="module" src="{% static 'js/comment.js' %}"></script>
+  <script src="{% static 'js/PersonalPage.js' %}"></script>
+  <script src="{% static 'js/home.js'%}"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+{% endblock homepage %}

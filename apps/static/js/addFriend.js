@@ -39,14 +39,6 @@ addFriendSocket.onmessage = function(e) {
     }
 };
 
-var btnUpdate = document.getElementsByClassName('updatefriend');
-for (let index = 0; index < btnUpdate.length; index++) {
-    btnUpdate[index].addEventListener('click', function () {
-        var userId = this.dataset.product;
-        var action = this.dataset.action;
-        updateUserOrder(userId, action);
-    });
-}
 document.addEventListener('DOMContentLoaded', function() {
     document.querySelector('.search').addEventListener('input', function() {
         var searchData = this.value; 
@@ -90,7 +82,6 @@ function search(searchData) {
                             <div class="col-md-7 col-sm-7 d-flex flex-column justify-content-center">
                                 <h6 class="m-0"><a href="#" class="profile-link">${user.user__username}</a></h6>
                                 <p class="text-muted name">${user.user__last_name} ${user.user__first_name}</p>
-                                <p class="text-muted m-0">${user.sobanbe} Friend</p>
                             </div>
                             <div class="col-md-3 col-sm-3 d-flex align-items-center justify-content-center">
                                 <button data-product="${user.user__username}" data-action="add" class="btn btn-primary pull-right add-btn updatefriend">Add friend</button>
@@ -114,7 +105,6 @@ function search(searchData) {
                             <div class="col-md-7 col-sm-7 d-flex flex-column justify-content-center">
                                 <h6 class="m-0"><a href="#" class="profile-link">${user.nguoidung2__user__username}</a></h6>
                                 <p class="text-muted name">${user.nguoidung2__user__last_name} ${user.nguoidung2__user__first_name}</p>
-                                <p class="text-muted m-0">${user.nguoidung2__sobanbe} Friend</p>
                             </div>
                             <div class="col-md-3 col-sm-3 d-flex align-items-center justify-content-center">
                                 <button data-product="${user.nguoidung2__user__username}" data-action="cancel" class="btn btn-white border-dark cancel-btn updatefriend">Cancel</button>
@@ -137,7 +127,6 @@ function search(searchData) {
                             <div class="col-md-7 col-sm-7 d-flex flex-column justify-content-center">
                                 <h6 class="m-0"><a href="#" class="profile-link">${user.nguoidung1__user__username}</a></h6>
                                 <p class="text-muted name">${user.nguoidung1__user__last_name} ${user.nguoidung1__user__first_name}</p>
-                                <p class="text-muted m-0">${user.nguoidung1__sobanbe} Friend</p>
                             </div>
                             <div class="col-md-3 col-sm-3 d-flex align-items-center justify-content-center">
                                 <button data-product="${user.nguoidung1__user__username}" data-action="accept" class="btn btn-primary me-3 pull-right accept-btn updatefriend">Accept</button>
@@ -162,7 +151,6 @@ function search(searchData) {
                             <div class="col-md-7 col-sm-7 d-flex flex-column justify-content-center">
                                 <h6 class="m-0"><a href="#" class="profile-link">${user.user__username}</a></h6>
                                 <p class="text-muted name">${user.user__last_name} ${user.user__first_name}</p>
-                                <p class="text-muted m-0">${user.sobanbe} Friend</p>
                             </div>
                             <div class="col-md-3 col-sm-3 d-flex align-items-center justify-content-center">
                             <button data-product="${user.user__username}" data-action="remove" class="btn btn-white border-dark remove-btn updatefriend">Unfriend</button>
@@ -178,7 +166,16 @@ function search(searchData) {
     
 }
 
-function updateUserOrder(userId, action) {
+var btnUpdate = document.getElementsByClassName('updatefriend');
+for (let index = 0; index < btnUpdate.length; index++) {
+    btnUpdate[index].addEventListener('click', function () {
+        var userId = this.dataset.product;
+        var action = this.dataset.action;
+        updateUserOrder(this,userId, action);
+    });
+}
+
+function updateUserOrder(element, userId, action) {
     var url = '/updatefriend/';
     fetch(url, {
             method: 'POST',
@@ -198,8 +195,6 @@ function updateUserOrder(userId, action) {
             return response.json();
         })
         .then((data) => {
-            console.log('Data:', data);
-
             // Gửi qua websocket
             addFriendSocket.send(JSON.stringify({
                 friendUsername: userId,
@@ -207,7 +202,38 @@ function updateUserOrder(userId, action) {
                 action: action,
             }));
 
-            location.reload();
+            if (data.message === 'Friendship added successfully') {
+                var successMessage = document.createElement('p');
+                successMessage.textContent = 'Đã gửi lời mời';
+                element.parentNode.insertBefore(successMessage, element);
+                element.style.display = 'none';
+                // element.parentNode.removeChild(element);
+                
+            }else if(data.message === 'Friendship removed successfully'){
+                var successMessage = document.createElement('p');
+                successMessage.textContent = 'Đã xóa bạn bè';
+                element.parentNode.insertBefore(successMessage, element);
+                element.style.display = 'none';
+
+            }else if(data.message === 'Friendship cancel successfully'){
+                var successMessage = document.createElement('p');
+                successMessage.textContent = 'Đã hủy lời mời';
+                element.parentNode.insertBefore(successMessage, element);
+                element.style.display = 'none';
+                
+            }else if(data.message === 'Friendship accepted successfully'){
+                var successMessage = document.createElement('p');
+                successMessage.textContent = 'Đã trở thành bạn bè';
+                element.parentNode.insertBefore(successMessage, element);
+                element.style.display = 'none';
+
+            }else if(data.message === 'Friendship refuse successfully'){
+                var successMessage = document.createElement('p');
+                successMessage.textContent = 'Đã hủy lời mời kết bạn';
+                element.parentNode.insertBefore(successMessage, element);
+                element.style.display = 'none';
+
+            }
         })
         .catch((error) => {
             console.error('Error:', error);

@@ -37,17 +37,165 @@ function updatelike(idPost, action) {
     });
 }
 
-function getCookie(name) {
-    var cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        var cookies = document.cookie.split(';');
-        for (var i = 0; i < cookies.length; i++) {
-            var cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
+document.addEventListener('DOMContentLoaded', function() {
+    var iconLikes = document.querySelectorAll('.loadUserLike');
+    iconLikes.forEach(function(iconLike) {
+        iconLike.addEventListener('click', function() {
+            var idPost = this.dataset.product; 
+            loadUserLike(idPost);
+        });
+    });
+});
+
+function loadUserLike(idPost) {
+    var csrftoken = getCookie('csrftoken'); // Assume you have a function to get csrf token
+    var url = '/loaduserlike/';
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken,
+        },
+        body: JSON.stringify({
+            'idPost': idPost
+        })
+    })
+    .then(function(response) {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(function(data) {
+        var load = document.querySelector('.hienUserLike');
+        load.innerHTML = '';
+        if (data.likeUsers.length > 0) {
+            var likeUsers = data.likeUsers;
+            load.innerHTML += `<div style="position: absolute; top: 0; right: 0; padding: 5px;">
+            <i class="fas fa-times" onclick="hideHienUserLike(this)"></i>
+            </div>
+            <h3 class=" text-center">Lượt thích</h3>
+            <hr class="bg-dark">`;
+            for (let i = 0; i < likeUsers.length; i++) {
+                const user = likeUsers[i];
+                let buttonHtml = '';
+                if (user.friendStatus === false) {
+                    buttonHtml = `<button data-product="${user.user__username}" data-action="add" class="btn btn-primary pull-right add-btn updatefriend">Add friend</button>`;
+                } else if (user.friendStatus === true) {
+                    buttonHtml = `<button data-product="${user.user__username}" data-action="remove" class="btn btn-white border-dark remove-btn updatefriend">Unfriend</button>`;
+                } else if (user.friendStatus === "pending_sender") {
+                    buttonHtml = `<button data-product="${user.user__username}" data-action="cancel" class="btn btn-white border-dark cancel-btn updatefriend">Cancel</button>`;
+                } else if (user.friendStatus === "pending_receiver") {
+                    buttonHtml = `<button data-product="${user.user__username}" data-action="accept" class="btn btn-primary me-3 pull-right accept-btn updatefriend">Accept</button>
+                                  <button data-product="${user.user__username}" data-action="refuse" class="btn btn-white border-dark refuse-btn updatefriend">Refuse</button>`;
+                }
+                load.innerHTML += `
+                <div class="nearby-user">
+                    <div class="row mb-3" style="margin: 0">
+                        <div class="col-md-2 col-sm-2 d-flex align-items-center justify-content-center">
+                            <img src="/media/${user.avatar}" alt="user" class="profile-photo-lg mx-auto d-block" style="height: 40px; width: 40px;">
+                        </div>
+                        <div class="col-md-7 col-sm-7 d-flex flex-column justify-content-center">
+                            <h6 class="m-0"><a href="#" class="profile-link">${user.user__username}</a></h6>
+                            <p class="text-muted name">${user.user__last_name} ${user.user__first_name}</p>
+                        </div>
+                        <div class="col-md-3 col-sm-3 d-flex align-items-center justify-content-center">
+                            ${buttonHtml}
+                        </div>
+                    </div>
+                </div>`;
             }
         }
-    }
-    return cookieValue;
+        
+    })
+    .catch(function(error) {
+        console.error('Error:', error);
+    });
 }
+
+function hideHienUserLike(element) {
+    var hienUserLike = element.closest('.hienUserLike');
+    hienUserLike.style.display = "none";
+}
+
+var btnUpdate = document.getElementsByClassName('updatefriend');
+for (let index = 0; index < btnUpdate.length; index++) {
+    btnUpdate[index].addEventListener('click', function () {
+        var userId = this.dataset.product;
+        var action = this.dataset.action;
+        updateUserOrder(this,userId, action);
+    });
+}
+
+function updateUserOrder(element, userId, action) {
+    var url = '/updatefriend/';
+    fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken,
+            },
+            body: JSON.stringify({
+                'userId': userId,
+                'action': action
+            })
+        })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then((data) => {
+            // Gửi qua websocket
+            addFriendSocket.send(JSON.stringify({
+                friendUsername: userId,
+                currentUser: username,
+                action: action,
+            }));
+            
+            var buttonHtml;
+            if (data.message === 'Friendship added successfully') {
+                buttonHtml = `<button data-product="${userId}" data-action="cancel" class="btn btn-white border-dark cancel-btn updatefriend">Cancel</button>`;
+            } else if (data.message === 'Friendship removed successfully') {
+                buttonHtml = `<button data-product="${userId}" data-action="add" class="btn btn-primary pull-right add-btn updatefriend">Add friend</button>`;
+            } else if (data.message === 'Friendship cancel successfully') {
+                buttonHtml = `<button data-product="${userId}" data-action="add" class="btn btn-primary pull-right add-btn updatefriend">Add friend</button>`;
+            } else if (data.message === 'Friendship accepted successfully') {
+                buttonHtml = `<button data-product="${userId}" data-action="remove" class="btn btn-white border-dark remove-btn updatefriend">Unfriend</button>`;
+            } else if (data.message === 'Friendship refuse successfully') {
+                buttonHtml = `<button data-product="${userId}" data-action="add" class="btn btn-primary pull-right add-btn updatefriend">Add friend</button>`;
+            }
+            element.outerHTML = buttonHtml;
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+}
+    let currentScroll = 0;
+    let scrollAmount = 320;
+
+    const sCont = document.querySelector(".stories");
+    const hScroll = document.querySelector(".status-wrapper");
+    const leftButton = document.querySelector("#scroll-left");
+    const rightButton = document.querySelector("#scroll-right");
+
+    let maxScroll = -sCont.offsetWidth + hScroll.offsetWidth;
+    leftButton.style.opacity = "0";
+
+    function scrollHorizontal(val) {
+    currentScroll += val * scrollAmount;
+    if (currentScroll >= 0) {
+        currentScroll = 0;
+        leftButton.style.opacity = "0";
+    } else {
+        leftButton.style.opacity = "1";
+    }
+    if (currentScroll <= maxScroll) {
+        currentScroll = maxScroll;
+        rightButton.style.opacity = "0";
+    } else {
+        rightButton.style.opacity = "1";
+    }
+    sCont.style.left = currentScroll + "px";
+    }

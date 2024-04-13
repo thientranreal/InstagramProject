@@ -13,6 +13,7 @@ urlpatterns = [
     path('friend', views.friend, name="friend"),
     path('updatefriend/', views.updatefriend, name="updatefriend"),
     path('updatelike/', views.updatelike, name="updatelike"),
+    path('loaduserlike/', views.loaduserlike, name="loaduserlike"),
     path('profile', views.getInfoProfile, name="profile"),
     path('messenger', views.messenger, name="messenger"),
     path('create_group', views.create_group, name="create_group"),

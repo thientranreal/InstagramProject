@@ -61,9 +61,9 @@
                 <div class="ngay-sinh">
                     <h3>Ngày sinh</h3>
                     <p>*Nhập ngày sinh theo định dạng yyyy-mm-dd (ví dụ: 2003-27-01)</p>
-                    {%if ngay_sinh_formatted%}
-                    <input type="text" class="form-control datepicker" value="{{ngay_sinh_formatted}}" name="ngaysinh" >
-                    {%endif%}
+                    
+                    <input type="text" class="form-control datepicker" {%if ngay_sinh_formatted%} value="{{ngay_sinh_formatted}}" {%endif%} name="ngaysinh" >
+                    
                 </div>
 
                 <button type="submit" class="btn btn-primary" name="action" value="submit">Submit</button>

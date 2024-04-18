@@ -100,7 +100,10 @@ function connectSocket() {
 
         otherUser = data.caller;
         remoteRTCMessage = data.rtcMessage
-        document.getElementById("callerName").innerHTML = otherUser;
+        // Sử dụng regular expression để tìm các số trong chuỗi
+        var numbers = otherUser.match(/\d+/);
+        var extractedNumber = numbers ? parseInt(numbers[0]) : null;
+        document.getElementById("callerName").innerHTML = extractedNumber;
         document.getElementById("call").style.display = "none";
         document.getElementById("answer").style.display = "block";
     }
@@ -345,9 +348,9 @@ function toggleMute() {
 
     // Cập nhật giao diện người dùng
     if (tracks[0].enabled) {
-        document.getElementById('mutene').src = "/static/assets/images/mute.jpg";
-    } else {
         document.getElementById('mutene').src = "/static/assets/images/unmute.jpg";
+    } else {
+        document.getElementById('mutene').src = "/static/assets/images/mute.jpg";
     }
 }
 

@@ -23,6 +23,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = text_data_json["message"]
         id_user = text_data_json["id_user"]
         id_receiver = text_data_json["id_receiver"]
+        user_name = text_data_json["user_name"]
         await self.channel_layer.group_send(
             self.group_name,
             {
@@ -30,12 +31,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 "message": message,
                 "id_user": id_user,
                 "id_receiver": id_receiver,
+                "user_name": user_name,
             },
         )
     async def chatbox_message(self, event):
         message = event["message"]
         id_receiver = event["id_receiver"]
         id_user = event["id_user"]
+        user_name = event["user_name"]
         # Check if the message is meant for this consumer
         # if id_receiver == self.scope["user"].id:
         await self.send(
@@ -44,6 +47,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     "message": message,
                     "id_user": id_user,
                     "id_receiver": id_receiver,
+                    "user_name": user_name,
                 }
             )
         )
@@ -241,6 +245,7 @@ class OnlineStatusConsumer(WebsocketConsumer):
 
 class CallConsumer(WebsocketConsumer):
         def connect(self):
+            self.group_name = "call"
             self.accept()
             self.send(text_data=json.dumps({
                 'type': 'connection',
@@ -305,6 +310,121 @@ class CallConsumer(WebsocketConsumer):
                     }
                 )
 
+        def call_received(self, event):
+            self.send(text_data=json.dumps({
+                'type': 'call_received',
+                'data': event['data']
+            }))
+
+
+        def call_answered(self, event):
+            self.send(text_data=json.dumps({
+                'type': 'call_answered',
+                'data': event['data']
+            }))
+
+
+        def ICEcandidate(self, event):
+            self.send(text_data=json.dumps({
+                'type': 'ICEcandidate',
+                'data': event['data']
+            }))
+            
+class GroupCallConsumer(WebsocketConsumer):
+        def connect(self):
+            self.group_name = "groupcall"
+            self.accept()
+            self.send(text_data=json.dumps({
+                'type': 'connection',
+                'data': {
+                    'message': "Connected"
+                }
+            }))
+
+        def disconnect(self, close_code):
+            async_to_sync(self.channel_layer.group_discard)(
+                self.my_name,
+                self.channel_name
+            )
+
+        # Receive message from client WebSocket
+        def receive(self, text_data):
+            text_data_json = json.loads(text_data)
+            eventType = text_data_json['type']
+
+            if eventType == 'login':
+                name = text_data_json['data']['id_user']
+                self.my_name = name
+                async_to_sync(self.channel_layer.group_add)(
+                    self.my_name,
+                    self.channel_name
+                )
+            
+            # if eventType == 'call':
+            #     name = text_data_json['data']['id_group']
+            #     async_to_sync(self.channel_layer.group_send)(
+            #         name,
+            #         {
+            #             'type': 'call_received',
+            #             'data': {
+            #                 'caller': self.my_name,
+            #                 'rtcMessage': text_data_json['data']['rtcMessage']
+            #             }
+            #         }
+            #     )
+            if eventType == 'call':
+            # Kiểm tra xem người gọi có quyền gọi đến nhóm không
+                caller = self.my_name
+                group_id = text_data_json['data']['id_group']
+                if self.check_call_permission(caller, group_id):
+                    async_to_sync(self.channel_layer.group_send)(
+                        group_id,
+                        {
+                            'type': 'call_received',
+                            'data': {
+                                'caller': self.my_name,
+                                'rtcMessage': text_data_json['data']['rtcMessage']
+                            }
+                        }
+                    )
+                else:
+                    self.send(text_data=json.dumps({
+                        'type': 'call_error',
+                        'data': {
+                            'message': "You do not have permission to call this group."
+                        }
+                    }))
+
+            if eventType == 'answer_call':
+                caller = text_data_json['data']['caller']
+                async_to_sync(self.channel_layer.group_send)(
+                    caller,
+                    {
+                        'type': 'call_answered',
+                        'data': {
+                            'rtcMessage': text_data_json['data']['rtcMessage']
+                        }
+                    }
+                )
+
+            if eventType == 'ICEcandidate':
+                user = text_data_json['data']['user']
+                async_to_sync(self.channel_layer.group_send)(
+                    user,
+                    {
+                        'type': 'ICEcandidate',
+                        'data': {
+                            'rtcMessage': text_data_json['data']['rtcMessage']
+                        }
+                    }
+                )
+        def check_call_permission(self, caller, group_id):
+            # Đây là nơi bạn kiểm tra xem người gọi có quyền gọi đến nhóm không
+            # Bạn có thể truy vấn cơ sở dữ liệu hoặc sử dụng logic tùy chỉnh ở đây
+            return True  # Trả về True nếu có quyền, False nếu không có quyền
+        
+        
+        
         def call_received(self, event):
             self.send(text_data=json.dumps({
                 'type': 'call_received',

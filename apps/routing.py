@@ -14,6 +14,7 @@ ws_urlpatterns=[
     re_path(r'ws/onlinestatus/', OnlineStatusConsumer.as_asgi()),
     # re_path(r'ws/videocall/(?P<room_name>\w+)/$', VideoCallConsumer.as_asgi()),
     re_path(r'ws/call/', CallConsumer.as_asgi()),
+    re_path(r'ws/groupcall/', GroupCallConsumer.as_asgi()),
     path('ws/online-status/', OnlineStatusConsumer.as_asgi()),
 ]
 

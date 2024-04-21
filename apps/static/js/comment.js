@@ -134,6 +134,23 @@ document.querySelectorAll(".comment-btn").forEach(function(element) {
     });
 });
 
+// Lấy ra tất cả các input có class là "comment-box"
+document.querySelectorAll('.comment-box').forEach(function(inputElement) {
+    // Thêm sự kiện keydown cho mỗi input
+    inputElement.addEventListener('keydown', function(event) {
+        // console.log(event.key);
+        // Kiểm tra xem phím được nhấn có phải là phím Enter không
+        if (event.key === 'Enter') {
+
+            // Lấy ra phần tử button.comment-btn gần nhất
+            let commentButton = inputElement.closest('.post').querySelector('.comment-btn');
+            // Gọi sự kiện click trên button.comment-btn
+            commentButton.click();
+        }
+    });
+});
+
+
 // Lắng nghe sự kiện click trên phần tử có class là 'no-comments'
 document.querySelectorAll(".no-comments").forEach(function (commentElement) {
     commentElement.addEventListener("click", function () {

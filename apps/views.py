@@ -416,10 +416,10 @@ def friend(request):
             friends = NguoiDung.objects.filter(id__in=all_friend_ids)
             
             return JsonResponse({
-                'other_users': list(other_users.values('avatar', 'user__username', 'user__first_name', 'user__last_name')), 
-                'sender_friend_ids': list(sender_friend_ids.values('nguoidung2__avatar', 'nguoidung2__user__username', 'nguoidung2__user__first_name', 'nguoidung2__user__last_name')), 
-                'receiver_friend_ids': list(receiver_friend_ids.values('nguoidung1__avatar', 'nguoidung1__user__username', 'nguoidung1__user__first_name', 'nguoidung1__user__last_name')), 
-                'friends': list(friends.values('avatar', 'user__username', 'user__first_name', 'user__last_name'))
+                'other_users': list(other_users.values('id', 'avatar', 'user__username', 'user__first_name', 'user__last_name')), 
+                'sender_friend_ids': list(sender_friend_ids.values('nguoidung2__id', 'nguoidung2__avatar', 'nguoidung2__user__username', 'nguoidung2__user__first_name', 'nguoidung2__user__last_name')), 
+                'receiver_friend_ids': list(receiver_friend_ids.values('nguoidung1__id', 'nguoidung1__avatar', 'nguoidung1__user__username', 'nguoidung1__user__first_name', 'nguoidung1__user__last_name')), 
+                'friends': list(friends.values('id', 'avatar', 'user__username', 'user__first_name', 'user__last_name'))
             })
     else:
         # Sử dụng truy vấn mặc định khi không có yêu cầu POST
@@ -798,3 +798,44 @@ def set_isread_notification(request):
         # người dùng hiện tại đọc hết tin nhắn
         ThongBao.objects.filter(nguoidung__user=request.user).update(is_read=True)
         return JsonResponse({'status': 'ok'})
+def loadfriend(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        user_id = data.get('id')
+        friends = BanBe.objects.filter(
+            Q(nguoidung1=user_id, is_banbe=True) | Q(nguoidung2=user_id, is_banbe=True)
+        ).select_related(
+            'nguoidung1', 'nguoidung2'
+        ).values(
+            'nguoidung1__id',
+            'nguoidung1__avatar',
+            'nguoidung1__user__username',
+            'nguoidung1__user__first_name',
+            'nguoidung1__user__last_name',
+            'nguoidung2__id',
+            'nguoidung2__avatar',
+            'nguoidung2__user__username',
+            'nguoidung2__user__first_name',
+            'nguoidung2__user__last_name'
+        )
+        friend_list = []
+        for friend in friends:
+            if friend['nguoidung1__id'] == int(user_id):
+                friend_data = {
+                    'id': friend['nguoidung2__id'],
+                    'avatar': friend['nguoidung2__avatar'],
+                    'username': friend['nguoidung2__user__username'],
+                    'first_name': friend['nguoidung2__user__first_name'],
+                    'last_name': friend['nguoidung2__user__last_name']
+                }
+            else:
+                friend_data = {
+                    'id': friend['nguoidung1__id'],
+                    'avatar': friend['nguoidung1__avatar'],
+                    'username': friend['nguoidung1__user__username'],
+                    'first_name': friend['nguoidung1__user__first_name'],
+                    'last_name': friend['nguoidung1__user__last_name']
+                }
+            friend_list.append(friend_data)
+        return JsonResponse({'friends': friend_list})
+    return JsonResponse({'error': 'Method not allowed'}, status=405)

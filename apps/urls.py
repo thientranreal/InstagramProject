@@ -15,7 +15,6 @@ urlpatterns = [
     path('updatelike/', views.updatelike, name="updatelike"),
     path('loaduserlike/', views.loaduserlike, name="loaduserlike"),
     path('profile', views.getInfoProfile, name="profile"),
-    path('loadfriend/', views.loadfriend, name="loadfriend"),
     path('messenger', views.messenger, name="messenger"),
     path('create_group', views.create_group, name="create_group"),
     path('delete-contact/', views.delete_contact, name='delete_contact'),

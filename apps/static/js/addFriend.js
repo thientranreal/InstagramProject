@@ -40,13 +40,10 @@ addFriendSocket.onmessage = function(e) {
 };
 
 document.addEventListener('DOMContentLoaded', function() {
-    var searchInput = document.querySelector('.search');
-    if (searchInput) { 
-        searchInput.addEventListener('input', function() {
-            var searchData = this.value; 
-            search(searchData);
-        });
-    }
+    document.querySelector('.search').addEventListener('input', function() {
+        var searchData = this.value; 
+        search(searchData);
+    });
 });
 
 function search(searchData) {
@@ -75,6 +72,7 @@ function search(searchData) {
             load.innerHTML += '<h6 class="mb-3"><a href="#" class="profile-link">Gợi ý kết bạn</a></h6>';
             for (let i = 0; i < otherUsersData.length; i++) {
                 const user = otherUsersData[i];
+        
                 load.innerHTML += `
                     <div class="nearby-user">
                         <div class="row mb-3">
@@ -82,7 +80,7 @@ function search(searchData) {
                                 <img src="/media/${user.avatar}" alt="user" class="profile-photo-lg mx-auto d-block">
                             </div>
                             <div class="col-md-7 col-sm-7 d-flex flex-column justify-content-center">
-                                <h6 class="m-0"><a href="profile_friend/${user.id}" class="profile-link">${user.user__username}</a></h6>
+                                <h6 class="m-0"><a href="#" class="profile-link">${user.user__username}</a></h6>
                                 <p class="text-muted name">${user.user__last_name} ${user.user__first_name}</p>
                             </div>
                             <div class="col-md-3 col-sm-3 d-flex align-items-center justify-content-center">
@@ -105,7 +103,7 @@ function search(searchData) {
                                 <img src="/media/${user.nguoidung2__avatar}" alt="user" class="profile-photo-lg mx-auto d-block">
                             </div>
                             <div class="col-md-7 col-sm-7 d-flex flex-column justify-content-center">
-                                <h6 class="m-0"><a href="profile_friend/${user.nguoidung2__id}" class="profile-link">${user.nguoidung2__user__username}</a></h6>
+                                <h6 class="m-0"><a href="#" class="profile-link">${user.nguoidung2__user__username}</a></h6>
                                 <p class="text-muted name">${user.nguoidung2__user__last_name} ${user.nguoidung2__user__first_name}</p>
                             </div>
                             <div class="col-md-3 col-sm-3 d-flex align-items-center justify-content-center">
@@ -127,7 +125,7 @@ function search(searchData) {
                                 <img src="/media/${user.nguoidung1__avatar}" alt="user" class="profile-photo-lg mx-auto d-block">
                             </div>
                             <div class="col-md-7 col-sm-7 d-flex flex-column justify-content-center">
-                                <h6 class="m-0"><a href="profile_friend/${user.nguoidung1__id}" class="profile-link">${user.nguoidung1__user__username}</a></h6>
+                                <h6 class="m-0"><a href="#" class="profile-link">${user.nguoidung1__user__username}</a></h6>
                                 <p class="text-muted name">${user.nguoidung1__user__last_name} ${user.nguoidung1__user__first_name}</p>
                             </div>
                             <div class="col-md-3 col-sm-3 d-flex align-items-center justify-content-center">
@@ -151,7 +149,7 @@ function search(searchData) {
                                 <img src="/media/${user.avatar}" alt="user" class="profile-photo-lg mx-auto d-block">
                             </div>
                             <div class="col-md-7 col-sm-7 d-flex flex-column justify-content-center">
-                                <h6 class="m-0"><a href="profile_friend/${user.id}" class="profile-link">${user.user__username}</a></h6>
+                                <h6 class="m-0"><a href="#" class="profile-link">${user.user__username}</a></h6>
                                 <p class="text-muted name">${user.user__last_name} ${user.user__first_name}</p>
                             </div>
                             <div class="col-md-3 col-sm-3 d-flex align-items-center justify-content-center">
@@ -161,7 +159,6 @@ function search(searchData) {
                     </div>`;
             }
         }
-        attachEventListeners();
     })
     .catch(function(error) {
         console.error('Error:', error);
@@ -229,35 +226,16 @@ function updateUserOrder(element, userId, action) {
                 successMessage.textContent = 'Đã trở thành bạn bè';
                 element.parentNode.insertBefore(successMessage, element);
                 element.style.display = 'none';
-                var acceptBtn = element.parentNode.querySelector('.refuse-btn');
-                if (acceptBtn) {
-                    acceptBtn.style.display = 'none';
-                }
 
             }else if(data.message === 'Friendship refuse successfully'){
                 var successMessage = document.createElement('p');
                 successMessage.textContent = 'Đã hủy lời mời kết bạn';
                 element.parentNode.insertBefore(successMessage, element);
                 element.style.display = 'none';
-                var acceptBtn = element.parentNode.querySelector('.accept-btn');
-                if (acceptBtn) {
-                    acceptBtn.style.display = 'none';
-                }
+
             }
         })
         .catch((error) => {
             console.error('Error:', error);
         });
-}
-
-function attachEventListeners() {
-    var btnUpdate = document.querySelectorAll('.updatefriend');
-    console.log(btnUpdate)
-    btnUpdate.forEach(function(button) {
-        button.addEventListener('click', function () {
-            var userId = this.dataset.product;
-            var action = this.dataset.action;
-            updateUserOrder(this, userId, action);
-        });
-    });
 }

@@ -30,12 +30,11 @@
 
     <div class="profile-stats">
       <ul>
-        {%if so_luong_baidang%}
         <li>
           <span class="profile-stat-count">{{ so_luong_baidang }}</span> Posts
         </li>
-        {%endif%}
-        <li>
+        {% csrf_token %}
+        <li class="m-0 loadFriend" data-product="{{nguoi_dung.id}}">
           <span class="profile-stat-count">{{ nguoi_dung.tong_luot_banbe }}</span>
           Friends
         </li>
@@ -111,8 +110,11 @@
   </div>
   <!-- End of container -->
 </main>
+<div class="hienfriend bg-light" id="hienUserLike" style="width: 700px; max-height: 300px; overflow-y: auto; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+</div>
 <script src="" async defer></script>
-<script src="{% static 'js/PersonalPage.js' %}"></script>
+  <script src="{% static 'js/addFriend.js'%}"></script>
+  <script src="{% static 'js/PersonalPage.js' %}"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>

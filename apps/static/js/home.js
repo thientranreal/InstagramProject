@@ -96,7 +96,7 @@ function loadUserLike(idPost) {
                             <img src="/media/${user.avatar}" alt="user" class="profile-photo-lg mx-auto d-block" style="height: 40px; width: 40px;">
                         </div>
                         <div class="col-md-7 col-sm-7 d-flex flex-column justify-content-center">
-                            <h6 class="m-0"><a href="#" class="profile-link">${user.user__username}</a></h6>
+                            <h6 class="m-0"><a href="profile_friend/${user.id}" class="profile-link">${user.user__username}</a></h6>
                             <p class="text-muted name">${user.user__last_name} ${user.user__first_name}</p>
                         </div>
                         <div class="col-md-3 col-sm-3 d-flex align-items-center justify-content-center">
@@ -106,7 +106,7 @@ function loadUserLike(idPost) {
                 </div>`;
             }
         }
-        
+        attachEventListeners()
     })
     .catch(function(error) {
         console.error('Error:', error);
@@ -118,60 +118,17 @@ function hideHienUserLike(element) {
     hienUserLike.style.display = "none";
 }
 
-var btnUpdate = document.getElementsByClassName('updatefriend');
-for (let index = 0; index < btnUpdate.length; index++) {
-    btnUpdate[index].addEventListener('click', function () {
-        var userId = this.dataset.product;
-        var action = this.dataset.action;
-        updateUserOrder(this,userId, action);
+function attachEventListeners() {
+    var btnUpdate = document.querySelectorAll('.updatefriend');
+    btnUpdate.forEach(function(button) {
+        button.addEventListener('click', function () {
+            var userId = this.dataset.product;
+            var action = this.dataset.action;
+            updateUserOrder(this, userId, action);
+        });
     });
 }
 
-function updateUserOrder(element, userId, action) {
-    var url = '/updatefriend/';
-    fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrftoken,
-            },
-            body: JSON.stringify({
-                'userId': userId,
-                'action': action
-            })
-        })
-        .then((response) => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then((data) => {
-            // Gửi qua websocket
-            addFriendSocket.send(JSON.stringify({
-                friendUsername: userId,
-                currentUser: username,
-                action: action,
-            }));
-            
-            var buttonHtml;
-            if (data.message === 'Friendship added successfully') {
-                buttonHtml = `<button data-product="${userId}" data-action="cancel" class="btn btn-white border-dark cancel-btn updatefriend">Cancel</button>`;
-            } else if (data.message === 'Friendship removed successfully') {
-                buttonHtml = `<button data-product="${userId}" data-action="add" class="btn btn-primary pull-right add-btn updatefriend">Add friend</button>`;
-            } else if (data.message === 'Friendship cancel successfully') {
-                buttonHtml = `<button data-product="${userId}" data-action="add" class="btn btn-primary pull-right add-btn updatefriend">Add friend</button>`;
-            } else if (data.message === 'Friendship accepted successfully') {
-                buttonHtml = `<button data-product="${userId}" data-action="remove" class="btn btn-white border-dark remove-btn updatefriend">Unfriend</button>`;
-            } else if (data.message === 'Friendship refuse successfully') {
-                buttonHtml = `<button data-product="${userId}" data-action="add" class="btn btn-primary pull-right add-btn updatefriend">Add friend</button>`;
-            }
-            element.outerHTML = buttonHtml;
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-        });
-}
     let currentScroll = 0;
     let scrollAmount = 320;
 

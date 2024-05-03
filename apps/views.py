@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth import login as auth_login, logout, get_user_model, authenticate
+from django.contrib.auth import logout as auth_logout
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.models import User
@@ -225,6 +226,8 @@ def format_time_ago(timestamp):
         return timestamp.strftime("%Y-%m-%d %H:%M")
 
 def messenger(request):
+    if not request.user.is_authenticated:
+        return redirect("login")
     # current_user = request.user.nguoidung
     current_user = request.user.nguoidung
     lienlac = BanBe.objects.filter(Q(nguoidung1=current_user) | Q(nguoidung2=current_user))
@@ -377,6 +380,8 @@ def create_group(request):
     return redirect('messenger')
 
 def friend(request):
+    if not request.user.is_authenticated:
+        return redirect("login")
     current_user = request.user.nguoidung
     if request.method == 'POST':
         data = json.loads(request.body)
@@ -522,6 +527,8 @@ def edit_profile(request):
         pass
 
 def profile_friend(request, user_id):
+    if not request.user.is_authenticated:
+        return redirect("login")
     current_user = request.user.nguoidung
     nguoi_dung = NguoiDung.objects.get(pk=user_id)
     if current_user.id == nguoi_dung.id:
@@ -773,6 +780,8 @@ def get_admin_nguoidung():
         return None  # Xử lý trường hợp không tìm thấy thông tin người dùng tương ứng
     
 def getInfoProfile(request):
+    if not request.user.is_authenticated:
+        return redirect("login")
     current_user = request.user.nguoidung
     # Truyền dữ liệu nguoi_dungs vào template profile.html
     danh_sach_baidang = BaiDang.objects.filter(nguoidung=current_user)
@@ -798,6 +807,7 @@ def set_isread_notification(request):
         # người dùng hiện tại đọc hết tin nhắn
         ThongBao.objects.filter(nguoidung__user=request.user).update(is_read=True)
         return JsonResponse({'status': 'ok'})
+
 def loadfriend(request):
     if request.method == 'POST':
         data = json.loads(request.body)
@@ -839,3 +849,7 @@ def loadfriend(request):
             friend_list.append(friend_data)
         return JsonResponse({'friends': friend_list})
     return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+def logout(request):
+    auth_logout(request)
+    return redirect('login')

@@ -38,6 +38,28 @@
         return cookieValue;
       }
       const csrftoken = getCookie("csrftoken");
+      function logoutUser() {
+        var url = '/logout';
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken,
+            },
+        })
+        .then(function(response) {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            window.location.href = '/login';
+        })
+        .then(function(data) {
+          window.location.href = '/login';
+        })
+        .catch(function(error) {
+            console.error('Error:', error);
+        });
+    }
     </script>
   </head>
   <body>
@@ -163,6 +185,7 @@
                 <img id="avatar" src="{% static "assets/images/profile/status-0.png" %}" class="icons user-account rounded-circle" alt="User Profile" style="width: 27px; height: 27px;" />
               {% endif %}
             </a>
+                <img id="logout" src="{% static "assets/images/logout.png" %}" class="icons user-account rounded-circle" alt="User Profile" style="width: 27px; height: 27px;" onclick="logoutUser()"/>
           </div>
         </div>
       </div>

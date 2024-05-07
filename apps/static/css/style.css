@@ -176,7 +176,15 @@ body {
   margin-top: 5px;
   color: #332c2c;
 }
-
+#changePassword{
+  z-index: 99;
+  display: none;
+  width: 500px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
 .post {
   width: 100;
   height: auto;

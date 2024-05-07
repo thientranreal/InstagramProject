@@ -67,7 +67,7 @@ This is a social website built using Django, a high-level Python web framework, 
 9. Change password
 <img src="apps/static/image/READMEIMG/changePassword.png" alt="Change password">
 10. Friends
-<img src="apps/static/image/READMEIMG" alt="">
+<img src="apps/static/image/READMEIMG/friend.png" alt="Friends">
 11. Notifications
 <img src="apps/static/image/READMEIMG" alt="Notifications">
 12. Messenger

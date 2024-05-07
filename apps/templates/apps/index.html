@@ -185,11 +185,45 @@
                 <img id="avatar" src="{% static "assets/images/profile/status-0.png" %}" class="icons user-account rounded-circle" alt="User Profile" style="width: 27px; height: 27px;" />
               {% endif %}
             </a>
-                <img id="logout" src="{% static "assets/images/logout.png" %}" class="icons user-account rounded-circle" alt="User Profile" style="width: 27px; height: 27px;" onclick="logoutUser()"/>
+            {% if request.path == '/profile' %}
+            <img src="{% static "assets/images/changePassword.png" %}" class="icons user-account rounded-circle" alt="changPassword" style="width: 27px; height: 27px;" onclick="openFormChangPassword()"/>
+            {% endif %}
+            <img id="logout" src="{% static "assets/images/logout.png" %}" class="icons user-account rounded-circle" alt="logout" style="width: 27px; height: 27px;" onclick="logoutUser()"/>
           </div>
         </div>
       </div>
     </nav>
+     <div id="changePassword" class="rounded-lg shadow bg-dark">
+      <div class="p-4">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+              <h2 class="text-xl font-bold text-center mx-auto text-white">Thay đổi mật khẩu</h2>
+              <button type="button" class="btn btn-sm btn-light" onclick="closeFormChangPassword()">
+                  <i class="fas fa-times"></i>
+              </button>
+          </div>
+          <form id="changePasswordForm" class="space-y-4" method="POST">
+              <div class="form-group">
+                  <label for="maXL" class="block mb-2 text-sm font-medium text-white">Mật khẩu hiện tại</label>
+                  <input type="password" class="form-control" id="matKhauCu" name="matKhauCu" placeholder="Mật khẩu hiện tại">
+                  <p class="errorMK text-danger"></p>
+              </div>
+              <div class="form-group">
+                <label for="maXL" class="block mb-2 text-sm font-medium text-white">Mật khẩu mới</label>
+                <input type="password" class="form-control" id="matKhauMoi" name="matKhauMoi" placeholder="Mật khẩu mới">
+                <p class="errorMKM text-danger"></p>
+            </div>
+            <div class="form-group">
+              <label for="maXL" class="block mb-2 text-sm font-medium text-white">Xác nhận mật khẩu mới</label>
+              <input type="password" class="form-control" id="xacNhanMatKhauMoi" name="xacNhanMatKhauMoi" placeholder="Xác nhận mật khẩu mới">
+              <p class="errorXNMKM text-danger"></p>
+          </div>
+              <div class="text-center">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-primary btn-lg">Thay đổi</button>
+              </div>
+          </form>
+      </div>
+    </div> 
     <nav class="navbar-mobile-top">
       <div class="navbar-wrapper">
         <img src="{% static 'assets/images/instagram_logo.png' %}" alt="Instagram logo" class="logo" />
@@ -218,6 +252,76 @@
     {% block profile %}{% endblock profile %} 
     {% block friend %}{% endblock friend %} 
     <script>
+
+      document.getElementById('changePasswordForm').addEventListener('submit', function(event) {
+          event.preventDefault();
+          const matKhauCu = document.getElementById('matKhauCu').value;
+          const matKhauMoi = document.getElementById('matKhauMoi').value;
+          const xacNhanMatKhauMoi = document.getElementById('xacNhanMatKhauMoi').value;
+      
+          if (matKhauMoi !== xacNhanMatKhauMoi) {
+              document.querySelector('.errorMKM').textContent ='Mật khẩu mới và xác nhận mật khẩu mới không trùng khớp.'
+              document.querySelector('.errorXNMKM').textContent ='Mật khẩu mới và xác nhận mật khẩu mới không trùng khớp.'
+              return;
+          }else{
+              document.querySelector('.errorMKM').textContent =''
+              document.querySelector('.errorXNMKM').textContent =''
+          }
+      
+          if (matKhauCu === '') {
+              document.querySelector('.errorMK').textContent ='Vui lòng nhập mật khẩu cũ.'
+              return;
+          }else{
+              document.querySelector('.errorMK').textContent =''
+          }
+          
+          if (matKhauMoi === '') {
+              document.querySelector('.errorMKM').textContent ='Vui lòng nhập mật khẩu mới.'
+              return;
+          }else{
+              document.querySelector('.errorMKM').textContent =''
+          }
+          
+          if (xacNhanMatKhauMoi === '') {
+              document.querySelector('.errorXNMKM').textContent ='Vui lòng nhập xác nhận mật khẩu mới.'
+              return;
+          }else{
+              document.querySelector('.errorXNMKM').textContent =''
+          }
+      
+          fetch('/changePassword', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'X-CSRFToken': csrftoken,
+              },
+              body: JSON.stringify({
+                  'matKhauCu': matKhauCu, 
+                  'matKhauMoi': matKhauMoi, 
+              })
+          })
+          .then(response => response.json())
+          .then(data => {
+              if (data.success) {
+                  alert(data.message);
+                  document.getElementById("changePassword").style.display = "none";
+              } else {
+                  document.querySelector('.errorMK').textContent = data.message;
+              }
+          })
+          .catch(error => {
+              console.error('Error:', error);
+          });
+      });
+
+      function openFormChangPassword() {
+        document.getElementById("changePassword").style.display = "block";
+      }
+
+      function closeFormChangPassword() {
+        document.getElementById("changePassword").style.display = "none";
+      }
+
       $(document).ready(function () {
         // Toggle notification container on notification link click
         $("#notificationLink").click(function (event) {

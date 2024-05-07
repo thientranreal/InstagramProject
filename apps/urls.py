@@ -39,6 +39,7 @@ urlpatterns = [
     path('xoa_baidang/<int:baidang_id>/', views.xoa_baidang, name='xoa_baidang'),
     path('add_notification', views.add_notification),
     path('is_read_notification', views.set_isread_notification),
+    path('changePassword', views.changePassword,name='changePassword'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
       

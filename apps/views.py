@@ -853,3 +853,38 @@ def loadfriend(request):
 def logout(request):
     auth_logout(request)
     return redirect('login')
+
+from django.contrib.auth import authenticate
+
+from django.http import JsonResponse
+import json
+
+def changePassword(request):
+    if request.method == "POST":
+        user = request.user
+        data = json.loads(request.body)
+        print(data)
+        mat_khau_cu = data['matKhauCu']
+        mat_khau_moi = data['matKhauMoi']
+        print(mat_khau_cu)
+        print(mat_khau_moi)
+    
+        if user.check_password(mat_khau_cu):
+            user.set_password(mat_khau_moi)
+            user.save()
+            response_data = {
+                'success': True, 
+                'message': 'Thay đổi mật khẩu thành công'  
+            }
+        else:
+            response_data = {
+                'success': False, 
+                'message': 'Mật khẩu cũ không đúng. Vui lòng thử lại.'  
+            }
+        print(response_data)
+        return JsonResponse(response_data)
+    else:
+        # Trả về một phản hồi HTTP khi request method không phải là POST
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+
+

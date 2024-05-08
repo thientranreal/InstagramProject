@@ -19,6 +19,12 @@ from django.utils import timezone
 from .models import *
 import json
 import re
+from django.core.files.base import ContentFile
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from io import BytesIO
+from PIL import Image as PILImage
+import sys
+
 
 def home(request):
     if not request.user.is_authenticated:
@@ -498,21 +504,43 @@ def editProfile(request):
 def edit_profile(request):
     if request.method == 'POST':
         if 'action' in request.POST:
-            if request.POST['action']== 'submit':
+            if request.POST['action'] == 'submit':
                 current_user = request.user
                 # Lấy dữ liệu từ request
                 mota = request.POST.get('mota')
-                ngaysinh=request.POST.get('ngaysinh')
-                phone=request.POST.get('phone')
-                gioitinh=request.POST.get('gioitinh')
+                ngaysinh = request.POST.get('ngaysinh')
+                phone = request.POST.get('phone')
+                gioitinh = request.POST.get('gioitinh')
 
-                nguoidung1=NguoiDung.objects.get(user=current_user)
+                nguoidung1 = NguoiDung.objects.get(user=current_user)
+
+                # Kiểm tra xem người dùng đã cắt ảnh mới chưa
                 if 'hinhanh_url' in request.FILES:
                     hinhanh_url = request.FILES['hinhanh_url']
-                    nguoidung1.avatar = hinhanh_url
-                    nguoidung1.save()
+                    # Lưu trữ ảnh đã được cắt
+                    img_temporary = PILImage.open(hinhanh_url)
+                    
+                    # Tính toán kích thước của phần cắt
+                    min_size = min(img_temporary.width, img_temporary.height)
+                    left = (img_temporary.width - min_size) / 2
+                    top = (img_temporary.height - min_size) / 2
+                    right = (img_temporary.width + min_size) / 2
+                    bottom = (img_temporary.height + min_size) / 2
+                    
+                    # Cắt ảnh theo hình vuông
+                    img_cropped = img_temporary.crop((left, top, right, bottom))
+                    
+                    output_io_stream = BytesIO()  # Tạo một luồng io mới để lưu trữ ảnh đã cắt
+                    img_cropped.save(output_io_stream, format='PNG')  # Lưu ảnh đã cắt vào luồng io
+                    output_io_stream.seek(0)  # Đặt con trỏ về đầu luồng io
 
-                # Tạo một bài đăng mới
+                    # Tạo một đối tượng InMemoryUploadedFile từ luồng io
+                    img_file = InMemoryUploadedFile(output_io_stream, 'ImageField', "%s.png" % hinhanh_url.name.split('.')[0], 'image/png', sys.getsizeof(output_io_stream), None)
+
+                    # Lưu ảnh đã cắt vào trường avatar của đối tượng NguoiDung
+                    nguoidung1.avatar.save("%s.png" % hinhanh_url.name.split('.')[0], img_file, save=True)
+
+                # Cập nhật các thông tin khác của người dùng
                 nguoidung = NguoiDung.objects.filter(user=current_user).update(
                     ngaysinh=ngaysinh,      
                     phone=phone,       
@@ -520,8 +548,8 @@ def edit_profile(request):
                     mota=mota 
                 )
 
-                # Chuyển hướng người dùng đến trang khác hoặc thông báo thành công
-                return redirect('profile')  # Chuyển hướng về trang chủ sau khi chia sẻ thành công
+                # Chuyển hướng người dùng đến trang profile
+                return redirect('profile')
     else:
         # Xử lý logic khi yêu cầu không phải là POST
         pass
@@ -549,21 +577,52 @@ def create_post(request):
     if request.method == 'POST':
         # Lấy dữ liệu từ request
         noidung = request.POST.get('noidung')
+        
+        # Kiểm tra xem có ảnh được tải lên không
         if 'hinhanh_url' in request.FILES:
             hinhanh_url = request.FILES['hinhanh_url']
-        else:
-            hinhanh_url = None
-        # Tạo một bài đăng mới
-        baidang = BaiDang.objects.create(
-            nguoidung=request.user.nguoidung,  # Sử dụng người dùng hiện tại đang đăng nhập
-            noidung=noidung,
-            thoigiandang=datetime.now(),
-        )
-        baidang.hinhanh=hinhanh_url
-        baidang.save()
+            
+            # Lưu trữ ảnh đã được cắt
+            img_temporary = PILImage.open(hinhanh_url)
+            
+            # Tính toán kích thước của phần cắt
+            min_size = min(img_temporary.width, img_temporary.height)
+            left = (img_temporary.width - min_size) / 2
+            top = (img_temporary.height - min_size) / 2
+            right = (img_temporary.width + min_size) / 2
+            bottom = (img_temporary.height + min_size) / 2
+            
+            # Cắt ảnh theo hình vuông
+            img_cropped = img_temporary.crop((left, top, right, bottom))
+            
+            # Tạo một luồng io mới để lưu trữ ảnh đã cắt
+            output_io_stream = BytesIO()
+            img_cropped.save(output_io_stream, format='PNG')
+            output_io_stream.seek(0)  # Đặt con trỏ về đầu luồng io
+            
+            # Tạo một đối tượng InMemoryUploadedFile từ luồng io
+            img_file = InMemoryUploadedFile(output_io_stream, 'ImageField', "%s.png" % hinhanh_url.name.split('.')[0], 'image/png', sys.getsizeof(output_io_stream), None)
 
-        # Chuyển hướng người dùng đến trang khác hoặc thông báo thành công
-        return redirect('home')  # Chuyển hướng về trang chủ sau khi chia sẻ thành công
+            # Tạo một bài đăng mới và lưu ảnh đã cắt vào trường hinhanh
+            baidang = BaiDang.objects.create(
+                nguoidung=request.user.nguoidung,  # Sử dụng người dùng hiện tại đang đăng nhập
+                noidung=noidung,
+                thoigiandang=datetime.now(),
+                hinhanh=img_file
+            )
+
+            # Chuyển hướng người dùng đến trang chủ
+            return redirect('home')
+        else:
+            # Nếu không có ảnh được tải lên, tạo bài đăng mà không có ảnh
+            BaiDang.objects.create(
+                nguoidung=request.user.nguoidung,  # Sử dụng người dùng hiện tại đang đăng nhập
+                noidung=noidung,
+                thoigiandang=datetime.now(),
+            )
+
+            # Chuyển hướng người dùng đến trang chủ
+            return redirect('home')
     else:
         # Xử lý logic khi yêu cầu không phải là POST
         pass
@@ -585,12 +644,35 @@ def edit_post(request, baidang_id):
         # Kiểm tra và cập nhật hình ảnh nếu có
         if 'hinhanh_url' in request.FILES:
             hinhanh_url = request.FILES['hinhanh_url']
-            baidang.hinhanh = hinhanh_url
+            
+            # Lưu trữ ảnh đã được cắt
+            img_temporary = PILImage.open(hinhanh_url)
+            
+            # Tính toán kích thước của phần cắt
+            min_size = min(img_temporary.width, img_temporary.height)
+            left = (img_temporary.width - min_size) / 2
+            top = (img_temporary.height - min_size) / 2
+            right = (img_temporary.width + min_size) / 2
+            bottom = (img_temporary.height + min_size) / 2
+            
+            # Cắt ảnh theo hình vuông
+            img_cropped = img_temporary.crop((left, top, right, bottom))
+            
+            # Tạo một luồng io mới để lưu trữ ảnh đã cắt
+            output_io_stream = BytesIO()
+            img_cropped.save(output_io_stream, format='PNG')
+            output_io_stream.seek(0)  # Đặt con trỏ về đầu luồng io
+            
+            # Tạo một đối tượng InMemoryUploadedFile từ luồng io
+            img_file = InMemoryUploadedFile(output_io_stream, 'ImageField', "%s.png" % hinhanh_url.name.split('.')[0], 'image/png', sys.getsizeof(output_io_stream), None)
+            
+            # Gán ảnh đã cắt cho trường hinhanh
+            baidang.hinhanh = img_file
 
         # Lưu các thay đổi vào cơ sở dữ liệu
         baidang.save()
 
-        # Chuyển hướng người dùng đến trang khác hoặc thông báo thành công
+        # Chuyển hướng người dùng đến trang profile
         return redirect('profile')
     else:
         # Xử lý logic khi yêu cầu không phải là POST

@@ -261,3 +261,47 @@ function attachEventListeners() {
         });
     });
 }
+
+document.querySelectorAll('h6.suggest').forEach(function(h6) {
+    h6.addEventListener('click', function() {
+      var nearbyUser = document.querySelector('.suggestDiv');
+      if (nearbyUser.style.display === 'none') {
+        nearbyUser.style.display = 'block';
+      } else {
+        nearbyUser.style.display = 'none';
+      }
+    });
+  });
+
+document.querySelectorAll('h6.invitation').forEach(function(h6) {
+    h6.addEventListener('click', function() {
+        var nearbyUser = document.querySelector('.invitationDiv');
+        if (nearbyUser.style.display === 'none') {
+        nearbyUser.style.display = 'block';
+        } else {
+        nearbyUser.style.display = 'none';
+        }
+    });
+});
+
+document.querySelectorAll('h6.request').forEach(function(h6) {
+    h6.addEventListener('click', function() {
+        var nearbyUser = document.querySelector('.requestDiv');
+        if (nearbyUser.style.display === 'none') {
+        nearbyUser.style.display = 'block';
+        } else {
+        nearbyUser.style.display = 'none';
+        }
+    });
+});
+
+document.querySelectorAll('h6.friend').forEach(function(h6) {
+    h6.addEventListener('click', function() {
+        var nearbyUser = document.querySelector('.friendDiv');
+        if (nearbyUser.style.display === 'none') {
+        nearbyUser.style.display = 'block';
+        } else {
+        nearbyUser.style.display = 'none';
+        }
+    });
+});

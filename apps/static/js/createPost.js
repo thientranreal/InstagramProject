@@ -8,19 +8,49 @@ document.getElementById('selectImage').addEventListener('click', function(e) {
 });
 
 // Lắng nghe sự kiện thay đổi của input type=file
-document.getElementById('imageInput').addEventListener('change', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Lấy file đã chọn
-    const selectedFile = this.files[0];
-    if (selectedFile) {
-        // Tạo đường dẫn đến file đã chọn
-        const objectURL = URL.createObjectURL(selectedFile);
-        // Hiển thị ảnh đã chọn lên thẻ <img>
-        document.querySelector('.image-visibility').style.display = 'block';
-        document.getElementById('selectedImage').src = objectURL;
-        // Ẩn class select-icon
-        document.querySelector('.select-icon').style.display = 'none';
-    }
+    const imageInput  = document.getElementById('imageInput');
+    const croppedImage =document.getElementById('selectedImage');
+    let cropper;
+    imageInput.addEventListener('change', function () {
+        const file = this.files[0];
+        const reader = new FileReader();
+
+        reader.onload = function (event) {
+            const img = new Image();
+            img.src = event.target.result;
+
+            img.onload = function () {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+
+                // Kích thước của phần cắt
+                let size = Math.min(img.width, img.height);
+                let x = (img.width - size) / 2;
+                let y = (img.height - size) / 2;
+
+                // Tạo canvas vuông với kích thước cố định
+                canvas.width = 300; // Đổi kích thước tùy ý
+                canvas.height = 300; // Đổi kích thước tùy ý
+
+                // Vẽ phần cắt của ảnh lên canvas
+                ctx.drawImage(img, x, y, size, size, 0, 0, canvas.width, canvas.height);
+
+                // Hiển thị ảnh đã cắt lên thẻ img
+                document.querySelector('.image-visibility').style.display = 'block';
+
+                // Ẩn class select-icon
+                document.querySelector('.select-icon').style.display = 'none';
+                croppedImage.src = canvas.toDataURL();
+            };
+        };
+
+        reader.readAsDataURL(file);
+    });
 });
+// end
+
 // end
 
 // xử lý add-icon

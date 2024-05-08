@@ -398,8 +398,9 @@ def friend(request):
             other_users = NguoiDung.objects.filter(id__in=search_user_ids).exclude(
                 Q(id=current_user.id) | 
                 Q(id__in=BanBe.objects.filter(nguoidung1_id=current_user.id).values_list('nguoidung2_id', flat=True)) | 
-                Q(id__in=BanBe.objects.filter(nguoidung2_id=current_user.id).values_list('nguoidung1_id', flat=True)) 
-            )
+                Q(id__in=BanBe.objects.filter(nguoidung2_id=current_user.id).values_list('nguoidung1_id', flat=True))
+            ).order_by('?')[:10]
+
             
             sender_friend_ids = BanBe.objects.filter(
                 nguoidung1_id=current_user.id, 
@@ -433,17 +434,16 @@ def friend(request):
                 'friends': list(friends.values('id', 'avatar', 'user__username', 'user__first_name', 'user__last_name'))
             })
     else:
-        # Sử dụng truy vấn mặc định khi không có yêu cầu POST
         other_users = NguoiDung.objects.exclude(
             Q(id=current_user.id) | 
             Q(id__in=BanBe.objects.filter(nguoidung1_id=current_user.id).values_list('nguoidung2_id', flat=True)) | 
             Q(id__in=BanBe.objects.filter(nguoidung2_id=current_user.id).values_list('nguoidung1_id', flat=True))
-        )
-        # Lấy tất cả bạn của người dùng hiện tại (người gửi lời mời kết bạn)
+        ).order_by('?')[:10]
+
         sender_friend_ids = BanBe.objects.filter(nguoidung1_id=current_user.id, is_banbe=False)
-        # Lấy tất cả bạn của người dùng hiện tại (người nhận lời mời kết bạn) 
+
         receiver_friend_ids = BanBe.objects.filter(nguoidung2_id=current_user.id, is_banbe=False)
-        # Lấy tất cả bạn của người dùng hiện tại
+
         friend_ids = BanBe.objects.filter(Q(nguoidung1_id=current_user.id) | Q(nguoidung2_id=current_user.id), is_banbe=True)
         all_friend_ids = []
         for friend in friend_ids:

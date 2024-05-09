@@ -327,19 +327,19 @@ let videone = document.getElementById('videone');
 mutene.addEventListener('click', toggleMute);
 videone.addEventListener('click', toggleVideo);
 
-function toggleMute() {
-    let tracks = localStream.getAudioTracks();
-    tracks.forEach(track => {
-        track.enabled = !track.enabled; // Bật hoặc tắt âm thanh
-    });
-}
+// function toggleMute() {
+//     let tracks = localStream.getAudioTracks();
+//     tracks.forEach(track => {
+//         track.enabled = !track.enabled; // Bật hoặc tắt âm thanh
+//     });
+// }
 
-function toggleVideo() {
-    let tracks = localStream.getVideoTracks();
-    tracks.forEach(track => {
-        track.enabled = !track.enabled; // Bật hoặc tắt video
-    });
-}
+// function toggleVideo() {
+//     let tracks = localStream.getVideoTracks();
+//     tracks.forEach(track => {
+//         track.enabled = !track.enabled; // Bật hoặc tắt video
+//     });
+// }
 function toggleMute() {
     let tracks = localStream.getAudioTracks();
     tracks.forEach(track => {

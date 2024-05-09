@@ -59,26 +59,41 @@ def home(request):
 
         messages = []
 
+        # Lấy các tin nhắn mà có liên quan đến người dùng hiện tại và group by 
         messages_current_user = TinNhan.objects.filter(
             Q(receiver=request.user.nguoidung) | Q(senter=request.user.nguoidung)
-        ).values('senter', 'receiver').annotate(thoigian_moi_nhat=Max('thoigian'))
+        ).values('senter_id', 'receiver_id').annotate(thoigian_moi_nhat=Max('thoigian'))
 
+
+        # Sắp xếp giảm dần theo thời gian mới nhất
+        messages_current_user = messages_current_user.order_by('-thoigian_moi_nhat')
+
+        # Tạo mảng để chứa người gửi và người nhận duy nhất
+        unique_pair = []
         for message in messages_current_user:
-            senter_id = message['senter']
-            receiver_id = message['receiver']
+            senter_id = message['senter_id']
+            receiver_id = message['receiver_id']
+
+            # Sắp xếp cặp theo thứ tự tăng dần
+            sorted_pair = tuple(sorted((senter_id, receiver_id)))
+
+            # Kiểm tra xem cặp có trong danh sách unique_pair hay không
+            if not sorted_pair in unique_pair:
+                unique_pair.append(sorted_pair)
+            else:
+                continue
 
             senter = NguoiDung.objects.get(id=senter_id)
             receiver = NguoiDung.objects.get(id=receiver_id)
 
-            if senter.user.username == request.user.username:
-                newestTime = message['thoigian_moi_nhat']
-                newestMessage = TinNhan.objects.filter(receiver__id=receiver_id, thoigian=newestTime).first()
-                messages.append({'nguoidung': receiver, 'noidung': newestMessage.noidung})
-            elif receiver.user.username == request.user.username:
-                newestTime = message['thoigian_moi_nhat']
-                newestMessage = TinNhan.objects.filter(senter__id=senter_id, thoigian=newestTime).first()
+            newestTime = message['thoigian_moi_nhat']
+            newestMessage = TinNhan.objects.filter(senter_id=senter_id, receiver_id=receiver_id, thoigian=newestTime).first()
+
+            if senter.user == request.user:
+                messages.append({'nguoidung': receiver, 'noidung': f'Bạn: {newestMessage.noidung}'})
+            elif receiver.user == request.user:
                 messages.append({'nguoidung': senter, 'noidung': newestMessage.noidung})
-        
+            
         # Lấy thông báo chưa đọc của người dùng
         notifications = ThongBao.objects.filter(Q(nguoidung__user=request.user) & Q(is_read=False))
     else:

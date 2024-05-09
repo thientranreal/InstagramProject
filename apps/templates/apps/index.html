@@ -120,8 +120,8 @@
 
 
             <div class="message">
+              {% for message in messages %}
               <div class="member">
-                {% for message in messages %}
                   {% if message.nguoidung.avatar %}
                       <!-- Nếu người dùng có avatar, hiển thị avatar -->
                       <img src="{{ message.nguoidung.avatar.url }}" alt="Avatar của người dùng">
@@ -133,8 +133,8 @@
                     {{message.nguoidung.user.username}}<br />
                     <p>{{message.noidung}}</p>
                   </h1>
-                {% endfor %}
               </div>
+              {% endfor %}
               <div id="notificationFooter"><a href="{% url 'messenger' %}">See All Messenger</a></div>
             </div>
             <!-- <hr /> -->

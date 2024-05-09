@@ -33,6 +33,33 @@ addFriendSocket.onmessage = function(e) {
 
         location.reload();
     }
+    // Nếu là type accept và thì sẽ thông báo cho người dùng gửi kết bạn
+    else if (data.type === "accept" && data.friend_username === username) {
+        // Nội dung
+        let noidung = `<p>${data.friend_username} has accepted you</p>`;
+
+        // Thêm thông báo có người kết bạn
+        fetch('/add_notification', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                // Thêm CSRF token để Django chấp nhận yêu cầu
+                'X-CSRFToken': csrftoken
+            },
+            body: JSON.stringify({
+                noidung: noidung,
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data.status);
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+
+        location.reload();
+    }
     // Khi có hành động bất kì liên quan đến người được kết bạn
     else if (data.friend_username === username) {
         location.reload();

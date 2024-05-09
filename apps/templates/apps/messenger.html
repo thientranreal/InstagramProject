@@ -193,7 +193,7 @@
             </div>
           </div>
 
-          <div id="call" style="text-align: center">
+          <div id="call" style="text-align: center ; display: none;">
             <div class="dialWrapper">
               <div class="dialNumpadHWrapper">
                 <div class="dialNumber"></div>
@@ -269,11 +269,6 @@
                   alt=""
                 />
               </div>
-              <!-- <div class="itemWrapper">
-                <h3 style="line-height: 0px">
-                  <span id="otherUserNameCA"></span>
-                </h3>
-              </div> -->
             </div>
           </div>
 
@@ -407,12 +402,15 @@
         <span id="sender"></span> Nhắn tin cho bạn : <span id="message"></span>
       </p>
     </div>
+
+    <!-- pop up call -->
+   
   </body>
 </html>
 
 <!-- {% comment %} Get data for username and chatbox name{% endcomment %}-->
-{{ request.user.id|json_script:"id_user" }} {{
-request.user.name|json_script:"user_name" }}
+{{ request.user.id|json_script:"id_user" }} 
+{{ request.user.name|json_script:"user_name" }}
 <!-- {{ chat_box_name|json_script:"room-name" }} -->
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -435,10 +433,11 @@ request.user.name|json_script:"user_name" }}
       is_nhom = $(this).data("nhom");
       if (is_nhom == "co") {
         document.getElementById("id_receiver").value = id;
+        document.getElementById("call").style.display = "none";
         groupToCall = id;
         var dichUser = $(this).find("h3").text();
         document.getElementById("receiverName").innerText = dichUser;
-        document.getElementById("nameHere").innerText = "Call to " + dichUser;
+        document.getElementById("nameHere").innerText = "";
         document.getElementById("call").style.display = "block";
         $.ajax({
           type: "GET",
@@ -474,6 +473,7 @@ request.user.name|json_script:"user_name" }}
       } else {
         document.getElementById("id_receiver").value = id;
         userToCall = id + "name";
+        document.getElementById("call").style.display = "block";
         var dichUser = $(this).find("h3").text();
         document.getElementById("receiverName").innerText = dichUser;
         document.getElementById("nameHere").innerText = "Call to " + dichUser;
@@ -666,10 +666,15 @@ request.user.name|json_script:"user_name" }}
 
 <script>
   function checkCall() {
-    // if (is_nhom == "co") {
-    //   return groupCall();
-    // } else {
-    //   return call();
-    // }
+    if (is_nhom == "co") {
+      // return groupCall();
+    } else {
+      // videoPopup.style.display = 'block';
+      return call();
+    }
   }
+  // function ketthuc() {
+  //   videoPopup.style.display = 'none';
+  //   stop();
+  // }
 </script>

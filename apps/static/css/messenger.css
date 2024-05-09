@@ -1,37 +1,88 @@
 .right-icon {
-    transition: transform 0.3s ease; /* Tạo hiệu ứng chuyển đổi mềm mại */
+  transition: transform 0.3s ease; /* Tạo hiệu ứng chuyển đổi mềm mại */
 }
 
 .right-icon:hover {
-    transform: scale(0.8); /* Thu nhỏ hình ảnh khi di chuột qua */
+  transform: scale(0.8); /* Thu nhỏ hình ảnh khi di chuột qua */
 }
 
 .popup {
-    display: none;
-    position: fixed;
-    /* bottom: 20px; */
-    top:100px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #f3f3f3;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    padding: 20px;
-    z-index: 1;
-  }
-  
-  .popup p {
-    margin: 0;
-  }
-  
-  .popup .close {
-    position: absolute;
-    top: 5px;
-    right: 7px;
-    cursor: pointer;
-  }
-  
-  .popup.show {
-    display: block;
-  }
-  
+  display: none;
+  position: fixed;
+  /* bottom: 20px; */
+  top:100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #f3f3f3;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 20px;
+  z-index: 1;
+}
+
+.popup p {
+  margin: 0;
+}
+
+.popup .close {
+  position: absolute;
+  top: 5px;
+  right: 7px;
+  cursor: pointer;
+}
+
+.popup.show {
+  display: block;
+}
+
+/* phần bên cái call */
+
+/* #videoPopup{
+display: none;
+} */
+
+.popupcall {
+position: fixed;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+background-color: #fff;
+border: 1px solid #ccc;
+padding: 20px;
+border-radius: 10px;
+box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+z-index: 1000;
+
+}
+
+.video-screen {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+video {
+  width: 45%;
+  max-height: 300px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.controls {
+  text-align: center;
+}
+
+.btnn {
+  padding: 10px 20px;
+  margin: 0 10px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.btnn:hover {
+  background-color: #0056b3;
+}
+

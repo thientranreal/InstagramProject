@@ -59,30 +59,48 @@ def home(request):
 
         messages = []
 
+        # Lấy các tin nhắn mà có liên quan đến người dùng hiện tại và group by 
         messages_current_user = TinNhan.objects.filter(
             Q(receiver=request.user.nguoidung) | Q(senter=request.user.nguoidung)
-        ).values('senter', 'receiver').annotate(thoigian_moi_nhat=Max('thoigian'))
+        ).values('senter_id', 'receiver_id').annotate(thoigian_moi_nhat=Max('thoigian'))
 
+
+        # Sắp xếp giảm dần theo thời gian mới nhất
+        messages_current_user = messages_current_user.order_by('-thoigian_moi_nhat')
+
+        # Tạo mảng để chứa người gửi và người nhận duy nhất
+        unique_pair = []
         for message in messages_current_user:
-            senter_id = message['senter']
-            receiver_id = message['receiver']
+            senter_id = message['senter_id']
+            receiver_id = message['receiver_id']
+
+            # Sắp xếp cặp theo thứ tự tăng dần
+            sorted_pair = tuple(sorted((senter_id, receiver_id)))
+
+            # Kiểm tra xem cặp có trong danh sách unique_pair hay không
+            if not sorted_pair in unique_pair:
+                unique_pair.append(sorted_pair)
+            else:
+                continue
 
             senter = NguoiDung.objects.get(id=senter_id)
             receiver = NguoiDung.objects.get(id=receiver_id)
 
-            if senter.user.username == request.user.username:
-                newestTime = message['thoigian_moi_nhat']
-                newestMessage = TinNhan.objects.filter(receiver__id=receiver_id, thoigian=newestTime).first()
-                messages.append({'nguoidung': receiver, 'noidung': newestMessage.noidung})
-            elif receiver.user.username == request.user.username:
-                newestTime = message['thoigian_moi_nhat']
-                newestMessage = TinNhan.objects.filter(senter__id=senter_id, thoigian=newestTime).first()
+            newestTime = message['thoigian_moi_nhat']
+            newestMessage = TinNhan.objects.filter(senter_id=senter_id, receiver_id=receiver_id, thoigian=newestTime).first()
+
+            if senter.user == request.user:
+                messages.append({'nguoidung': receiver, 'noidung': f'Bạn: {newestMessage.noidung}'})
+            elif receiver.user == request.user:
                 messages.append({'nguoidung': senter, 'noidung': newestMessage.noidung})
+            
+        # Lấy thông báo chưa đọc của người dùng
+        notifications = ThongBao.objects.filter(Q(nguoidung__user=request.user) & Q(is_read=False))
     else:
         logout(request)
         return redirect("login")
 
-    context = {'posts': posts, 'messages': messages}
+    context = {'posts': posts, 'messages': messages, 'notifications': notifications}
     return render(request, 'apps/homepage.html', context)
 
 def signup(request):
@@ -398,8 +416,9 @@ def friend(request):
             other_users = NguoiDung.objects.filter(id__in=search_user_ids).exclude(
                 Q(id=current_user.id) | 
                 Q(id__in=BanBe.objects.filter(nguoidung1_id=current_user.id).values_list('nguoidung2_id', flat=True)) | 
-                Q(id__in=BanBe.objects.filter(nguoidung2_id=current_user.id).values_list('nguoidung1_id', flat=True)) 
-            )
+                Q(id__in=BanBe.objects.filter(nguoidung2_id=current_user.id).values_list('nguoidung1_id', flat=True))
+            ).order_by('?')[:10]
+
             
             sender_friend_ids = BanBe.objects.filter(
                 nguoidung1_id=current_user.id, 
@@ -433,17 +452,16 @@ def friend(request):
                 'friends': list(friends.values('id', 'avatar', 'user__username', 'user__first_name', 'user__last_name'))
             })
     else:
-        # Sử dụng truy vấn mặc định khi không có yêu cầu POST
         other_users = NguoiDung.objects.exclude(
             Q(id=current_user.id) | 
             Q(id__in=BanBe.objects.filter(nguoidung1_id=current_user.id).values_list('nguoidung2_id', flat=True)) | 
             Q(id__in=BanBe.objects.filter(nguoidung2_id=current_user.id).values_list('nguoidung1_id', flat=True))
-        )
-        # Lấy tất cả bạn của người dùng hiện tại (người gửi lời mời kết bạn)
+        ).order_by('?')[:10]
+
         sender_friend_ids = BanBe.objects.filter(nguoidung1_id=current_user.id, is_banbe=False)
-        # Lấy tất cả bạn của người dùng hiện tại (người nhận lời mời kết bạn) 
+
         receiver_friend_ids = BanBe.objects.filter(nguoidung2_id=current_user.id, is_banbe=False)
-        # Lấy tất cả bạn của người dùng hiện tại
+
         friend_ids = BanBe.objects.filter(Q(nguoidung1_id=current_user.id) | Q(nguoidung2_id=current_user.id), is_banbe=True)
         all_friend_ids = []
         for friend in friend_ids:
@@ -452,7 +470,57 @@ def friend(request):
             else:
                 all_friend_ids.append(friend.nguoidung1_id)
         friends = [NguoiDung.objects.get(id=user_id) for user_id in all_friend_ids]
-        context = {'other_users': other_users, 'sender_friend_ids': sender_friend_ids, 'receiver_friend_ids': receiver_friend_ids, 'friends': friends}
+
+        #Xử lý lấy thông tin tin nhắn và thông báo
+        messages = []
+
+        # Lấy các tin nhắn mà có liên quan đến người dùng hiện tại và group by 
+        messages_current_user = TinNhan.objects.filter(
+            Q(receiver=request.user.nguoidung) | Q(senter=request.user.nguoidung)
+        ).values('senter_id', 'receiver_id').annotate(thoigian_moi_nhat=Max('thoigian'))
+
+
+        # Sắp xếp giảm dần theo thời gian mới nhất
+        messages_current_user = messages_current_user.order_by('-thoigian_moi_nhat')
+
+        # Tạo mảng để chứa người gửi và người nhận duy nhất
+        unique_pair = []
+        for message in messages_current_user:
+            senter_id = message['senter_id']
+            receiver_id = message['receiver_id']
+
+            # Sắp xếp cặp theo thứ tự tăng dần
+            sorted_pair = tuple(sorted((senter_id, receiver_id)))
+
+            # Kiểm tra xem cặp có trong danh sách unique_pair hay không
+            if not sorted_pair in unique_pair:
+                unique_pair.append(sorted_pair)
+            else:
+                continue
+
+            senter = NguoiDung.objects.get(id=senter_id)
+            receiver = NguoiDung.objects.get(id=receiver_id)
+
+            newestTime = message['thoigian_moi_nhat']
+            newestMessage = TinNhan.objects.filter(senter_id=senter_id, receiver_id=receiver_id, thoigian=newestTime).first()
+
+            if senter.user == request.user:
+                messages.append({'nguoidung': receiver, 'noidung': f'Bạn: {newestMessage.noidung}'})
+            elif receiver.user == request.user:
+                messages.append({'nguoidung': senter, 'noidung': newestMessage.noidung})
+            
+        # Lấy thông báo chưa đọc của người dùng
+        notifications = ThongBao.objects.filter(Q(nguoidung__user=request.user) & Q(is_read=False))
+        
+        context = {
+            'other_users': other_users, 
+            'sender_friend_ids': sender_friend_ids, 
+            'receiver_friend_ids': receiver_friend_ids, 
+            'friends': friends,
+            'messages': messages, 
+            'notifications': notifications
+            }
+
         return render(request, 'apps/friend.html', context)
 
 def updatefriend(request):

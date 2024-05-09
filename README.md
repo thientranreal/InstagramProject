@@ -1,4 +1,4 @@
-`python3.12.1` `Django5.0.1` 
+<img alt="Static Badge" src="https://img.shields.io/badge/Python-3.12.1-blue"><img alt="Static Badge" src="https://img.shields.io/badge/Django-5.0.1-blue">
 
 # Social Website
 This is a social website built using Django, a high-level Python web framework,  inspired by Instagram. Users can connect, interact, share posts, and engage in discussions, fostering connections and sharing inspirations.
@@ -70,12 +70,12 @@ This is a social website built using Django, a high-level Python web framework, 
 <img src="apps/static/image/READMEIMG/friend.png" alt="Friends">
 11. Notifications
 <img src="apps/static/image/READMEIMG" alt="Notifications">
-12. Messenger
-<img src="apps/static/image/READMEIMG" alt="Messenger">
-13. Individual call
-<img src="apps/static/image/READMEIMG" alt="Individual call">
-14. Group call
-<img src="apps/static/image/READMEIMG" alt="Group call"> 
+12. Chat with friends 
+<img src="apps/static/image/READMEIMG/messenger.png" alt="Messenger">
+13. Group chat
+<img src="apps/static/image/READMEIMG/groupChat.png" alt="Group chat">
+14. Call video 
+<img src="apps/static/image/READMEIMG/callVideo" alt="Call video">
 
 ## Installation
 

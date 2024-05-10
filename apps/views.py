@@ -946,8 +946,12 @@ def add_notification(request):
     if request.method == 'POST':
         data = json.loads(request.body)
 
+        username = data.get('nguoidung')
         noidung = data.get('noidung')
-        thong_bao_moi = ThongBao.objects.create(nguoidung=request.user.nguoidung, noidung=noidung, is_read=False)
+        # Lấy người dùng
+        nguoidung_notification = User.objects.get(username = username).nguoidung
+
+        thong_bao_moi = ThongBao.objects.create(nguoidung=nguoidung_notification, noidung=noidung, is_read=False)
         thong_bao_moi.save()
         
         return JsonResponse({'status': 'ok'})

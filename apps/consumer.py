@@ -187,33 +187,30 @@ class AddFriendConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         # Xử lý dữ liệu nhận được nếu cần thiết
         text_data_json = json.loads(text_data)
-        friend_username = text_data_json['friendUsername']
-        current_user = text_data_json['currentUser']
-        action = text_data_json['action']
+        receive_user = text_data_json['receive_user']
+        noidung = text_data_json['noidung']
 
         # Gửi lại thông báo cho client
         await self.channel_layer.group_send(
             self.group_name,
             {
                 "type": "add_friend_message",
-                "friend_username": friend_username,
-                "current_user": current_user,
-                "action": action
+                "receive_user": receive_user,
+                "noidung": noidung,
             },
         )
 
     # Receive message from room group.
     async def add_friend_message(self, event):
-        friend_username = event["friend_username"]
-        current_user = event["current_user"]
-        action = event["action"]
+        receive_user = event['receive_user']
+        noidung = event['noidung']
+
         #send message and username of senter to websocket
         await self.send(
             text_data=json.dumps(
                 {
-                    "type": action,
-                    "friend_username": friend_username,
-                    "current_user": current_user,
+                    "receive_user": receive_user,
+                    "noidung": noidung,
                 }
             )
         )

@@ -6,62 +6,8 @@ const addFriendSocket = new WebSocket(urlAddFriend);
 
 addFriendSocket.onmessage = function(e) {
     let data = JSON.parse(e.data);
-    // Nếu là type add và đang được người khác kết bạn
-    if (data.type === "add" && data.friend_username === username) {
-        // Nội dung
-        let noidung = `<p>${data.current_user} has requested to follow you</p>`;
-
-        // Thêm thông báo có người kết bạn
-        fetch('/add_notification', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                // Thêm CSRF token để Django chấp nhận yêu cầu
-                'X-CSRFToken': csrftoken
-            },
-            body: JSON.stringify({
-                noidung: noidung,
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log(data.status);
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-        });
-
-        location.reload();
-    }
-    // Nếu là type accept và thì sẽ thông báo cho người dùng gửi kết bạn
-    else if (data.type === "accept" && data.friend_username === username) {
-        // Nội dung
-        let noidung = `<p>${data.friend_username} has accepted you</p>`;
-
-        // Thêm thông báo có người kết bạn
-        fetch('/add_notification', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                // Thêm CSRF token để Django chấp nhận yêu cầu
-                'X-CSRFToken': csrftoken
-            },
-            body: JSON.stringify({
-                noidung: noidung,
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log(data.status);
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-        });
-
-        location.reload();
-    }
-    // Khi có hành động bất kì liên quan đến người được kết bạn
-    else if (data.friend_username === username) {
+    
+    if (data.receive_user === username) {
         location.reload();
     }
 };
@@ -225,12 +171,52 @@ function updateUserOrder(element, userId, action) {
             return response.json();
         })
         .then((data) => {
-            // Gửi qua websocket
-            addFriendSocket.send(JSON.stringify({
-                friendUsername: userId,
-                currentUser: username,
-                action: action,
-            }));
+
+            let noidung;
+            if (action === "add") {
+                noidung = `<p>${username} has requested to follow you</p>`;
+            }
+            else if (action === "accept") {
+                noidung = `<p>${username} has accepted you</p>`;
+            }
+            else {
+                // Gửi qua websocket
+                addFriendSocket.send(JSON.stringify({
+                    receive_user: userId,
+                    noidung: "unfriend",
+                }));
+            }
+
+            if (noidung) {
+                // Thêm thông báo có người kết bạn
+                fetch('/add_notification', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        // Thêm CSRF token để Django chấp nhận yêu cầu
+                        'X-CSRFToken': csrftoken
+                    },
+                    body: JSON.stringify({
+                        nguoidung: userId,
+                        noidung: noidung,
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Nếu thêm thông báo thành công vào db thì sẽ gửi web socket
+                    if (data.status === 'ok') {
+                        // Gửi qua websocket
+                        addFriendSocket.send(JSON.stringify({
+                            receive_user: userId,
+                            noidung: noidung,
+                        }));
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+            }
+
 
             if (data.message === 'Friendship added successfully') {
                 var successMessage = document.createElement('p');

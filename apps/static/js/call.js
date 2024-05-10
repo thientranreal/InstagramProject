@@ -82,6 +82,10 @@ function connectSocket() {
         if (type == 'connection') {
             console.log(response.data.message)
         }
+        if (type == 'call_stop') {
+            // console.log(response.data.message)
+            StopCall(response.data);
+        }
 
         if (type == 'call_received') {
             onNewCall(response.data)
@@ -106,6 +110,10 @@ function connectSocket() {
         document.getElementById("callerName").innerHTML = extractedNumber;
         document.getElementById("call").style.display = "none";
         document.getElementById("answer").style.display = "block";
+    }
+
+    const StopCall = (data) => {
+        stop();
     }
 
     const onCallAnswered = (data) => {
@@ -152,6 +160,18 @@ function sendCall(data) {
     document.getElementById("call").style.display = "none";
     // document.getElementById("otherUserNameCA").innerHTML = otherUser;
     document.getElementById("calling").style.display = "block";
+}
+function sendStopCall(data) {
+    callSocket.send(JSON.stringify({
+        type: 'stop_call',
+        data
+    }));
+}
+function hitStopCall() {
+    sendStopCall({
+        caller: otherUser
+    })  
+    stop();
 }
 function answerCall(data) {
     callSocket.send(JSON.stringify({
@@ -274,6 +294,7 @@ function handleIceCandidate(event) {
 
     } else {
         console.log('End of candidates.');
+        // stop();
     }
 }
 
@@ -296,10 +317,21 @@ window.onbeforeunload = function () {
 };
 
 
+
 function stop() {
-    localStream.getTracks().forEach(track => track.stop());
+    // localStream.getTracks().forEach(track => track.stop());
+    if (localStream) {
+        localStream.getTracks().forEach(track => {
+            if (track.readyState === 'live') {
+                track.stop();
+            }
+        });
+    }
     callInProgress = false;
-    peerConnection.close();
+    if (peerConnection) {
+        peerConnection.close();
+    }
+    // peerConnection.close();
     peerConnection = null;
     document.getElementById("call").style.display = "block";
     document.getElementById("answer").style.display = "none";
@@ -309,6 +341,10 @@ function stop() {
     document.getElementById("controls").style.display = "none";
     document.getElementById("calloff").style.display = "none"
     document.getElementById("userInfo").style.display = "block";
+    if(document.getElementById("id_receiver").value==""){
+        document.getElementById("nameHere").innerText = "";
+        document.getElementById("call").style.display = "none";
+    }
     otherUser = null;
 }
 

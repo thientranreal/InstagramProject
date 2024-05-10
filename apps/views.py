@@ -25,7 +25,7 @@ from io import BytesIO
 from PIL import Image as PILImage
 import sys
 
-
+@csrf_exempt
 def home(request):
     if not request.user.is_authenticated:
         return redirect("login")
@@ -103,6 +103,7 @@ def home(request):
     context = {'posts': posts, 'messages': messages, 'notifications': notifications}
     return render(request, 'apps/homepage.html', context)
 
+@csrf_exempt
 def signup(request):
     if request.method == 'POST':
         # Lấy giá trị gửi từ client
@@ -180,6 +181,7 @@ def check_login_status(request):
     else:
         return JsonResponse({'status': 'not login'})
 
+@csrf_exempt
 def login(request):
     if request.method == 'POST':
         # Lấy giá trị gửi từ client

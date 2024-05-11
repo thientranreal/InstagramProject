@@ -609,13 +609,19 @@ def edit_profile(request):
                     nguoidung1.avatar.save("%s.png" % hinhanh_url.name.split('.')[0], img_file, save=True)
 
                 # Cập nhật các thông tin khác của người dùng
-                nguoidung = NguoiDung.objects.filter(user=current_user).update(
-                    ngaysinh=ngaysinh,      
-                    phone=phone,       
-                    gioitinh=gioitinh,  
-                    mota=mota 
-                )
-
+                if ngaysinh:
+                    nguoidung = NguoiDung.objects.filter(user=current_user).update(
+                        ngaysinh=ngaysinh,      
+                        phone=phone,       
+                        gioitinh=gioitinh,  
+                        mota=mota 
+                    )
+                else:
+                    nguoidung = NguoiDung.objects.filter(user=current_user).update(     
+                        phone=phone,       
+                        gioitinh=gioitinh,  
+                        mota=mota 
+                    )
                 # Chuyển hướng người dùng đến trang profile
                 return redirect('profile')
     else:
